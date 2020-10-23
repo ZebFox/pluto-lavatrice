@@ -1,0 +1,1 @@
+Template for esp32 projects
