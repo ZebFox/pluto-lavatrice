@@ -24,6 +24,8 @@ def serial_ports(avoid: List[str] = []) -> List[str]:
                 s = serial.Serial(port)
                 s.close()
                 result.append(port)
+            else:
+                result.append(port)
         except (OSError, serial.SerialException, termios.error):
             pass
     return result

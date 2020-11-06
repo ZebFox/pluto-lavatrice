@@ -21,3 +21,9 @@ class Channel:
             return self.receiveq.get(**kwargs)
         except Empty:
             return None
+
+    def clear(self):
+        while not self.sendq.empty():
+            self.sendq.get()
+        while not self.receiveq.empty():
+            self.receiveq.get()
