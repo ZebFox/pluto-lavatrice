@@ -24,6 +24,7 @@ class ControllerData:
         else:
             try:
                 fun(self.modbus)
+                time.sleep(0.05)
                 return True
             except (NoResponseError, InvalidResponseError) as e:
                 print('Errore di comunicazione:', e)
@@ -38,6 +39,7 @@ class SysRedirect:
         self.channel = channel
 
     def write(self, msg):
+        msg = msg.replace('\r', '\n')
         self.channel.send(ViewMessage.ESPTOOL_OUTPUT(msg))
 
     def flush(self):
@@ -51,6 +53,7 @@ def controller_task(channel: Channel):
     data = ControllerData(modbus=None, channel=channel)
 
     while True:
+
         def connect_to(portName: str):
             print('connecting to ', portName)
             if data.modbus:
@@ -59,6 +62,9 @@ def controller_task(channel: Channel):
                 data.modbus = Instrument(portName, 1)
                 data.modbus.serial.baudrate = 115200
                 data.modbus.serial.timeout = 0.1
+                data.modbus.serial.rts = 0
+                data.modbus.serial.dtr = 0
+                print(data.modbus.serial.rts, data.modbus.serial.dtr)
                 data.modbus.clear_buffers_before_each_transaction = True
 
                 data.channel.send(ViewMessage.CONNECTED(portName))
@@ -93,5 +99,4 @@ def controller_task(channel: Channel):
             data.channel.send(ViewMessage.FLASH_DONE())
 
         if msg := channel.recv(timeout=0.1):
-            msg.match(connect_to=connect_to,
-                      flash=flash)
+            msg.match(connect_to=connect_to, flash=flash)
