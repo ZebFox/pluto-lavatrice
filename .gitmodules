@@ -1,0 +1,9 @@
+[submodule "main/simulator/b64"]
+	path = simulator/b64
+	url = https://github.com/littlstar/b64.c.git
+[submodule "main/simulator/cJSON"]
+	path = simulator/cJSON
+	url = https://github.com/DaveGamble/cJSON.git
+[submodule "simulator/freertos-simulator"]
+	path = simulator/freertos-simulator
+	url = https://github.com/Maldus512/freertos-simulator.git

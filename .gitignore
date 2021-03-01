@@ -8,6 +8,8 @@ tmp
 *.pem
 .vscode
 .cache
+simulated
+sdkconfig.h
 
 export.sh
 *.log
