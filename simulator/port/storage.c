@@ -56,11 +56,19 @@ void storage_save_uint8(uint8_t *value, char *key) {
 
 
 int storage_load_uint16(uint16_t *value, char *key) {
-    return 0;
+    double number = 0;
+    if (load_number(&number, key)) {
+        return -1;
+    } else {
+        *value = (uint8_t)number;
+        return 0;
+    }
 }
 
 
-void storage_save_uint16(uint16_t *value, char *key) {}
+void storage_save_uint16(uint16_t *value, char *key) {
+    save_number((double)*value, key);
+}
 
 
 int storage_load_uint32(uint32_t *value, char *key) {
@@ -80,11 +88,19 @@ void storage_save_uint32(uint32_t *value, char *key) {
 
 
 int storage_load_uint64(uint64_t *value, char *key) {
-    return 0;
+    double number = 0;
+    if (load_number(&number, key)) {
+        return -1;
+    } else {
+        *value = (uint8_t)number;
+        return 0;
+    }
 }
 
 
-void storage_save_uint64(uint64_t *value, char *key) {}
+void storage_save_uint64(uint64_t *value, char *key) {
+    save_number(*value, key);
+}
 
 
 int storage_load_blob(void *value, size_t len, char *key) {
