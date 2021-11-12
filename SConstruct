@@ -65,6 +65,8 @@ COMPONENTS = "components"
 FREERTOS = f'{SIMULATOR}/freertos-simulator'
 CJSON = f'{SIMULATOR}/cJSON'
 B64 = f'{SIMULATOR}/b64'
+DRIVERS = f'{SIMULATOR}/lv_drivers'
+LVGL = f"{COMPONENTS}/lvgl"
 
 CFLAGS = [
     "-Wall",
@@ -73,17 +75,17 @@ CFLAGS = [
     "-g",
     "-O0",
     "-DLV_CONF_INCLUDE_SIMPLE",
+    "-DPC_SIMULATOR",
     '-DprojCOVERAGE_TEST=1',
     "-Wno-unused-parameter",
-    "-static-libgcc",
-    "-static-libstdc++",
+    "-DGEL_PAGEMANAGER_CONFIGURATION_HEADER=\"\\\"view/view_types.h\\\"\"",
 ]
 LDLIBS = ["-lmingw32", "-lSDL2main",
           "-lSDL2"] if MINGW else ["-lSDL2"] + ['-lpthread']
 
 CPPPATH = [
     COMPONENTS, f'{SIMULATOR}/port', f'#{MAIN}',
-    f"#{MAIN}/config", f"#{SIMULATOR}", B64, CJSON
+    f"#{MAIN}/config", f"#{SIMULATOR}", B64, CJSON, DRIVERS, f"#{LVGL}", f"#{LVGL}/lvgl"
 ]
 
 
@@ -106,9 +108,15 @@ def main():
     env.Tool('compilation_db')
 
     freertos_env = env
-    (freertos, include) = SConscript(f'{FREERTOS}/SConscript', exports=['freertos_env'])
+    (freertos, include) = SConscript(
+        f'{FREERTOS}/SConscript', exports=['freertos_env'])
     env['CPPPATH'] += [include]
 
+    gel_env = env
+    gel_selected = ["keypad", "collections", "pagemanager"]
+    (gel, include) = SConscript(
+        f'{COMPONENTS}/generic_embedded_libs/SConscript', exports=['gel_env', 'gel_selected'])
+    env['CPPPATH'] += [include]
 
     sdkconfig = env.Command(
         f"{SIMULATOR}/sdkconfig.h",
@@ -119,13 +127,22 @@ def main():
     sources = Glob(f'{SIMULATOR}/*.c')
     sources += Glob(f'{SIMULATOR}/port/*.c')
     sources += [File(filename) for filename in Path('main/model').rglob('*.c')]
-    sources += [File(filename) for filename in Path('main/config').rglob('*.c')]
-    # sources += [File(filename) for filename in Path('main/view').rglob('*.c')]
-    sources += [File(filename) for filename in Path('main/controller').rglob('*.c')]
+    sources += [File(filename)
+                for filename in Path('main/config').rglob('*.c')]
+    sources += [File(filename) for filename in Path('main/view').rglob('*.c')]
+    sources += [File(filename)
+                for filename in Path('main/controller').rglob('*.c')]
+    sources += [File(filename)
+                for filename in Path(f"{DRIVERS}/display").rglob('*.c')]
+    sources += [File(filename)
+                for filename in Path(f"{DRIVERS}/indev").rglob('*.c')]
+    sources += [File(filename)
+                for filename in Path(f"{LVGL}/lvgl").rglob('*.c')]
     sources += [File(f'{CJSON}/cJSON.c')]
-    sources += [File(f'{B64}/encode.c'), File(f'{B64}/decode.c'), File(f'{B64}/buffer.c')]
+    sources += [File(f'{B64}/encode.c'),
+                File(f'{B64}/decode.c'), File(f'{B64}/buffer.c')]
 
-    prog = env.Program(PROGRAM, sources + freertos)
+    prog = env.Program(PROGRAM, sources + freertos + gel)
     PhonyTargets('run', './simulated', prog, env)
     env.Alias('mingw', prog)
     env.CompilationDatabase('build/compile_commands.json')
