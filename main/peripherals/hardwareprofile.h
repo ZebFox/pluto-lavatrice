@@ -3,7 +3,6 @@
 
 #include "driver/gpio.h"
 
-
 #define HAL_BUTTON_OUT_1 GPIO_NUM_1
 #define HAL_BUTTON_OUT_2 GPIO_NUM_2
 #define HAL_BUTTON_OUT_3 GPIO_NUM_3
@@ -35,5 +34,8 @@
 #define HAL_WRITE_PROTECT GPIO_NUM_39
 #define HAL_I2C_SCL       GPIO_NUM_37
 #define HAL_I2C_SDA       GPIO_NUM_38
+
+#define HAL_MB_UART_TXD GPIO_NUM_26
+#define HAL_MB_UART_RXD GPIO_NUM_21
 
 #endif

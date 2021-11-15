@@ -7,85 +7,113 @@
 
 #include "peripherals/keyboard.h"
 #include "peripherals/hardwareprofile.h"
-#include "gel/debounce/debounce.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#include "driver/gpio.h"
+#include "freertos/semphr.h"
+#include "esp_log.h"
+#include "freertos/timers.h"
 
-static debounce_filter_t filter;
 static int               ignore_events = 0;
+static SemaphoreHandle_t sem;
+static void keyboard_periodic_read(TimerHandle_t timer);
 
+#define GPIO_INPUT_PIN_SEL  ((1ULL<<HAL_BUTTON_IN_1) | (1ULL<<HAL_BUTTON_IN_2) | (1ULL<<HAL_BUTTON_IN_3) | (1ULL<<HAL_BUTTON_IN_4) )
+#define GPIO_OUTPUT_PIN_SEL ((1ULL<<HAL_BUTTON_OUT_1) | (1ULL<<HAL_BUTTON_OUT_2) | (1ULL<<HAL_BUTTON_OUT_3) | (1ULL<<HAL_BUTTON_OUT_4) )
 
 static keypad_key_t keyboard[] = {
-    KEYPAD_KEY(0x01, BUTTON_MEDIO),
-    KEYPAD_KEY(0x02, BUTTON_PADLOCK),
-    KEYPAD_KEY(0x04, BUTTON_CALDO),
-    KEYPAD_KEY(0x08, BUTTON_FREDDO),
-    KEYPAD_KEY(0x10, BUTTON_PLAY),
-    KEYPAD_KEY(0x20, BUTTON_PLUS),
-    KEYPAD_KEY(0x40, BUTTON_LINGUA),
-    KEYPAD_KEY(0x80, BUTTON_MENU),
-    KEYPAD_KEY(0x100, BUTTON_STOP),
+    KEYPAD_KEY(0x400, BUTTON_LANA),
+    KEYPAD_KEY(0x8000, BUTTON_CALDO4),
+    KEYPAD_KEY(0x80, BUTTON_CALDO3),
+    KEYPAD_KEY(0x4000, BUTTON_CALDO2),
+    KEYPAD_KEY(0x40, BUTTON_FREDDO),
+    KEYPAD_KEY(0x20, BUTTON_LINGUA),
+    KEYPAD_KEY(0x200, BUTTON_MENU),
+    KEYPAD_KEY(0x2000, BUTTON_STOP),
 
-    KEYPAD_KEY(0x60, BUTTON_LINGUA_TIEPIDO),
-    KEYPAD_KEY(0x180, BUTTON_STOP_MENU),
-    KEYPAD_KEY(0x110, BUTTON_STOP_LANA),
-    KEYPAD_KEY(0x108, BUTTON_STOP_FREDDO),
-
+    KEYPAD_KEY(0x2400, BUTTON_STOP_LANA),
+    KEYPAD_KEY(0x240, BUTTON_STOP_FREDDO),
     KEYPAD_NULL_KEY,
 };
 
 void keyboard_init(void) {
-    /*KEYBOARD_RIGA1_TRIS = TRIS_OUTPUT;
-    KEYBOARD_RIGA2_TRIS = TRIS_OUTPUT;
-    KEYBOARD_RIGA3_TRIS = TRIS_OUTPUT;
-    KEYBOARD_COL1_TRIS  = TRIS_INPUT;
-    KEYBOARD_COL2_TRIS  = TRIS_INPUT;
-    KEYBOARD_COL3_TRIS  = TRIS_INPUT;
+//zero-initialize the config structure.
+    gpio_config_t io_conf_input = {};
+    //disable interrupt
+    io_conf_input.intr_type = GPIO_INTR_DISABLE;
+    //bit mask of the pins, use GPIO4/5 here
+    io_conf_input.pin_bit_mask = GPIO_INPUT_PIN_SEL;
+    //set as input mode
+    io_conf_input.mode = GPIO_MODE_INPUT;
+    //disable pull-down mode
+    io_conf_input.pull_down_en = 0;
+    //disable pull-up mode
+    io_conf_input.pull_up_en = 0;
+    gpio_config(&io_conf_input);
 
-    KEYBOARD_RIGA1_LAT = 0;
-    KEYBOARD_RIGA2_LAT = 0;
-    KEYBOARD_RIGA3_LAT = 0;*/
+    //zero-initialize the config structure.
+    gpio_config_t io_conf_output = {};
+    //disable interrupt
+    io_conf_output.intr_type = GPIO_INTR_DISABLE;
+    //set as output mode
+    io_conf_output.mode = GPIO_MODE_INPUT_OUTPUT;
+    //bit mask of the pins that you want to set,e.g.GPIO18/19
+    io_conf_output.pin_bit_mask = GPIO_OUTPUT_PIN_SEL;
+    //disable pull-down mode
+    io_conf_output.pull_down_en = 0;
+    //disable pull-up mode
+    io_conf_output.pull_up_en = 0;
+    //configure GPIO with the given settings
+    gpio_config(&io_conf_output);
 
-    debounce_filter_init(&filter);
+    sem = xSemaphoreCreateMutex();
+
+    TimerHandle_t timer = xTimerCreate("timerInput", pdMS_TO_TICKS(5), pdTRUE, NULL, keyboard_periodic_read);
+    xTimerStart(timer, portMAX_DELAY);
 }
-
 
 void keyboard_reset(void) {
     ignore_events = 1;
 }
 
-
 unsigned int keyboard_read(void) {
 
     unsigned int res = 0;
 
-    /*KEYBOARD_RIGA1_LAT = 1;
-    __delay_us(1);
-    res |= KEYBOARD_COL1_PORT;
-    res |= KEYBOARD_COL2_PORT << 1;
-    res |= KEYBOARD_COL3_PORT << 2;
-    KEYBOARD_RIGA1_LAT = 0;
+    gpio_set_level(HAL_BUTTON_OUT_1, 1);
+    res |= gpio_get_level(HAL_BUTTON_IN_1);
+    res |= gpio_get_level(HAL_BUTTON_IN_2)<<1;
+    res |= gpio_get_level(HAL_BUTTON_IN_3)<<2;
+    res |= gpio_get_level(HAL_BUTTON_IN_4)<<3;
+    gpio_set_level(HAL_BUTTON_OUT_1, 0);
 
-    KEYBOARD_RIGA2_LAT = 1;
-    __delay_us(1);
-    res |= KEYBOARD_COL1_PORT << 3;
-    res |= KEYBOARD_COL2_PORT << 4;
-    res |= KEYBOARD_COL3_PORT << 5;
-    KEYBOARD_RIGA2_LAT = 0;
+    gpio_set_level(HAL_BUTTON_OUT_2, 1);
+    res |= gpio_get_level(HAL_BUTTON_IN_1)<<4;
+    res |= gpio_get_level(HAL_BUTTON_IN_2)<<5;
+    res |= gpio_get_level(HAL_BUTTON_IN_3)<<6;
+    res |= gpio_get_level(HAL_BUTTON_IN_4)<<7;
+    gpio_set_level(HAL_BUTTON_OUT_2, 0);
 
-    KEYBOARD_RIGA3_LAT = 1;
-    __delay_us(1);
-    res |= KEYBOARD_COL1_PORT << 6;
-    res |= KEYBOARD_COL2_PORT << 7;
-    res |= KEYBOARD_COL3_PORT << 8;
-    KEYBOARD_RIGA3_LAT = 0;*/
+    gpio_set_level(HAL_BUTTON_OUT_3, 1);
+    res |= gpio_get_level(HAL_BUTTON_IN_1)<<8;
+    res |= gpio_get_level(HAL_BUTTON_IN_2)<<9;
+    res |= gpio_get_level(HAL_BUTTON_IN_3)<<10;
+    res |= gpio_get_level(HAL_BUTTON_IN_4)<<11;
+    gpio_set_level(HAL_BUTTON_OUT_3, 0);
+
+        gpio_set_level(HAL_BUTTON_OUT_4, 1);
+    res |= gpio_get_level(HAL_BUTTON_IN_1)<<12;
+    res |= gpio_get_level(HAL_BUTTON_IN_2)<<13;
+    res |= gpio_get_level(HAL_BUTTON_IN_3)<<14;
+    res |= gpio_get_level(HAL_BUTTON_IN_4)<<15;
+    gpio_set_level(HAL_BUTTON_OUT_4, 0);
 
     return res;
 }
 
 
 keypad_update_t keyboard_manage(unsigned long ts) {
-    // unsigned int input=0;
-    // input=keyboard_read();
-    // debounce_filter(&filter, input, 2);
 
     unsigned int keymap = keyboard_read();
     if (ignore_events) {
@@ -97,4 +125,11 @@ keypad_update_t keyboard_manage(unsigned long ts) {
     } else {
         return keypad_routine(keyboard, 40, 1500, 100, ts, keymap);
     }
+}
+
+static void keyboard_periodic_read(TimerHandle_t timer) {
+    (void) timer;
+    xSemaphoreTake(sem, portMAX_DELAY);
+    keyboard_read();
+    xSemaphoreGive(sem);
 }

@@ -6,6 +6,7 @@
 #include "view/view_types.h"
 #include "view/widgets/custom_lv_img.h"
 #include "gel/pagemanager/page_manager.h"
+#include "peripherals/keyboard.h"
 
 
 struct page_data {};
@@ -24,7 +25,7 @@ static void open_page(model_t *pmodel, void *args) {
     lv_obj_t *logo = custom_lv_img_create(lv_scr_act(), NULL);
     custom_lv_img_set_src(logo, &legacy_img_logo_ciao);
     lv_obj_align(logo, NULL, LV_ALIGN_CENTER, 0, 0);
-    //lv_label_set_text(lv_label_create(lv_scr_act(), NULL), "hELLO");
+    // lv_label_set_text(lv_label_create(lv_scr_act(), NULL), "hELLO");
 }
 
 
@@ -34,10 +35,23 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
     (void)data;
 
     switch (event.code) {
+        case VIEW_EVENT_KEYPAD: {
+            if (event.key_event.event == KEY_CLICK) {
+                switch (event.key_event.code) {
+                    case BUTTON_LANA: {
+                        msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;
+                        msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
+                        msg.vmsg.page = &page_test_digout;
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
         default:
             break;
     }
-
     return msg;
 }
 
