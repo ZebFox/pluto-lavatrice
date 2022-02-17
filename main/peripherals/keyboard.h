@@ -5,21 +5,19 @@
 #include <stdint.h>
 #include "gel/keypad/keypad.h"
 
-#define BUTTON_MENO BUTTON_FREDDO
-#define BUTTON_PIU BUTTON_MEDIO
 
 typedef enum {
     BUTTON_NONE  = 0,
-    BUTTON_CALDO = 1,
-    BUTTON_TIEPIDO,
-    BUTTON_MEDIO,
+    BUTTON_CALDO,
+    BUTTON_KEY,
+    BUTTON_DESTRA,
+    BUTTON_PIU,
     BUTTON_LANA,
-    BUTTON_FREDDO = 5,
+    BUTTON_FREDDO,
     BUTTON_STOP,
     BUTTON_MENU,
     BUTTON_LINGUA,
-    BUTTON_STOP_LANA = 9,
-    BUTTON_STOP_FREDDO,
+    BUTTON_STOP_MENU,
 } button_t;
 
 void            keyboard_init(void);

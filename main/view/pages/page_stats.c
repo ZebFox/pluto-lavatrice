@@ -132,7 +132,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         update_page(pmodel, data);
                         break;
 
-                    case BUTTON_MEDIO:
+                    case BUTTON_DESTRA:
                         if (data->index > 0) {
                             data->index--;
                         } else {

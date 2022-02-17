@@ -24,6 +24,6 @@ void       view_close_all(void *data);
 void       view_destroy_all(void *arg, void *extra);
 lv_task_t *view_register_periodic_task(size_t period, lv_task_prio_t prio, int id);
 
-extern const pman_page_t page_main, page_test_digout, page_splash, page_parmac, page_reset_ram, page_stats;
+extern const pman_page_t page_main, page_test_digout, page_splash, page_parmac, page_reset_ram, page_stats, page_datetime, page_set_datetime;
 
 #endif

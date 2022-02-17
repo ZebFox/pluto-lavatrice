@@ -20,18 +20,19 @@
 #include "peripherals/storage.h"
 #include "peripherals/fs_storage.h"
 #include "view/view_types.h"
-#include "i2c_devices/eeprom/24LC1025/24lc1025.h"
+#include "gel/timer/timecheck.h"
 
+#include "freertos/queue.h"
 
 static const char *TAG = "Main";
 static model_t     model;
 
+void invioprova();
+
 
 void app_main(void) {
     keypad_update_t event;
-
-    i2c_driver_t driver;
-    ee24lc1025_sequential_read(driver, 0,0, NULL, 0);
+    unsigned long t=0;
 
     system_i2c_init();
     nt7534_init();
@@ -49,15 +50,23 @@ void app_main(void) {
     view_init(&model, nt7534_flush, nt7534_rounder, nt7534_set_px, keyboard_reset);
     controller_init(&model);
 
+
     ESP_LOGI(TAG, "Begin main loop");
+    ESP_LOGI(TAG, "");
+
     for (;;) {
         controller_gui_process(&model);
         controller_manage(&model);
         event = keyboard_manage(get_millis());
         if (event.event != KEY_NOTHING) {
-            ESP_LOGI(TAG, "%i", event.code);
             view_event((view_event_t){.code = VIEW_EVENT_CODE_KEYPAD, .key_event = event});
         }
+        if (is_expired(t, get_millis(), 5000)) {
+           //invioprova();
+            t = get_millis();
+        }
+
         vTaskDelay(pdMS_TO_TICKS(4));
+
     }
 }

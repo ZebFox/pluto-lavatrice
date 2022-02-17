@@ -68,7 +68,7 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
         case VIEW_EVENT_CODE_KEYPAD: {
             if (event.key_event.event == KEY_CLICK) {
                 switch (event.key_event.code) {
-                    case BUTTON_TIEPIDO: {
+                    case BUTTON_PIU: {
                         msg.vmsg.code          = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
                         msg.vmsg.page          = &page_main;
                         page_data.digout_state = 0;
@@ -101,7 +101,7 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
                         msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;
                         break;
                     }
-                    case BUTTON_MEDIO: {
+                    case BUTTON_DESTRA: {
                         page_data.digout_state = 0;
                         if (page_data.digout_index > 1) {
                             page_data.digout_index--;

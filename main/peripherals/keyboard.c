@@ -16,28 +16,29 @@
 #include "freertos/timers.h"
 
 static int               ignore_events = 0;
-static SemaphoreHandle_t sem;
-static void keyboard_periodic_read(TimerHandle_t timer);
 
 #define GPIO_INPUT_PIN_SEL  ((1ULL<<HAL_BUTTON_IN_1) | (1ULL<<HAL_BUTTON_IN_2) | (1ULL<<HAL_BUTTON_IN_3) | (1ULL<<HAL_BUTTON_IN_4) )
 #define GPIO_OUTPUT_PIN_SEL ((1ULL<<HAL_BUTTON_OUT_1) | (1ULL<<HAL_BUTTON_OUT_2) | (1ULL<<HAL_BUTTON_OUT_3) | (1ULL<<HAL_BUTTON_OUT_4) )
 
-static keypad_key_t keyboard[] = {
-    KEYPAD_KEY(0x400, BUTTON_LANA),
-    KEYPAD_KEY(0x8000, BUTTON_CALDO),
-    KEYPAD_KEY(0x80, BUTTON_TIEPIDO),
-    KEYPAD_KEY(0x4000, BUTTON_MEDIO),
-    KEYPAD_KEY(0x40, BUTTON_FREDDO),
-    KEYPAD_KEY(0x20, BUTTON_LINGUA),
-    KEYPAD_KEY(0x200, BUTTON_MENU),
-    KEYPAD_KEY(0x2000, BUTTON_STOP),
 
-    KEYPAD_KEY(0x2400, BUTTON_STOP_LANA),
-    KEYPAD_KEY(0x240, BUTTON_STOP_FREDDO),
+static const char *TAG = "keyboard";
+
+static keypad_key_t keyboard[] = {
+    KEYPAD_KEY(0x6000, BUTTON_STOP_MENU),
+    KEYPAD_KEY(0x8000, BUTTON_CALDO),
+    KEYPAD_KEY(0x800, BUTTON_KEY),
+    KEYPAD_KEY(0x80, BUTTON_DESTRA),
+    KEYPAD_KEY(0x4000, BUTTON_PIU),
+    KEYPAD_KEY(0x400, BUTTON_LANA),
+    KEYPAD_KEY(0x40, BUTTON_FREDDO),
+    KEYPAD_KEY(0x2000, BUTTON_STOP),
+    KEYPAD_KEY(0x200, BUTTON_MENU),
+    KEYPAD_KEY(0x20, BUTTON_LINGUA),
     KEYPAD_NULL_KEY,
 };
 
 void keyboard_init(void) {
+    (void)TAG;
 //zero-initialize the config structure.
     gpio_config_t io_conf_input = {};
     //disable interrupt
@@ -66,11 +67,6 @@ void keyboard_init(void) {
     io_conf_output.pull_up_en = 0;
     //configure GPIO with the given settings
     gpio_config(&io_conf_output);
-
-    sem = xSemaphoreCreateMutex();
-
-    TimerHandle_t timer = xTimerCreate("timerInput", pdMS_TO_TICKS(5), pdTRUE, NULL, keyboard_periodic_read);
-    xTimerStart(timer, portMAX_DELAY);
 }
 
 void keyboard_reset(void) {
@@ -125,11 +121,4 @@ keypad_update_t keyboard_manage(unsigned long ts) {
     } else {
         return keypad_routine(keyboard, 40, 1500, 100, ts, keymap);
     }
-}
-
-static void keyboard_periodic_read(TimerHandle_t timer) {
-    (void) timer;
-    xSemaphoreTake(sem, portMAX_DELAY);
-    keyboard_read();
-    xSemaphoreGive(sem);
 }
