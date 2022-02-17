@@ -6,10 +6,9 @@ static int     ignore_events = 0;
 
 
 static keypad_key_t keyboard[] = {
-    KEYPAD_KEY(0x01, BUTTON_MEDIO),      KEYPAD_KEY(0x02, BUTTON_PADLOCK), KEYPAD_KEY(0x04, BUTTON_CALDO),
-    KEYPAD_KEY(0x08, BUTTON_MINUS),      KEYPAD_KEY(0x10, BUTTON_PLAY),    KEYPAD_KEY(0x20, BUTTON_PLUS),
-    KEYPAD_KEY(0x40, BUTTON_LINGUA),     KEYPAD_KEY(0x80, BUTTON_MENU),    KEYPAD_KEY(0x60, BUTTON_LINGUA_TIEPIDO),
-    KEYPAD_KEY(0x110, BUTTON_STOP_MENU), KEYPAD_KEY(0x100, BUTTON_STOP),   KEYPAD_NULL_KEY,
+    KEYPAD_KEY(0x01, BUTTON_MEDIO), KEYPAD_KEY(0x02, BUTTON_TIEPIDO), KEYPAD_KEY(0x04, BUTTON_CALDO),
+    KEYPAD_KEY(0x08, BUTTON_LANA),  KEYPAD_KEY(0x10, BUTTON_FREDDO),  KEYPAD_KEY(0x40, BUTTON_LINGUA),
+    KEYPAD_KEY(0x80, BUTTON_MENU),  KEYPAD_KEY(0x100, BUTTON_STOP),   KEYPAD_NULL_KEY,
 };
 
 
@@ -23,7 +22,7 @@ void keyboard_init(void) {
 }
 
 
-static unsigned int keyboard_read(void) {
+unsigned int keyboard_read(void) {
     static unsigned int input = 0;
 
     SDL_PumpEvents();

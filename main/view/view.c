@@ -61,7 +61,6 @@ view_t view_change_page_extra(model_t *model, const pman_page_t *page, void *ext
 
 
 view_t view_change_page(model_t *model, const pman_page_t *page) {
-    reset_input();
     return view_change_page_extra(model, page, NULL);
 }
 
@@ -96,32 +95,38 @@ int view_process_msg(view_page_command_t vmsg, model_t *model) {
     switch (vmsg.code) {
         case VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE:
             view_change_page(model, vmsg.page);
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
             break;
 
         case VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE_EXTRA:
             view_change_page_extra(model, vmsg.page, vmsg.extra);
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
             break;
 
         case VIEW_PAGE_COMMAND_CODE_BACK:
             pman_back(&pman, model);
             reset_input();
             event_queue_init(&q);
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
             break;
 
         case VIEW_PAGE_COMMAND_CODE_REBASE:
             view_rebase_page(model, vmsg.page);
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
             break;
 
         case VIEW_PAGE_COMMAND_CODE_SWAP_PAGE:
             event_queue_init(&q);
             reset_input();
             pman_swap_page(&pman, model, *(pman_page_t *)vmsg.page);
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
             break;
 
         case VIEW_PAGE_COMMAND_CODE_SWAP_PAGE_EXTRA:
             event_queue_init(&q);
             reset_input();
             pman_swap_page_extra(&pman, model, *(pman_page_t *)vmsg.page, vmsg.extra);
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
             break;
 
         case VIEW_PAGE_COMMAND_CODE_UPDATE:

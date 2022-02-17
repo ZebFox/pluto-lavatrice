@@ -42,8 +42,6 @@ static void init_backlight() {
 #include "freertos/task.h"
 
 void init_display_spi(void) {
-    esp_err_t ret;
-
     gpio_config_t io_conf;
     io_conf.intr_type    = GPIO_INTR_DISABLE;
     io_conf.mode         = GPIO_MODE_OUTPUT;
@@ -72,12 +70,10 @@ void init_display_spi(void) {
     };
 
     // Initialize the SPI bus
-    ret = spi_bus_initialize(HSPI_HOST, &buscfg, SPI_DMA_CH_AUTO);
-    assert(ret == ESP_OK);
+    ESP_ERROR_CHECK(spi_bus_initialize(HSPI_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
     // Attach the LCD to the SPI bus
-    ret = spi_bus_add_device(HSPI_HOST, &devcfg, &display_spi);
-    assert(ret == ESP_OK);
+    ESP_ERROR_CHECK(spi_bus_add_device(HSPI_HOST, &devcfg, &display_spi));
 
     init_backlight();
 }

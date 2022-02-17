@@ -6,7 +6,6 @@
 #include "controller/controller.h"
 #include "controller/gui.h"
 #include "display/monitor.h"
-#include "indev/mouse.h"
 #include "peripherals/keyboard.h"
 #include "view/view.h"
 

@@ -32,7 +32,7 @@ typedef struct {
     union {
         struct {
             const void *page;
-            void *      extra;
+            void       *extra;
         };
     };
 } view_page_command_t;
@@ -41,7 +41,8 @@ typedef struct {
 typedef enum {
     VIEW_CONTROLLER_COMMAND_CODE_NOTHING = 0,
     VIEW_CONTROLLER_COMMAND_CODE_UPDATE_PWM,
-    VIEW_CONTROLLER_COMMAND_CODE_UPDATE_DIGOUT,
+    VIEW_CONTROLLER_COMMAND_CODE_TEST,
+    VIEW_CONTROLLER_COMMAND_CODE_TEST_DIGOUT,
     VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF,
     VIEW_CONTROLLER_COMMAND_CODE_PARAMETERS_SAVE,
     VIEW_CONTROLLER_COMMAND_CODE_RESET_RAM,
@@ -58,6 +59,7 @@ typedef struct {
             int output;
             int value;
         };
+        int test;
     };
 } view_controller_command_t;
 
@@ -71,12 +73,13 @@ typedef uint8_t view_t;
 
 
 typedef enum {
-    VIEW_EVENT_KEYPAD,
-    VIEW_EVENT_MODEL_UPDATE,
-    VIEW_EVENT_COIN,
-    VIEW_EVENT_STATO_UPDATE,
-    VIEW_EVENT_ALARM,
+    VIEW_EVENT_CODE_KEYPAD,
+    VIEW_EVENT_CODE_MODEL_UPDATE,
+    VIEW_EVENT_CODE_COIN,
+    VIEW_EVENT_CODE_STATO_UPDATE,
+    VIEW_EVENT_CODE_ALARM,
     VIEW_EVENT_CODE_TIMER,
+    VIEW_EVENT_CODE_OPEN,
 } view_event_code_t;
 
 

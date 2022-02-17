@@ -19,7 +19,7 @@ static unsigned long time_off = 0;
 static size_t        repeat   = 0;
 static int           is_set   = 0;
 static TimerHandle_t timer;
-static const char *TAG = "Buzzer";
+static const char   *TAG = "Buzzer";
 
 #define GPIO_OUTPUT_PIN_SEL (1ULL << HAL_BUZZER)
 
@@ -44,6 +44,10 @@ void buzzer_init(void) {
 }
 
 void buzzer_bip(size_t r, unsigned long t_on, unsigned long t_off) {
+    if (t_on == 0) {
+        return;
+    }
+
     repeat   = r;
     time_on  = t_on;
     time_off = t_off;
@@ -57,9 +61,14 @@ void buzzer_bip(size_t r, unsigned long t_on, unsigned long t_off) {
 void buzzer_check(void) {
     if (is_set && repeat > 0) {
         if (gpio_get_level(HAL_BUZZER)) {
-            gpio_set_level(HAL_BUZZER, 0);
-            xTimerChangePeriod(timer, pdMS_TO_TICKS(time_off), portMAX_DELAY);
-            xTimerReset(timer, portMAX_DELAY);
+            if (time_off > 0) {
+                gpio_set_level(HAL_BUZZER, 0);
+                xTimerChangePeriod(timer, pdMS_TO_TICKS(time_off), portMAX_DELAY);
+                xTimerReset(timer, portMAX_DELAY);
+            } else {
+                xTimerChangePeriod(timer, pdMS_TO_TICKS(time_on), portMAX_DELAY);
+                xTimerReset(timer, portMAX_DELAY);
+            }
             repeat--;
         } else if (!gpio_get_level(HAL_BUZZER)) {
             gpio_set_level(HAL_BUZZER, 1);

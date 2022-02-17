@@ -1,6 +1,7 @@
 import kconfiglib
 import os
 import multiprocessing
+import tools.meta.csv2carray as csv2carray
 from pathlib import Path
 
 
@@ -60,13 +61,32 @@ def generate_sdkconfig_header(target, source, env):
 MINGW = 'mingw' in COMMAND_LINE_TARGETS
 PROGRAM = "simulated.exe" if MINGW else "simulated"
 MAIN = "main"
-SIMULATOR = 'simulator'
+SIMULATOR = "simulator"
 COMPONENTS = "components"
+ASSETS = "assets"
 FREERTOS = f'{SIMULATOR}/freertos-simulator'
 CJSON = f'{SIMULATOR}/cJSON'
 B64 = f'{SIMULATOR}/b64'
-DRIVERS = f'{SIMULATOR}/lv_drivers'
+DRIVERS = f"{SIMULATOR}"
 LVGL = f"{COMPONENTS}/lvgl"
+
+
+PARMAC_DESCRIPTIONS = f"{MAIN}/model/descriptions"
+STRING_TRANSLATIONS = f"{MAIN}/view/intl"
+
+TRANSLATIONS = [
+    {
+        "res": [f"{PARMAC_DESCRIPTIONS}/AUTOGEN_FILE_parmac.c", f"{PARMAC_DESCRIPTIONS}/AUTOGEN_FILE_parmac.h"],
+        "input": f"{ASSETS}/translations/parmac",
+        "output": PARMAC_DESCRIPTIONS,
+    },
+    {
+        "res": [f"{STRING_TRANSLATIONS}/AUTOGEN_FILE_strings.c", f"{STRING_TRANSLATIONS}/AUTOGEN_FILE_strings.h"],
+        "input": f"{ASSETS}/translations/strings",
+        "output": STRING_TRANSLATIONS
+    },
+]
+
 
 CFLAGS = [
     "-Wall",
@@ -107,6 +127,15 @@ def main():
     env = Environment(**env_options)
     env.Tool('compilation_db')
 
+    translations = []
+    for translation in TRANSLATIONS:
+        def operation(t):
+            return lambda target, source, env: csv2carray.main(t["input"], t["output"])
+
+        env.Command(
+            translation["res"], Glob(f"{translation['input']}/*.csv"), operation(translation))
+        translations += translation["res"]
+
     freertos_env = env
     (freertos, include) = SConscript(
         f'{FREERTOS}/SConscript', exports=['freertos_env'])
@@ -135,8 +164,6 @@ def main():
     sources += [File(filename)
                 for filename in Path(f"{DRIVERS}/display").rglob('*.c')]
     sources += [File(filename)
-                for filename in Path(f"{DRIVERS}/indev").rglob('*.c')]
-    sources += [File(filename)
                 for filename in Path(f"{LVGL}/lvgl").rglob('*.c')]
     sources += [File(f'{CJSON}/cJSON.c')]
     sources += [File(f'{B64}/encode.c'),
@@ -146,6 +173,7 @@ def main():
     PhonyTargets('run', './simulated', prog, env)
     env.Alias('mingw', prog)
     env.CompilationDatabase('build/compile_commands.json')
+    env.Alias("intl", translations)
 
 
 main()

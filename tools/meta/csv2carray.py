@@ -16,9 +16,7 @@ def main(indir, outdir):
             csvreader = csv.reader(f, delimiter=',', skipinitialspace=True)
             arrayname = os.path.basename(csvfile).replace(".csv", "")
             tmp = {}
-
             csvreader.__next__() # Drop the first line
-
             for line in csvreader:
                 if len(line) < 2:
                     print("Devono esserci almeno due colonne (la prima e' per l'enum)")
@@ -33,7 +31,6 @@ def main(indir, outdir):
         with open(os.path.join(outdir, f"AUTOGEN_FILE_{name}.c"), 'w') as c, open(os.path.join(outdir, f"AUTOGEN_FILE_{name}.h"), "w") as h:
             h.write(f"#ifndef AUTOGEN_FILE_{name.upper()}_H_INCLUDED\n")
             h.write(f"#define AUTOGEN_FILE_{name.upper()}_H_INCLUDED\n\n")
-
             for key, value in translations.items():
                 if key == name:
                     prefix = name

@@ -5,9 +5,16 @@
 #include "utils/utils.h"
 #include "view/view.h"
 #include "model/model.h"
+#include "peripherals/buzzer.h"
+#include "esp_log.h"
+#include "controller.h"
+
+
+static const char *TAG = "Gui";
 
 
 void controller_gui_process(model_t *pmodel) {
+    (void)TAG;
     static unsigned long last_invoked = 0;
 
     view_message_t umsg;
@@ -25,11 +32,11 @@ void controller_gui_process(model_t *pmodel) {
     }
 
     while (view_get_next_msg(pmodel, &umsg, &event)) {
-        // controller_process_msg(&umsg.cmsg, model);
+        controller_process_msg(&umsg.cmsg, pmodel);
         view_process_msg(umsg.vmsg, pmodel);
 
-        if (event.code == VIEW_EVENT_KEYPAD && event.key_event.event == KEY_CLICK) {
-            // digout_buzzer_bip(1, 100, 0);
+        if (event.code == VIEW_EVENT_CODE_KEYPAD && event.key_event.event == KEY_CLICK) {
+            buzzer_bip(1, 100, 0);
         }
     }
 }

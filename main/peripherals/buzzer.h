@@ -1,7 +1,6 @@
 #ifndef BUZZER_H_INCLUDED
 #define	BUZZER_H_INCLUDED
 
-#include "hal/gpio_types.h"
 #include <string.h>
 #include <stdint.h>
 
