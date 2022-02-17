@@ -69,14 +69,22 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                     msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                     msg.vmsg.page = &page_stats;
                     break;
-                } else if (view_common_check_password_started(&data->password)) {
+                } else if (view_common_check_password(&data->password, VIEW_PASSWORD_SET_DATETIME,
+                                                    VIEW_SHORT_PASSWORD_LEN, get_millis())) {
+                    // uuuuu
+                    msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
+                    msg.vmsg.page = &page_set_datetime;
+                    break;                                 
+                }else if (view_common_check_password_started(&data->password)) {
                     break;
                 }
-
                 switch (event.key_event.code) {
-                    case BUTTON_LANA: {
+                    case BUTTON_STOP_MENU: {
+                        msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
+                        msg.vmsg.page = &page_datetime;
                         break;
                     }
+                    
                     default:
                         break;
                 }

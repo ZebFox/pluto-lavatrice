@@ -58,7 +58,7 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
         case VIEW_EVENT_CODE_KEYPAD: {
             if (event.key_event.event == KEY_CLICK) {
                 switch (event.key_event.code) {
-                    case BUTTON_TIEPIDO:
+                    case BUTTON_DESTRA:
                         if (data->parameter > 0) {
                             data->parameter--;
                         } else {
@@ -72,7 +72,7 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                         msg.vmsg.code   = VIEW_PAGE_COMMAND_CODE_UPDATE;
                         break;
 
-                    case BUTTON_MENO:
+                    case BUTTON_FREDDO:
                         parmac_operation(model, data->parameter, -1, data->livello_accesso);
                         msg.vmsg.code     = VIEW_PAGE_COMMAND_CODE_UPDATE;
                         data->par_to_save = 1;

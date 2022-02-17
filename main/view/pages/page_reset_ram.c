@@ -64,7 +64,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         }
                         break;
 
-                    case BUTTON_TIEPIDO:
+                    case BUTTON_PIU:
                         data->count2++;
                         if (data->count2 >= 3) {
                             // pmodel->pmac.abilita_parametri_ridotti = 0;
