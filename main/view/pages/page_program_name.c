@@ -16,29 +16,20 @@
 
 
 struct page_data {
-    size_t index;
-
-    lv_obj_t *lbl_nome;
+    name_t names[MAX_LINGUE];
 };
 
-
-static void update_page(model_t *pmodel, struct page_data *pdata) {}
 
 
 static void *create_page(model_t *pmodel, void *extra) {
     struct page_data *pdata = malloc(sizeof(struct page_data));
-    pdata->index            = 0;
     return pdata;
 }
 
 
 static void open_page(model_t *pmodel, void *args) {
     struct page_data *pdata = args;
-    view_common_title(lv_scr_act(), view_intl_get_string(pmodel, STRINGS_MODIF_PROGRAMMA));
-
-
-    // lv_obj_t *lbl = lv_label_create(lv_scr_act(), NULL);
-    // pdata->lbl_nome = lbl;
+    (void)pdata;
 }
 
 
@@ -52,15 +43,10 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
             if (event.key_event.event == KEY_CLICK) {
 
                 switch (event.key_event.code) {
-                    case BUTTON_STOP:
+                    case BUTTON_STOP: {
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
                         break;
-
-                    case BUTTON_MENU:
-                        msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
-                        msg.vmsg.page = (void*)&page_program_name;
-                        break;
-
+                    }
                     default:
                         break;
                 }
@@ -91,7 +77,7 @@ static void destroy_page(void *arg, void *extra) {
 }
 
 
-const pman_page_t page_programs = {
+const pman_page_t page_program_name = {
     .create        = create_page,
     .open          = open_page,
     .process_event = process_page_event,

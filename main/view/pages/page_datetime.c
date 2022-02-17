@@ -61,6 +61,7 @@ static void open_page(model_t *model, void *args) {
 
 static view_message_t process_page_event(model_t *model, void *args, pman_event_t event) {
     struct page_data *data = args;
+    (void)data;
     view_message_t    msg  = VIEW_EMPTY_MSG;
 
     switch (event.code) {

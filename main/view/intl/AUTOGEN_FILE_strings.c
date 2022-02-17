@@ -1,4 +1,4 @@
-const char *strings[44][2] = {
+const char *strings[52][2] = {
     {"Inserire moneta", "Insert coin", },
     {"Inserire gettone", "Insert token", },
     {"Pagare cassa", "Pay at desk", },
@@ -43,5 +43,13 @@ const char *strings[44][2] = {
     {"TEMPO CICLO", "CYCLE TIME", },
     {"TEMPERATURA", "TEMPERATURE", },
     {"VELOCITA'", "SPEED", },
+    {"LUNEDI'", "MONDAY", },
+    {"MARTEDI'", "TUESDAY", },
+    {"MERCOLEDI'", "WEDNESDAY", },
+    {"GIOVEDI'", "THURSDAY", },
+    {"VENERDI'", "FRIDAY", },
+    {"SABATO", "SATURDAY", },
+    {"DOMENICA", "SUNDAY", },
+    {"MODIF. PROGRAMMA", "MODIFY PROG.", },
 };
 

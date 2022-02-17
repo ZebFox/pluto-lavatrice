@@ -31,6 +31,8 @@ static void *create_page(model_t *pmodel, void *extra) {
 static void open_page(model_t *pmodel, void *args) {
     struct page_data *pdata = args;
     view_common_password_reset(&pdata->password, get_millis());
+    lv_obj_t *line = view_common_horizontal_line();
+    lv_obj_set_pos(line, 0, 32);
     (void)pdata;
 }
 
@@ -46,8 +48,8 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                 view_common_password_add_key(&data->password, event.key_event.code, get_millis());
                 if (view_common_check_password(&data->password, VIEW_PASSWORD_MINUS, VIEW_SHORT_PASSWORD_LEN,
                                                get_millis())) {
-                    msg.vmsg.code           = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
-                    msg.vmsg.page           = &page_test_digout;
+                    msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
+                    msg.vmsg.page = &page_test_digout;
                     break;
                 } else if (view_common_check_password(&data->password, VIEW_PASSWORD_RIGHT, VIEW_SHORT_PASSWORD_LEN,
                                                       get_millis())) {
@@ -56,26 +58,26 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                     break;
                 } else if (view_common_check_password(&data->password, VIEW_PASSWORD_LEFT, VIEW_SHORT_PASSWORD_LEN,
                                                       get_millis())) {
-                    //msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
-                    //msg.vmsg.page = &page_scelta_programma;
+                    msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
+                    msg.vmsg.page = &page_programs;
                     break;
                 } else if (view_common_check_password(&data->password, VIEW_PASSWORD_RESET, VIEW_LONG_PASSWORD_LEN,
                                                       get_millis())) {
                     msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                     msg.vmsg.page = &page_reset_ram;
                     break;
-                } else if (view_common_check_password(&data->password, VIEW_PASSWORD_TIEPIDO,
-                                                      VIEW_SHORT_PASSWORD_LEN, get_millis())) {
+                } else if (view_common_check_password(&data->password, VIEW_PASSWORD_TIEPIDO, VIEW_SHORT_PASSWORD_LEN,
+                                                      get_millis())) {
                     msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                     msg.vmsg.page = &page_stats;
                     break;
                 } else if (view_common_check_password(&data->password, VIEW_PASSWORD_SET_DATETIME,
-                                                    VIEW_SHORT_PASSWORD_LEN, get_millis())) {
+                                                      VIEW_SHORT_PASSWORD_LEN, get_millis())) {
                     // uuuuu
                     msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                     msg.vmsg.page = &page_set_datetime;
-                    break;                                 
-                }else if (view_common_check_password_started(&data->password)) {
+                    break;
+                } else if (view_common_check_password_started(&data->password)) {
                     break;
                 }
                 switch (event.key_event.code) {
@@ -84,7 +86,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         msg.vmsg.page = &page_datetime;
                         break;
                     }
-                    
+
                     default:
                         break;
                 }

@@ -46,8 +46,16 @@ typedef enum {
     STRINGS_TEMPO_CICLO,
     STRINGS_TEMPERATURA,
     STRINGS_VELOCITA,
+    STRINGS_LUNEDI,
+    STRINGS_MARTEDI,
+    STRINGS_MERCOLEDI,
+    STRINGS_GIOVEDI,
+    STRINGS_VENERDI,
+    STRINGS_SABATO,
+    STRINGS_DOMENICA,
+    STRINGS_MODIF_PROGRAMMA,
 } strings_t;
 
-extern const char *strings[44][2];
+extern const char *strings[52][2];
 
 #endif

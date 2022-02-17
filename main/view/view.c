@@ -4,6 +4,7 @@
 #include "model/model.h"
 #include "view/view.h"
 #include "view/images/legacy.h"
+#include "view/styles.h"
 
 
 #define BUFFER_SIZE (256 * 3)
@@ -26,7 +27,7 @@ void view_init(model_t *model, void (*flush_cb)(struct _disp_drv_t *, const lv_a
                                  lv_opa_t),
                void (*rinput)(void)) {
     lv_init();
-    // styles_init();
+    styles_init();
 
     static lv_disp_buf_t disp_buf;
 #ifdef PC_SIMULATOR

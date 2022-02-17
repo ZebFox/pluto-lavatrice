@@ -1,13 +1,14 @@
 #include <assert.h>
 #include "common.h"
 #include "gel/timer/timecheck.h"
+#include "styles.h"
 
 
 static void timer_task(lv_task_t *task);
 static int  find_password_start(view_common_password_t *password);
 
 
-static const button_t preamble[3]                          = {BUTTON_STOP, BUTTON_STOP, BUTTON_STOP};
+static const button_t preamble[3] = {BUTTON_STOP, BUTTON_STOP, BUTTON_STOP};
 
 
 lv_obj_t *view_common_title(lv_obj_t *root, const char *str) {
@@ -21,16 +22,17 @@ lv_obj_t *view_common_title(lv_obj_t *root, const char *str) {
     style.body.padding.inner  = 0;
     style.body.padding.top    = 2;
     style.body.padding.bottom = 2;
+    style.text.letter_space   = 0;
     lv_obj_set_style(cont, &style);
 
     lv_obj_t *title = lv_label_create(cont, NULL);
     lv_label_set_align(title, LV_LABEL_ALIGN_CENTER);
     lv_label_set_long_mode(title, LV_LABEL_LONG_CROP);
     lv_label_set_text(title, str);
-    lv_obj_set_width(title, LV_HOR_RES_MAX - 4);
+    lv_obj_set_width(title, LV_HOR_RES_MAX);
 
     lv_cont_set_fit2(cont, LV_FIT_NONE, LV_FIT_TIGHT);
-    lv_obj_set_width(cont, LV_HOR_RES_MAX - 4);
+    lv_obj_set_width(cont, LV_HOR_RES_MAX);
     lv_obj_align(cont, NULL, LV_ALIGN_IN_TOP_MID, 0, 2);
     lv_obj_align(title, NULL, LV_ALIGN_CENTER, 0, 0);
 
@@ -94,6 +96,26 @@ int view_common_check_password_started(view_common_password_t *inserted) {
 
 lv_task_t *view_common_register_timer(unsigned long period) {
     return lv_task_create(timer_task, period, LV_TASK_PRIO_OFF, NULL);
+}
+
+
+lv_obj_t *view_common_horizontal_line(void) {
+    /*Create an array for the points of the line*/
+    static lv_point_t line_points[] = {{0, 0}, {128, 0}};
+
+    /*Create new style (thick dark blue)*/
+    static lv_style_t style_line;
+    lv_style_copy(&style_line, &lv_style_plain);
+    style_line.line.color   = LV_COLOR_BLACK;
+    style_line.line.width   = 1;
+    style_line.line.rounded = 0;
+
+    /*Copy the previous line and apply the new style*/
+    lv_obj_t *line1;
+    line1 = lv_line_create(lv_scr_act(), NULL);
+    lv_line_set_points(line1, line_points, 2); /*Set the points*/
+    lv_line_set_style(line1, LV_LINE_STYLE_MAIN, &style_line);
+    return line1;
 }
 
 
