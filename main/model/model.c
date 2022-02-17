@@ -1,7 +1,12 @@
+#include <stdio.h>
 #include <assert.h>
 #include <string.h>
 #include "model.h"
 #include "gel/serializer/serializer.h"
+
+
+static char *new_unique_filename(model_t *model, char *filename, unsigned long seed);
+
 
 void model_init(model_t *pmodel) {
     memset(pmodel, 0, sizeof(model_t));
@@ -11,6 +16,21 @@ void model_init(model_t *pmodel) {
 size_t model_get_language(model_t *pmodel) {
     assert(pmodel != NULL);
     return pmodel->prog.parmac.lingua;
+}
+
+
+size_t model_get_num_programs(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return pmodel->prog.num_programmi;
+}
+
+
+const programma_preview_t *model_get_preview(model_t *pmodel, size_t i) {
+    assert(pmodel != NULL);
+    if (i >= model_get_num_programs(pmodel)) {
+        return NULL;
+    }
+    return &pmodel->prog.preview_programmi[i];
 }
 
 
@@ -444,4 +464,174 @@ void model_unpack_stato_macchina(stato_macchina_t *stato, uint8_t *buffer) {
     i += 2;
 
     i += UNPACK_UINT8(stato->descrizione_pedante, &buffer[i]);
+}
+
+
+size_t model_pack_parametri_macchina(uint8_t *buffer, parmac_t *p) {
+    size_t i = 0;
+
+    i += serialize_uint16_be(&buffer[i], p->diametro_cesto);
+    i += serialize_uint16_be(&buffer[i], p->profondita_cesto);
+    i += serialize_uint16_be(&buffer[i], p->altezza_trappola);
+
+    i += serialize_uint8(&buffer[i], p->correzione_contagiri);
+    i += serialize_uint8(&buffer[i], p->tempo_allarme_livello);
+    i += serialize_uint8(&buffer[i], p->tempo_allarme_temperatura);
+    i += serialize_uint8(&buffer[i], p->tempo_allarme_scarico);
+    i += serialize_uint8(&buffer[i], p->tempo_ritardo_micro_oblo);
+
+    i += serialize_uint8(&buffer[i], p->tipo_out_aux_1);
+    i += serialize_uint8(&buffer[i], p->tipo_out_aux_2);
+    i += serialize_uint8(&buffer[i], p->tipo_out_aux_3);
+    i += serialize_uint8(&buffer[i], p->tipo_out_aux_4);
+    i += serialize_uint8(&buffer[i], 0);
+
+    i += serialize_uint8(&buffer[i], 0);
+    i += serialize_uint8(&buffer[i], p->f_scarico_recupero);
+    i += serialize_uint8(&buffer[i], p->abilitazione_macchina_libera);
+    i += serialize_uint8(&buffer[i], p->f_macchina_libera);
+    i += serialize_uint8(&buffer[i], p->abilitazione_espansione_io);
+    i += serialize_uint8(&buffer[i], p->tipo_gettoniera);
+    i += serialize_uint8(&buffer[i], p->prezzo_unico);
+    i += serialize_uint8(&buffer[i], p->valore_impulso);
+    i += serialize_uint8(&buffer[i], p->temperatura_massima);
+    i += serialize_uint8(&buffer[i], p->isteresi_temperatura);
+    i += serialize_uint8(&buffer[i], p->temperatura_sicurezza);
+    i += serialize_uint8(&buffer[i], p->temperatura_termodegradazione);
+    i += serialize_uint8(&buffer[i], p->tipo_livello);
+    i += serialize_uint16_be(&buffer[i], p->impulsi_litro);
+    i += serialize_uint8(&buffer[i], p->tempo_isteresi_livello);
+    i += serialize_uint16_be(&buffer[i], p->centimetri_max_livello);
+    i += serialize_uint16_be(&buffer[i], p->livello_sfioro);
+    i += serialize_uint8(&buffer[i], p->centimetri_minimo_scarico);
+    i += serialize_uint16_be(&buffer[i], p->centimetri_minimo_riscaldo);
+    i += serialize_uint16_be(&buffer[i], p->litri_massimi);
+    i += serialize_uint16_be(&buffer[i], p->litri_minimi_riscaldo);
+    i += serialize_uint8(&buffer[i], p->tempo_minimo_scarico);
+    i += serialize_uint8(&buffer[i], p->tempo_scarico_servizio);
+    i += serialize_uint8(&buffer[i], p->tempo_colpo_aperto_scarico);
+    i += serialize_uint8(&buffer[i], p->tipo_inverter);
+    i += serialize_uint8(&buffer[i], p->velocita_minima_lavaggio);
+    i += serialize_uint8(&buffer[i], p->velocita_massima_lavaggio);
+    i += serialize_uint8(&buffer[i], p->velocita_servizio);
+    i += serialize_uint8(&buffer[i], p->abilitazione_preparazione_rotazione);
+    i += serialize_uint8(&buffer[i], p->tempo_marcia_preparazione_rotazione);
+    i += serialize_uint8(&buffer[i], p->tempo_sosta_preparazione_rotazione);
+    i += serialize_uint8(&buffer[i], p->velocita_minima_preparazione);
+    i += serialize_uint8(&buffer[i], p->velocita_massima_preparazione);
+
+    i += serialize_uint16_be(&buffer[i], p->velocita_minima_centrifuga_1);
+    i += serialize_uint16_be(&buffer[i], p->velocita_massima_centrifuga_1);
+    i += serialize_uint16_be(&buffer[i], p->velocita_minima_centrifuga_2);
+    i += serialize_uint16_be(&buffer[i], p->velocita_massima_centrifuga_2);
+    i += serialize_uint16_be(&buffer[i], p->velocita_minima_centrifuga_3);
+    i += serialize_uint16_be(&buffer[i], p->velocita_massima_centrifuga_3);
+    i += serialize_uint16_be(&buffer[i], p->tempo_minimo_rampa);
+    i += serialize_uint16_be(&buffer[i], p->tempo_massimo_rampa);
+
+    i += serialize_uint8(&buffer[i], p->nro_max_sbilanciamenti);
+    i += serialize_uint8(&buffer[i], p->f_proximity);
+    i += serialize_uint8(&buffer[i], p->tempo_minimo_frenata);
+    i += serialize_uint8(&buffer[i], p->numero_raggi);
+    i += serialize_uint8(&buffer[i], p->abilitazione_accelerometro);
+    i += serialize_uint8(&buffer[i], p->scala_accelerometro);
+
+    i += serialize_uint16_be(&buffer[i], p->soglia_x_accelerometro);
+    i += serialize_uint16_be(&buffer[i], p->soglia_y_accelerometro);
+    i += serialize_uint16_be(&buffer[i], p->soglia_z_accelerometro);
+    i += serialize_uint16_be(&buffer[i], p->soglia_x_accelerometro_h);
+    i += serialize_uint16_be(&buffer[i], p->soglia_y_accelerometro_h);
+    i += serialize_uint16_be(&buffer[i], p->soglia_z_accelerometro_h);
+    i += serialize_uint16_be(&buffer[i], p->giri_accelerometro);
+    i += serialize_uint16_be(&buffer[i], p->giri_accelerometro_2);
+    i += serialize_uint8(&buffer[i], p->delta_val_accelerometro);
+    i += serialize_uint16_be(&buffer[i], p->tempo_attesa_accelerometro);
+    i += serialize_uint16_be(&buffer[i], p->tempo_scarico_accelerometro);
+
+    i += serialize_uint8(&buffer[i], p->numero_saponi_utilizzabili);
+    i += serialize_uint8(&buffer[i], p->tempo_h2o_pulizia_saponi);
+    i += serialize_uint8(&buffer[i], p->tempo_precarica);
+    i += serialize_uint8(&buffer[i], p->tempo_tasto_carico_saponi);
+    i += serialize_uint8(&buffer[i], p->abilitazione_min_sec);
+    i += serialize_uint8(&buffer[i], p->abilitazione_sblocco_get);
+    i += serialize_uint8(&buffer[i], p->inibizione_allarmi);
+    i += serialize_uint8(&buffer[i], p->autoavvio);
+    i += serialize_uint8(&buffer[i], p->abilitazione_loop_prog);
+
+    memcpy(&buffer[i], p->funzioni_rgb, NUM_CONDIZIONI_MACCHINA);
+    i += NUM_CONDIZIONI_MACCHINA;
+
+    i += serialize_uint8(&buffer[i], p->esclusione_sapone);
+
+    i += serialize_uint8(&buffer[i], p->tipo_serratura);
+    i += serialize_uint8(&buffer[i], p->durata_impulso_serratura);
+
+    return i;
+}
+
+
+
+
+void model_unpack_test(test_data_t *test, uint8_t *buffer) {
+    uint32_t min, max;
+    uint16_t x, y, z;
+    size_t   i = 0;
+
+    // ADC
+    i += deserialize_uint16_be(&test->adc_press, &buffer[i]);
+    i += deserialize_uint16_be(&test->adc_temp, &buffer[i]);
+    i += deserialize_uint16_be(&test->offset_press, &buffer[i]);
+
+    // Ingressi
+    i += deserialize_uint16_be(&test->inputs, &buffer[i]);
+    i += deserialize_uint8(&test->inputs_exp, &buffer[i]);
+
+    // Accelerometro
+    i += deserialize_uint16_be(&x, &buffer[i]);
+    i += deserialize_uint16_be(&y, &buffer[i]);
+    i += deserialize_uint16_be(&z, &buffer[i]);
+    i += deserialize_uint8(&test->accelerometro_ok, &buffer[i]);
+    // enqueue_dati_accelerometro(pmodel, x, y, z);
+
+    // Proximity
+    i += deserialize_uint32_be(&min, &buffer[i]);
+    i += deserialize_uint32_be(&max, &buffer[i]);
+
+    if (test->pmin == 0 || min < test->pmin) {
+        test->pmin = min;
+    }
+
+    if (max > test->pmax) {
+        test->pmax = max;
+    }
+
+    i += deserialize_uint8(&test->gettoniera_impulsi_abilitata, &buffer[i]);
+
+    for (int j = 0; j < 3; j++) {
+        i += deserialize_uint32_be(&test->minp[j], &buffer[i]);
+    }
+    for (int j = 0; j < 3; j++) {
+        i += deserialize_uint32_be(&test->maxp[j], &buffer[i]);
+    }
+}
+
+
+static char *new_unique_filename(model_t *model, char *filename, unsigned long seed) {
+    unsigned long now = seed;
+    int           found;
+
+    do {
+        found = 0;
+        snprintf(filename, STRING_NAME_SIZE, "%lu.bin", now);
+
+        for (size_t i = 0; i < model->prog.num_programmi; i++) {
+            if (strcmp(filename, model->prog.preview_programmi[i].filename) == 0) {
+                now++;
+                found = 1;
+                break;
+            }
+        }
+    } while (found);
+
+    return filename;
 }

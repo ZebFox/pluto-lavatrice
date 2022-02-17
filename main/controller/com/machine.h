@@ -4,12 +4,14 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "model/model.h"
 
 
 typedef enum {
     MACHINE_RESPONSE_CODE_ERRORE_COMUNICAZIONE,
     MACHINE_RESPONSE_CODE_PRESENTAZIONI,
     MACHINE_RESPONSE_CODE_STATO,
+    MACHINE_RESPONSE_CODE_TEST,
 } machine_response_code_t;
 
 
@@ -21,7 +23,10 @@ typedef struct {
             uint8_t stato;
             uint8_t nro_programma;
             uint8_t nro_step;
+            name_t  machine_fw_version;
+            name_t  machine_fw_date;
         } presentazioni;
+        test_data_t test;
     };
 } machine_response_t;
 
@@ -33,6 +38,8 @@ int  machine_ricevi_risposta(machine_response_t *risposta);
 void machine_imposta_uscita_singola(size_t uscita, int valore);
 void machine_test(int test);
 void machine_richiedi_stato(void);
+void machine_read_state(model_t *pmodel);
+void machine_richiedi_dati_test(void);
 
 
 #endif

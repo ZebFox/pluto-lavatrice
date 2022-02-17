@@ -27,6 +27,10 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
             machine_test(msg->test);
             break;
 
+        case VIEW_CONTROLLER_COMMAND_CODE_TEST_REFRESH:
+            machine_richiedi_dati_test();
+            break;
+
         case VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF:
             machine_imposta_uscita_singola(0, 0);
             break;
@@ -42,12 +46,12 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
 
 
 void controller_manage(model_t *pmodel) {
-    static unsigned long timestamp = 0;
+    static unsigned long stato_ts = 0;
     machine_response_t   risposta;
 
-    if (is_expired(timestamp, get_millis(), 250)) {
+    if (is_expired(stato_ts, get_millis(), 250)) {
         machine_richiedi_stato();
-        timestamp = get_millis();
+        stato_ts = get_millis();
     }
 
     if (machine_ricevi_risposta(&risposta)) {
@@ -56,12 +60,39 @@ void controller_manage(model_t *pmodel) {
                 // TODO: segnala errore di comunicazione
                 break;
 
-            case MACHINE_RESPONSE_CODE_PRESENTAZIONI:
-                // TODO: ricevi le presentazioni
+            case MACHINE_RESPONSE_CODE_PRESENTAZIONI: {
+                uint8_t buffer[256];
+                // Invia i parametri macchina
+                size_t len = model_pack_parametri_macchina(buffer, &pmodel->prog.parmac);
+                machine_request(request_pipe, COMANDO_SCRIVI_PARMAC, buffer, len);
+
+                if (risposta.presentazioni.n_all == 0 || risposta.presentazioni.n_all == 2) {
+                    // allarme poweroff; se l'autoavvio e' configurato devo ripartire
+                    if (risposta.presentazioni.n_all == 0x02 && pmodel->prog.parmac.autoavvio) {
+                        simple_machine_request(request_pipe, COMANDO_AZZERA_ALLARMI);
+                    }
+
+                    if (risposta.presentazioni.stato != STATO_MACCHINA_STOP) {
+                        uint8_t lavaggio = risposta.presentazioni.nro_programma;
+                        int     step     = risposta.presentazioni.nro_step;
+                        if (model_select_program_step(pmodel, lavaggio, step) >= 0) {
+                            ESP_LOGI(TAG, "Macchina spenta in azione: lavaggio %i e step %i", lavaggio + 1, step + 1);
+
+                            richiedi_nuovo_stato_macchina(model, STATO_MACCHINA_MARCIA);
+                            machine_request(request_pipe, START_LAVAGGIO, &lavaggio, 1);
+                        }
+                    }
+                }
+                break;
+            }
+
+            case MACHINE_RESPONSE_CODE_TEST:
+                pmodel->test = risposta.test;
+                view_event((view_event_t){.code = VIEW_EVENT_CODE_MODEL_UPDATE});
                 break;
 
             case MACHINE_RESPONSE_CODE_STATO:
-                // TODO: ricevi lo stato
+                machine_read_state(pmodel);
                 break;
         }
     }

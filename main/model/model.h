@@ -310,13 +310,29 @@ typedef struct {
 
 
 typedef struct {
+    uint16_t     inputs;
+    uint8_t      inputs_exp;
+    uint16_t     adc_temp, adc_press;
+    uint16_t     offset_press;
+    uint32_t     pmin, pmax;
+    uint8_t      gettoniera_impulsi_abilitata;
+    uint32_t     minp[3], maxp[3];
+    uint8_t      accelerometro_ok;
+    int          log_index;
+    unsigned int log_accelerometro[MAX_LOG_ACCELEROMETRO][3];
+} test_data_t;
+
+
+typedef struct {
     statistics_t stats;
+    test_data_t  test;     // Informazioni relative alle schermate di test
 
     struct {
-        parmac_t parmac;
-        size_t   num_programmi;
-        // programma_lavatrice_t programmi[MAX_PROGRAMMI];
-        int ordine_modificato, parmac_modificati;
+        parmac_t              parmac;
+        programma_lavatrice_t programma_caricato;
+        size_t                num_programmi;
+        programma_preview_t   preview_programmi[MAX_PROGRAMMI];
+        int                   ordine_modificato, parmac_modificati;
     } prog;     // Programmazione (parametri e lavaggi)
 
     struct {
@@ -346,19 +362,6 @@ typedef struct {
     } run;     // Informazioni relative all'esecuzione attuale (sia della scheda quadro che dell'applicazione)
 
     struct {
-        uint16_t     inputs;
-        uint8_t      inputs_exp;
-        uint16_t     adc_temp, adc_press;
-        uint16_t     offset_press;
-        uint32_t     pmin, pmax;
-        uint8_t      gettoniera_impulsi_abilitata;
-        uint32_t     minp[3], maxp[3];
-        uint8_t      accelerometro_ok;
-        int          log_index;
-        unsigned int log_accelerometro[MAX_LOG_ACCELEROMETRO][3];
-    } test;     // Informazioni relative alle schermate di test
-
-    struct {
         char wifi_ipaddr[16];
         char machine_fw_version[STRING_NAME_SIZE];
         char machine_fw_date[STRING_NAME_SIZE];
@@ -380,10 +383,14 @@ typedef struct {
 void model_init(model_t *model);
 
 
-size_t model_get_language(model_t *pmodel);
-size_t model_deserialize_parmac(parmac_t *p, uint8_t *buffer);
-size_t model_serialize_parmac(uint8_t *buffer, parmac_t *p);
-void   model_unpack_stato_macchina(stato_macchina_t *stato, uint8_t *buffer);
+size_t                     model_get_language(model_t *pmodel);
+size_t                     model_deserialize_parmac(parmac_t *p, uint8_t *buffer);
+size_t                     model_serialize_parmac(uint8_t *buffer, parmac_t *p);
+void                       model_unpack_stato_macchina(stato_macchina_t *stato, uint8_t *buffer);
+size_t                     model_get_num_programs(model_t *pmodel);
+const programma_preview_t *model_get_preview(model_t *pmodel, size_t i);
+void                       model_unpack_test(test_data_t *test, uint8_t *buffer);
+size_t                     model_pack_parametri_macchina(uint8_t *buffer, parmac_t *p);
 
 
 #endif

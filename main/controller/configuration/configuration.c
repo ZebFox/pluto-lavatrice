@@ -13,7 +13,7 @@
 #include "model/parmac.h"
 #include "model/programs.h"
 //#include "model/parametri_macchina.h"
-//#include "model/parametri_lavaggio.h"
+#include "model/parlav.h"
 #include "utils/utils.h"
 #include "config/app_config.h"
 
@@ -197,8 +197,9 @@ int configuration_update_program_index(programma_lavatrice_t *p, int len) {
         char buffer[64];
 
         for (int i = 0; i < len; i++) {
-            if (strlen(p[i].filename) == 0)
+            if (strlen(p[i].filename) == 0) {
                 continue;
+            }
 
             snprintf(buffer, STRING_NAME_SIZE + 1, "%s\n", p[i].filename);
             if (fwrite(buffer, 1, strlen(buffer), findex) == 0) {
@@ -213,7 +214,7 @@ int configuration_update_program_index(programma_lavatrice_t *p, int len) {
 }
 
 
-void configuration_clear_orphan_programs(programma_lavatrice_t *ps, int num) {
+void configuration_clear_orphan_programs(programma_preview_t *previews, int num) {
     struct dirent *dir;
     char           string[300];
 
@@ -223,11 +224,12 @@ void configuration_clear_orphan_programs(programma_lavatrice_t *ps, int num) {
         while ((dir = readdir(d)) != NULL) {
             int orphan = 1;
 
-            if (strcmp(dir->d_name, "index.txt") == 0)
+            if (strcmp(dir->d_name, "index.txt") == 0) {
                 continue;
+            }
 
             for (int i = 0; i < num; i++) {
-                if (strcmp(ps[i].filename, dir->d_name) == 0) {
+                if (strcmp(previews[i].filename, dir->d_name) == 0) {
                     orphan = 0;
                     break;
                 }
@@ -243,7 +245,7 @@ void configuration_clear_orphan_programs(programma_lavatrice_t *ps, int num) {
 }
 
 
-int list_saved_programs(char *names[]) {
+int list_saved_programs(programma_preview_t *previews, size_t len) {
     int count = 0;
 
     FILE *findex = fopen(PATH_FILE_INDICE, "r");
@@ -256,11 +258,11 @@ int list_saved_programs(char *names[]) {
         while (fgets(filename, STRING_NAME_SIZE + 1, findex)) {
             int len = strlen(filename);
 
-            if (filename[len - 1] == '\n')     // Rimuovo il newline
+            if (filename[len - 1] == '\n') {     // Rimuovo il newline
                 filename[len - 1] = 0;
+            }
 
-            names[count] = malloc(strlen(filename) + 1);
-            strcpy(names[count++], filename);
+            strcpy(previews[count++].filename, filename);
         }
 
         fclose(findex);
@@ -270,11 +272,49 @@ int list_saved_programs(char *names[]) {
 }
 
 
-int load_saved_programs(model_t *model) {
+int configuration_load_program(model_t *pmodel) {
+    programma_lavatrice_t *programma = &pmodel->prog.programma_caricato;
+    uint8_t                buffer[MAX_PROGRAM_SIZE];
+    char                   path[PATH_MAX];
+    int                    count = 0;
+
+    sprintf(path, "%s/%s", PROGRAMS_PATH, programma->filename);
+
+    if (is_file(path)) {
+        ESP_LOGD(TAG, "Trovato lavaggio %s", path);
+        FILE *fp = fopen(path, "r");
+
+        if (!fp) {
+            ESP_LOGE(TAG, "Non sono riuscito ad aprire il file %s: %s", path, strerror(errno));
+            return -1;
+        }
+
+        size_t read = fread(buffer, 1, MAX_PROGRAM_SIZE, fp);
+
+        if (read == 0) {
+            ESP_LOGE(TAG, "Non sono riuscito a leggere il file %s: %s", path, strerror(errno));
+        } else {
+            deserialize_program(programma, buffer);
+            programma->modificato = 0;
+
+            // Controllo dei limiti
+            for (size_t i = 0; i < programma->num_steps; i++) {
+                programma->modificato = parlav_init(&pmodel->prog.parmac, &programma->steps[i]);
+            }
+
+            count++;
+        }
+
+        fclose(fp);
+    }
+    return 0;
+}
+
+
+int configuration_load_programs_preview(programma_preview_t *previews, size_t len, uint16_t lingua) {
     uint8_t buffer[MAX_PROGRAM_SIZE];
-    char   *names[100];
     name_t  filename;
-    int     num = list_saved_programs(names);
+    int     num = list_saved_programs(previews, len);
     char    path[PATH_MAX];
     int     count = 0;
 
@@ -283,11 +323,10 @@ int load_saved_programs(model_t *model) {
         num = 0;
     }
 
-    for (int i = 0; i < num; i++) {
-        sprintf(path, "%s/%s", PROGRAMS_PATH, names[i]);
+    for (size_t i = 0; i < num; i++) {
+        sprintf(path, "%s/%s", PROGRAMS_PATH, previews[i].name);
         memset(filename, 0, sizeof(name_t));
-        strcpy(filename, names[i]);
-        free(names[i]);
+        strcpy(filename, previews[i].name);
 
         if (is_file(path)) {
             ESP_LOGD(TAG, "Trovato lavaggio %s", path);
@@ -303,19 +342,7 @@ int load_saved_programs(model_t *model) {
             if (read == 0) {
                 ESP_LOGE(TAG, "Non sono riuscito a leggere il file %s: %s", path, strerror(errno));
             } else {
-                //TODO: caricare solo i programmi necessari
-#if 0
-                deserialize_program(&model->prog.programmi[count], buffer);
-                memcpy(&model->prog.programmi[count].filename, filename, STRING_NAME_SIZE);
-                model->prog.programmi[count].modificato = 0;
-
-                // Controllo dei limiti
-                for (size_t i = 0; i < model->prog.programmi[count].num_steps; i++) {
-                    programma_lavatrice_t *prog = &model->prog.programmi[count];
-                    prog->modificato            = init_parameter_lav_list(&model->prog.parmac, &prog->steps[i]);
-                }
-#endif
-
+                program_deserialize_preview(&previews[i], buffer, lingua);
                 count++;
             }
 
@@ -323,7 +350,6 @@ int load_saved_programs(model_t *model) {
         }
     }
 
-    model->prog.num_programmi = count;
     return count;
 }
 
@@ -400,14 +426,15 @@ int load_all_data(model_t *model) {
     parmac_init(model, 0);
 
     if (err) {
-        //change_machine_name(model, NOME_MACCHINA_NUOVA);
+        // change_machine_name(model, NOME_MACCHINA_NUOVA);
         parmac_init(model, 1);
         save_parmac(&model->prog.parmac);
     }
 
-    load_saved_programs(model);
-    //configuration_clear_orphan_programs(model->prog.programmi, model->prog.num_programmi);
-    //model_select_program(model, 0);
+    model->prog.num_programmi =
+        configuration_load_programs_preview(model->prog.preview_programmi, MAX_PROGRAMMI, model_get_language(model));
+    configuration_clear_orphan_programs(model->prog.preview_programmi, model->prog.num_programmi);
+    // model_select_program(model, 0);
 
     return configuration_read_local_data_version();
 }

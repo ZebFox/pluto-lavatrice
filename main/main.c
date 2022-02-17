@@ -20,6 +20,7 @@
 #include "peripherals/storage.h"
 #include "peripherals/fs_storage.h"
 #include "view/view_types.h"
+#include "i2c_devices/eeprom/24LC1025/24lc1025.h"
 
 
 static const char *TAG = "Main";
@@ -28,6 +29,9 @@ static model_t     model;
 
 void app_main(void) {
     keypad_update_t event;
+
+    i2c_driver_t driver;
+    ee24lc1025_sequential_read(driver, 0,0, NULL, 0);
 
     system_i2c_init();
     nt7534_init();

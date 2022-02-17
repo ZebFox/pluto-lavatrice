@@ -16,7 +16,7 @@ void init_new_program(programma_lavatrice_t *p, int num) {
     p->filename[0] = '\0';
 
     for (int i = 0; i < NUM_LINGUE_PREDISPOSTE; i++) {
-        //get_string_fmt(string, STRINGA_NOME_PROGRAMMA_DEFAULT, i, num);
+        // get_string_fmt(string, STRINGA_NOME_PROGRAMMA_DEFAULT, i, num);
         strcpy(p->nomi[i], string);
     }
 
@@ -518,6 +518,19 @@ static int deserialize_step(parametri_step_t *s, uint8_t *buffer) {
     assert(i <= STEP_SIZE);
     return STEP_SIZE;     // Allow for some margin
 }
+
+
+void program_deserialize_preview(programma_preview_t *p, uint8_t *buffer, uint16_t lingua) {
+    size_t i = lingua * STRING_NAME_SIZE;
+    memcpy(p->name, &buffer[i], STRING_NAME_SIZE);
+
+    i = MAX_LINGUE * STRING_NAME_SIZE;
+    uint32_t prezzo;
+    i += deserialize_uint32_be(&prezzo, &buffer[i]);
+    p->prezzo = prezzo;
+    i += UNPACK_UINT16_BE(p->tipo, &buffer[i]);
+}
+
 
 size_t deserialize_program(programma_lavatrice_t *p, uint8_t *buffer) {
     size_t   i = 0;

@@ -1,7 +1,9 @@
+#include <string.h>
 #include "packet.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "freertos/semphr.h"
 #include "config/app_config.h"
 #include "peripherals/machine_serial.h"
 #include "esp_log.h"
@@ -18,9 +20,11 @@
 typedef enum {
     MACHINE_REQUEST_CODE_PRESENTAZIONI,
     MACHINE_REQUEST_CODE_TEST,
+    MACHINE_REQUEST_CODE_TEST_DATA,
     MACHINE_REQUEST_CODE_STATO,
     MACHINE_REQUEST_CODE_RIAVVIA_COMUNICAZIONE,
     MACHINE_REQUEST_CODE_IMPOSTA_USCITA,
+    MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA,
 } machine_request_code_t;
 
 
@@ -32,7 +36,8 @@ typedef struct {
             size_t uscita;
             int    valore;
         };
-        int test;
+        int       test;
+        parmac_t *parmac;
     };
 } machine_request_t;
 
@@ -44,10 +49,11 @@ static int  invia_pacchetto(int comando, uint8_t *dati, uint8_t lunghezza_dati, 
 static int  task_gestisci_richiesta(machine_request_t request);
 
 
-static const char      *TAG       = "Machine";
-static QueueHandle_t    requestq  = NULL;
-static QueueHandle_t    responseq = NULL;
-static stato_macchina_t stato     = {0};
+static const char       *TAG       = "Machine";
+static QueueHandle_t     requestq  = NULL;
+static QueueHandle_t     responseq = NULL;
+static SemaphoreHandle_t sem       = NULL;
+static stato_macchina_t  stato     = {0};
 
 
 void machine_init(void) {
@@ -64,6 +70,24 @@ void machine_init(void) {
     static StaticTask_t static_task;
     static StackType_t  task_stack[BASE_TASK_STACK_SIZE * 5] = {0};
     xTaskCreateStatic(communication_task, TAG, sizeof(task_stack), NULL, 1, task_stack, &static_task);
+
+    static StaticSemaphore_t static_semaphore;
+    sem = xSemaphoreCreateMutexStatic(&static_semaphore);
+}
+
+
+void machine_read_state(model_t *pmodel) {
+    xSemaphoreTake(sem, portMAX_DELAY);
+    memcpy(&pmodel->run.macchina, &stato, sizeof(stato_macchina_t));
+    xSemaphoreGive(sem);
+}
+
+
+void machine_invia_parmac(parmac_t *parmac) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA};
+    richiesta.parmac            = malloc(sizeof(parmac_t));
+    memcpy(richiesta.parmac, parmac, sizeof(parmac_t));
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
 
 
@@ -86,6 +110,12 @@ void machine_richiedi_stato(void) {
 
 void machine_test(int test) {
     machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_TEST, .test = test};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_richiedi_dati_test(void) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_TEST_DATA};
     xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
 
@@ -154,11 +184,29 @@ static int task_gestisci_richiesta(machine_request_t request) {
             deserialize_uint8(&risposta_task.presentazioni.stato, &risposta_pacchetto.data[3]);
             deserialize_uint8(&risposta_task.presentazioni.nro_programma, &risposta_pacchetto.data[4]);
             deserialize_uint8(&risposta_task.presentazioni.nro_step, &risposta_pacchetto.data[5]);
+
+            // Versione di firmware della macchina
+            char string[64];
+            strcpy(string, (char *)&risposta_pacchetto.data[6]);
+            char *dash = strchr(string, '-');
+            if (dash) {
+                *dash = '\0';
+                dash++;
+                memset(risposta_task.presentazioni.machine_fw_date, 0, STRING_NAME_SIZE);
+                strncpy(risposta_task.presentazioni.machine_fw_date, dash, STRING_NAME_SIZE);
+            }
+            memset(risposta_task.presentazioni.machine_fw_version, 0, STRING_NAME_SIZE);
+            strncpy(risposta_task.presentazioni.machine_fw_version, string, MAX_NAME_SIZE);
+
             free(risposta_pacchetto.data);
 
             xQueueSend(responseq, &risposta_task, portMAX_DELAY);
             break;
         }
+
+        case MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA:
+            //TODO:
+            break;
 
         case MACHINE_REQUEST_CODE_STATO:
             res = invia_pacchetto_semplice(COMANDO_LEGGI_STATO, &risposta_pacchetto, -1);
@@ -167,18 +215,26 @@ static int task_gestisci_richiesta(machine_request_t request) {
             }
 
             risposta_task.code = MACHINE_RESPONSE_CODE_STATO;
-            // model_unpack_stato_macchina(&, uint8_t *buffer)
-            //  TODO: spacchetta lo stato
-            //  Attenzione: lo stato macchina comporta una grossa quantita' di dati, ed e' inopportuno inserirli nel
-            //  messaggio di risposta onde evitare che la coda esploda in dimensione. Piuttosto e' meglio avere
-            //  un'area di memoria coperta da semaforo che viene usata come casella postale quando arriva la
-            //  risposta.
+            xSemaphoreTake(sem, portMAX_DELAY);
+            model_unpack_stato_macchina(&stato, &risposta_pacchetto.data[1]);
+            xSemaphoreGive(sem);
             free(risposta_pacchetto.data);
             xQueueSend(responseq, &risposta_task, portMAX_DELAY);
             break;
 
         case MACHINE_REQUEST_CODE_TEST:
             res = invia_pacchetto_semplice(request.test ? ENTRA_IN_TEST : ESCI_DAL_TEST, &risposta_pacchetto, 1);
+            break;
+
+        case MACHINE_REQUEST_CODE_TEST_DATA:
+            res = invia_pacchetto_semplice(COMANDO_LEGGI_TEST, &risposta_pacchetto, -1);
+            if (res) {
+                break;
+            }
+
+            risposta_task.code = MACHINE_RESPONSE_CODE_TEST;
+            model_unpack_test(&risposta_task.test, &risposta_pacchetto.data[1]);
+            xQueueSend(responseq, &risposta_task, portMAX_DELAY);
             break;
 
         case MACHINE_REQUEST_CODE_IMPOSTA_USCITA: {
