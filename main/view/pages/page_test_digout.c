@@ -77,7 +77,7 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
                         msg.cmsg.test = 0;
                         break;
                     }
-                    case BUTTON_CALDO: {
+                    case BUTTON_SINISTRA: {
                         /*msg.vmsg.code          = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
                         page_data.digout_state = 0;
                         msg.vmsg.page          = &page_splash;

@@ -22,11 +22,12 @@
 #define BASENAME(x)   (strrchr(x, '/') + 1)
 
 #define BASE_PATH              LITTLEFS_PARTITION_PATH
-#define PROGRAMS_PATH          (BASE_PATH "/data/programmi")
-#define PARAMS_PATH            (BASE_PATH "/data/parametri")
-#define PATH_FILE_INDICE       (BASE_PATH "/data/programmi/index.txt")
-#define PATH_FILE_PARMAC       (BASE_PATH "/data/parametri/parmac.bin")
-#define PATH_FILE_DATA_VERSION (BASE_PATH "/data/version.txt")
+#define DATA_PATH              BASE_PATH "/data"
+#define PROGRAMS_PATH          (DATA_PATH "/programmi")
+#define PARAMS_PATH            (DATA_PATH "/parametri")
+#define PATH_FILE_INDICE       (DATA_PATH "/programmi/index.txt")
+#define PATH_FILE_PARMAC       (DATA_PATH "/parametri/parmac.bin")
+#define PATH_FILE_DATA_VERSION (DATA_PATH "/version.txt")
 
 #define DIR_CHECK(x)                                                                                                   \
     {                                                                                                                  \
@@ -142,11 +143,15 @@ static int cp(const char *to, const char *from) {
  */
 
 void configuration_init(void) {
-    if (!dir_exists(PROGRAMS_PATH))
+    if (!dir_exists(DATA_PATH)) {
+        create_dir(DATA_PATH);
+    }
+    if (!dir_exists(PROGRAMS_PATH)) {
         create_dir(PROGRAMS_PATH);
-    if (!dir_exists(PARAMS_PATH))
+    }
+    if (!dir_exists(PARAMS_PATH)) {
         create_dir(PARAMS_PATH);
-
+    }
     if (!is_file(PATH_FILE_DATA_VERSION)) {
         configuration_save_data_version();
     }
@@ -164,6 +169,33 @@ void configuration_remove_program_file(char *name) {
         ESP_LOGE(TAG, "Non sono riuscito a cancellare il file %s: %s", filename, strerror(errno));
     }
 }
+
+
+int configuration_create_empty_program(model_t *pmodel) {
+    uint16_t num       = model_get_num_programs(pmodel);
+    char     path[128] = {0};
+    name_t   filename;
+    uint8_t  buffer[PROGRAM_SIZE(0)];
+    int      res = 0;
+
+    size_t size = program_serialize_empty(buffer, num);
+
+    snprintf(path, sizeof(path), "%s/%s", PROGRAMS_PATH, model_new_unique_filename(pmodel, filename, get_millis()));
+    ESP_LOGI(TAG, "Creating new program %s", path);
+    FILE *fp = fopen(path, "w");
+    if (fwrite(buffer, 1, size, fp) == 0) {
+        res = 1;
+        ESP_LOGE(TAG, "Non sono riuscito a scrivere il file %s : %s", filename, strerror(errno));
+    }
+    fclose(fp);
+
+    if (configuration_add_program_to_index(filename)) {
+        ESP_LOGE(TAG, "Unable to add program to index");
+        return -1;
+    }
+    return res;
+}
+
 
 
 int configuration_update_program(programma_lavatrice_t *p) {
@@ -185,27 +217,20 @@ int configuration_update_program(programma_lavatrice_t *p) {
 }
 
 
-int configuration_update_program_index(programma_lavatrice_t *p, int len) {
+int configuration_add_program_to_index(char *filename) {
     int res = 0;
 
-    FILE *findex = fopen(PATH_FILE_INDICE, "w");
+    FILE *findex = fopen(PATH_FILE_INDICE, "a");
 
     if (!findex) {
         ESP_LOGE(TAG, "Operazione di scrittura dell'indice fallita: %s", strerror(errno));
         res = 1;
     } else {
-        char buffer[64];
-
-        for (int i = 0; i < len; i++) {
-            if (strlen(p[i].filename) == 0) {
-                continue;
-            }
-
-            snprintf(buffer, STRING_NAME_SIZE + 1, "%s\n", p[i].filename);
-            if (fwrite(buffer, 1, strlen(buffer), findex) == 0) {
-                ESP_LOGE(TAG, "Errore durante la scrittura dell'indice dei programmi: %s", strerror(errno));
-                res = 1;
-            }
+        char buffer[64] = {0};
+        snprintf(buffer, sizeof(buffer), "%s\n", filename);
+        if (fwrite(buffer, 1, strlen(buffer), findex) == 0) {
+            ESP_LOGE(TAG, "Errore durante la scrittura dell'indice dei programmi: %s", strerror(errno));
+            res = 1;
         }
         fclose(findex);
     }
@@ -253,16 +278,21 @@ int list_saved_programs(programma_preview_t *previews, size_t len) {
         ESP_LOGI(TAG, "Indice non trovato: %s", strerror(errno));
         return -1;
     } else {
-        char filename[STRING_NAME_SIZE + 1];
+        char filename[256];
 
-        while (fgets(filename, STRING_NAME_SIZE + 1, findex)) {
+        while (fgets(filename, sizeof(filename), findex)) {
             int len = strlen(filename);
+            if (len <= 0) {
+                continue;
+            }
 
             if (filename[len - 1] == '\n') {     // Rimuovo il newline
                 filename[len - 1] = 0;
             }
 
-            strcpy(previews[count++].filename, filename);
+            strcpy(previews[count].filename, filename);
+            ESP_LOGI(TAG, "File %s in indice", previews[count].filename);
+            count++;
         }
 
         fclose(findex);
@@ -312,24 +342,21 @@ int configuration_load_program(model_t *pmodel) {
 
 
 int configuration_load_programs_preview(programma_preview_t *previews, size_t len, uint16_t lingua) {
-    uint8_t buffer[MAX_PROGRAM_SIZE];
-    name_t  filename;
+    uint8_t buffer[512];
     int     num = list_saved_programs(previews, len);
     char    path[PATH_MAX];
     int     count = 0;
 
     if (num < 0) {
-        configuration_update_program_index(NULL, 0);
+        remove(PATH_FILE_INDICE);
         num = 0;
     }
+    ESP_LOGI(TAG, "%i programs found", num);
 
     for (size_t i = 0; i < num; i++) {
-        sprintf(path, "%s/%s", PROGRAMS_PATH, previews[i].name);
-        memset(filename, 0, sizeof(name_t));
-        strcpy(filename, previews[i].name);
+        sprintf(path, "%s/%s", PROGRAMS_PATH, previews[i].filename);
 
         if (is_file(path)) {
-            ESP_LOGD(TAG, "Trovato lavaggio %s", path);
             FILE *fp = fopen(path, "r");
 
             if (!fp) {
@@ -337,16 +364,19 @@ int configuration_load_programs_preview(programma_preview_t *previews, size_t le
                 continue;
             }
 
-            size_t read = fread(buffer, 1, MAX_PROGRAM_SIZE, fp);
+            size_t read = fread(buffer, 1, sizeof(buffer), fp);
 
             if (read == 0) {
                 ESP_LOGE(TAG, "Non sono riuscito a leggere il file %s: %s", path, strerror(errno));
             } else {
                 program_deserialize_preview(&previews[i], buffer, lingua);
+                ESP_LOGI(TAG, "Trovato lavaggio %s (%s)", previews[i].name, path);
                 count++;
             }
 
             fclose(fp);
+        } else {
+            ESP_LOGW(TAG, "Cannot find program %s", path);
         }
     }
 
@@ -412,7 +442,7 @@ int configuration_save_data_version(void) {
         res = -1;
     } else {
         char string[64];
-        snprintf(string, 64, "%i", VER_DATI);
+        snprintf(string, sizeof(string), "%i", VER_DATI);
         fwrite(string, 1, strlen(string), findex);
         fclose(findex);
     }
@@ -421,20 +451,20 @@ int configuration_save_data_version(void) {
 }
 
 
-int load_all_data(model_t *model) {
-    int err = load_parmac(&model->prog.parmac);
-    parmac_init(model, 0);
+int configuration_load_all_data(model_t *pmodel) {
+    int err = load_parmac(&pmodel->prog.parmac);
 
     if (err) {
         // change_machine_name(model, NOME_MACCHINA_NUOVA);
-        parmac_init(model, 1);
-        save_parmac(&model->prog.parmac);
+        parmac_init(pmodel, 1);
+        save_parmac(&pmodel->prog.parmac);
+    } else {
+        parmac_init(pmodel, 0);
     }
 
-    model->prog.num_programmi =
-        configuration_load_programs_preview(model->prog.preview_programmi, MAX_PROGRAMMI, model_get_language(model));
-    configuration_clear_orphan_programs(model->prog.preview_programmi, model->prog.num_programmi);
-    // model_select_program(model, 0);
+    pmodel->prog.num_programmi =
+        configuration_load_programs_preview(pmodel->prog.preview_programmi, MAX_PROGRAMMI, model_get_language(pmodel));
+    configuration_clear_orphan_programs(pmodel->prog.preview_programmi, pmodel->prog.num_programmi);
 
     return configuration_read_local_data_version();
 }

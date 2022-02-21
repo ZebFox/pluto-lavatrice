@@ -8,7 +8,7 @@
 
 typedef enum {
     BUTTON_NONE  = 0,
-    BUTTON_CALDO,
+    BUTTON_SINISTRA,
     BUTTON_KEY,
     BUTTON_DESTRA,
     BUTTON_PIU,

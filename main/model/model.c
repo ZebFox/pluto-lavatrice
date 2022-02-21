@@ -616,7 +616,7 @@ void model_unpack_test(test_data_t *test, uint8_t *buffer) {
 }
 
 
-static char *new_unique_filename(model_t *model, char *filename, unsigned long seed) {
+char *model_new_unique_filename(model_t *model, char *filename, unsigned long seed) {
     unsigned long now = seed;
     int           found;
 

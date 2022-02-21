@@ -11,18 +11,9 @@
 #define PACK_BYTE(buffer, num, i)     PACK_UINT8(&buffer[i], num)
 #define PACK_SHORT_BE(buffer, num, i) PACK_UINT16_BE(&buffer[i], num)
 
-void init_new_program(programma_lavatrice_t *p, int num) {
-    char string[33];
-    p->filename[0] = '\0';
 
-    for (int i = 0; i < NUM_LINGUE_PREDISPOSTE; i++) {
-        // get_string_fmt(string, STRINGA_NOME_PROGRAMMA_DEFAULT, i, num);
-        strcpy(p->nomi[i], string);
-    }
+static void init_names(name_t *names, uint16_t num);
 
-    p->num_steps  = 0;
-    p->modificato = 1;
-}
 
 void update_program_name(programma_lavatrice_t *p, const char *str, int lingua) {
     if (strlen(str) > 0) {
@@ -566,9 +557,40 @@ size_t serialize_program(uint8_t *buffer, programma_lavatrice_t *p) {
     i += serialize_uint16_be(&buffer[i], p->tipo);
     i += serialize_uint16_be(&buffer[i], p->num_steps);
 
-    for (size_t j = 0; j < p->num_steps; j++)
+    for (size_t j = 0; j < p->num_steps; j++) {
         i += serialize_step(&buffer[i], &p->steps[j]);
+    }
 
     assert(i == PROGRAM_SIZE(p->num_steps));
     return i;
+}
+
+
+size_t program_serialize_empty(uint8_t *buffer, uint16_t num) {
+    size_t i = 0;
+    name_t names[MAX_LINGUE];
+    init_names(names, num);
+
+    for (int j = 0; j < MAX_LINGUE; j++) {
+        memcpy(&buffer[i], names[j], STRING_NAME_SIZE);
+        i += STRING_NAME_SIZE;
+    }
+
+    i += serialize_uint32_be(&buffer[i], (uint32_t)0);
+    i += serialize_uint16_be(&buffer[i], 0);
+    i += serialize_uint16_be(&buffer[i], 0);
+
+    assert(i == PROGRAM_SIZE(0));
+    return i;
+}
+
+
+static void init_names(name_t *names, uint16_t num) {
+    const char *nuovo_programma[MAX_LINGUE] = {"Nuovo programma", "New program", "New program", "New program",
+                                               "New program",     "New program", "New program", "New program",
+                                               "New program",     "New program"};
+
+    for (int i = 0; i < MAX_LINGUE; i++) {
+        snprintf(names[i], sizeof(names[i]), "%s %i", nuovo_programma[i], num + 1);
+    }
 }

@@ -25,7 +25,7 @@ static const char *TAG = "keyboard";
 
 static keypad_key_t keyboard[] = {
     KEYPAD_KEY(0x6000, BUTTON_STOP_MENU),
-    KEYPAD_KEY(0x8000, BUTTON_CALDO),
+    KEYPAD_KEY(0x8000, BUTTON_SINISTRA),
     KEYPAD_KEY(0x800, BUTTON_KEY),
     KEYPAD_KEY(0x80, BUTTON_DESTRA),
     KEYPAD_KEY(0x4000, BUTTON_PIU),

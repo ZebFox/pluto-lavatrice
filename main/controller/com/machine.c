@@ -68,7 +68,7 @@ void machine_init(void) {
                                    sizeof(machine_response_t), responseq_queue_buffer, &static_responseq_queue);
 
     static StaticTask_t static_task;
-    static StackType_t  task_stack[BASE_TASK_STACK_SIZE * 5] = {0};
+    static StackType_t  task_stack[BASE_TASK_STACK_SIZE * 6] = {0};
     xTaskCreateStatic(communication_task, TAG, sizeof(task_stack), NULL, 1, task_stack, &static_task);
 
     static StaticSemaphore_t static_semaphore;
@@ -138,6 +138,7 @@ static void communication_task(void *args) {
     const machine_response_t risposta_errore          = {.code = MACHINE_RESPONSE_CODE_ERRORE_COMUNICAZIONE};
     machine_request_t        ultima_richiesta_fallita = {0};
     int                      errore_comunicazione     = 0;
+    ESP_LOGI(TAG, "Inizio task di comunicazione");
 
     for (;;) {
         machine_request_t request = {0};
@@ -205,7 +206,7 @@ static int task_gestisci_richiesta(machine_request_t request) {
         }
 
         case MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA:
-            //TODO:
+            // TODO:
             break;
 
         case MACHINE_REQUEST_CODE_STATO:

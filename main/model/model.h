@@ -46,6 +46,8 @@
 
 #define EVENT_LOG_CHUNK 50
 
+#define NUM_LINGUE 2
+
 enum {
     PAGAMENTO_NESSUNO = 0,
     PAGAMENTO_1_LINEA_NA,
@@ -391,6 +393,7 @@ size_t                     model_get_num_programs(model_t *pmodel);
 const programma_preview_t *model_get_preview(model_t *pmodel, size_t i);
 void                       model_unpack_test(test_data_t *test, uint8_t *buffer);
 size_t                     model_pack_parametri_macchina(uint8_t *buffer, parmac_t *p);
+char                      *model_new_unique_filename(model_t *model, char *filename, unsigned long seed);
 
 
 #endif

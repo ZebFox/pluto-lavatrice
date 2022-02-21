@@ -4,15 +4,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define MAX_LINGUE             10
-#define MAX_PROGRAMMI          100
-#define MAX_NAME_SIZE          32
-#define STRING_NAME_SIZE       (MAX_NAME_SIZE + 1)
-#define MAX_STEPS              36
-#define STEP_SIZE              256
-#define PROGRAM_SIZE(steps)    ((size_t)(338 + STEP_SIZE * steps))
-#define MAX_PROGRAM_SIZE       PROGRAM_SIZE(MAX_STEPS)
-#define NUM_LINGUE_PREDISPOSTE 5
+#define MAX_LINGUE          10
+#define MAX_PROGRAMMI       100
+#define MAX_NAME_SIZE       32
+#define STRING_NAME_SIZE    (MAX_NAME_SIZE + 1)
+#define MAX_STEPS           36
+#define STEP_SIZE           256
+#define PROGRAM_SIZE(steps) ((size_t)(338 + STEP_SIZE * steps))
+#define MAX_PROGRAM_SIZE    PROGRAM_SIZE(MAX_STEPS)
 
 typedef char name_t[STRING_NAME_SIZE];
 
@@ -104,7 +103,7 @@ typedef struct {
 
 typedef struct {
     name_t   filename;
-    char     nomi[MAX_LINGUE][STRING_NAME_SIZE];
+    name_t   nomi[MAX_LINGUE];
     uint32_t prezzo;
     uint8_t  tipo;
 
@@ -137,5 +136,6 @@ int              pack_step(uint8_t *buffer, const parametri_step_t *step, int nu
 size_t           deserialize_program(programma_lavatrice_t *p, uint8_t *buffer);
 size_t           serialize_program(uint8_t *buffer, programma_lavatrice_t *p);
 void             program_deserialize_preview(programma_preview_t *p, uint8_t *buffer, uint16_t lingua);
+size_t           program_serialize_empty(uint8_t *buffer, uint16_t num);
 
 #endif

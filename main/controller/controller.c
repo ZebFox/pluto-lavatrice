@@ -11,6 +11,7 @@
 #include "peripherals/pwoff.h"
 #include "i2c_devices/rtc/M41T81/m41t81.h"
 #include "peripherals/i2c_devices.h"
+#include "configuration/configuration.h"
 
 
 static const char *TAG = "Controller";
@@ -24,7 +25,9 @@ static struct tm      tm;
 void controller_init(model_t *pmodel) {
     (void)TAG;
     machine_init();
-    parmac_init(pmodel, 0);
+    configuration_init();
+    configuration_load_all_data(pmodel);
+
     view_change_page(pmodel, &page_splash);
     power_off_init();
     power_off_register_callback(pwoff_callback, pmodel);
@@ -52,6 +55,14 @@ void controller_init(model_t *pmodel) {
 
 void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
     switch (msg->code) {
+        case VIEW_CONTROLLER_COMMAND_CODE_CREATE_PROGRAM:
+            configuration_create_empty_program(pmodel);
+            pmodel->prog.num_programmi = configuration_load_programs_preview(pmodel->prog.preview_programmi,
+                                                                             MAX_PROGRAMMI, model_get_language(pmodel));
+            configuration_clear_orphan_programs(pmodel->prog.preview_programmi, pmodel->prog.num_programmi);
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_DATA_REFRESH});
+            break;
+
         case VIEW_CONTROLLER_COMMAND_CODE_TEST:
             machine_test(msg->test);
             break;

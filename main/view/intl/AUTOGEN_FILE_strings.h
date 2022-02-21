@@ -54,8 +54,11 @@ typedef enum {
     STRINGS_SABATO,
     STRINGS_DOMENICA,
     STRINGS_MODIF_PROGRAMMA,
+    STRINGS_NESSUN_PROGRAMMA,
+    STRINGS_NUOVO_PROGRAMMA,
+    STRINGS_PARAMETRI_MAC,
 } strings_t;
 
-extern const char *strings[52][2];
+extern const char *strings[55][2];
 
 #endif

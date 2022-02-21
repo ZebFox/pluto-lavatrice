@@ -106,7 +106,7 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                             timedata_update(data);
                         }
                         break;
-                    case BUTTON_CALDO:     // skip sinistra
+                    case BUTTON_SINISTRA:     // skip sinistra
                         if (data->index > 0) {
                             data->index--;
                             data->flag = 1;

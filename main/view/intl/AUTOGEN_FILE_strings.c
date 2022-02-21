@@ -1,4 +1,4 @@
-const char *strings[52][2] = {
+const char *strings[55][2] = {
     {"Inserire moneta", "Insert coin", },
     {"Inserire gettone", "Insert token", },
     {"Pagare cassa", "Pay at desk", },
@@ -51,5 +51,8 @@ const char *strings[52][2] = {
     {"SABATO", "SATURDAY", },
     {"DOMENICA", "SUNDAY", },
     {"MODIF. PROGRAMMA", "MODIFY PROG.", },
+    {"Nessun programma", "No programs", },
+    {"Crea un nuovo programma", "Create a new program", },
+    {"PARAMETRI MAC.", "MAC. PARAMETERS", },
 };
 

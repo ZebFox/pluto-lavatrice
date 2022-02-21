@@ -498,10 +498,10 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_LABEL    1
 #if LV_USE_LABEL != 0
 /*Hor, or ver. scroll speed [px/sec] in 'LV_LABEL_LONG_ROLL/ROLL_CIRC' mode*/
-#  define LV_LABEL_DEF_SCROLL_SPEED       4
+#  define LV_LABEL_DEF_SCROLL_SPEED       8
 
 /* Waiting period at beginning/end of animation cycle */
-#  define LV_LABEL_WAIT_CHAR_COUNT        2
+#  define LV_LABEL_WAIT_CHAR_COUNT        1
 
 /*Enable selecting text of the label */
 #  define LV_LABEL_TEXT_SEL               0

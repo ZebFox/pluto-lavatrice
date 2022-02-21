@@ -7,6 +7,8 @@
 #include "view/fonts/legacy_fonts.h"
 #include "view/common.h"
 #include "peripherals/keyboard.h"
+#include "view/intl/intl.h"
+
 
 struct page_data {
     lv_obj_t *lnum;
@@ -28,9 +30,9 @@ static void *create_page(model_t *model, void *extra) {
 }
 
 
-static void open_page(model_t *model, void *args) {
+static void open_page(model_t *pmodel, void *args) {
     struct page_data *data = args;
-    view_common_title(lv_scr_act(), "PARAMETRI MAC.");
+    view_common_title(lv_scr_act(), view_intl_get_string(pmodel, STRINGS_PARAMETRI_MAC));
 
     data->num_parameters = parmac_get_tot_parameters(data->livello_accesso);
     data->parameter      = 0;
@@ -42,6 +44,9 @@ static void open_page(model_t *model, void *args) {
 
     lv_obj_t *ldesc = lv_label_create(lv_scr_act(), lnum);
     lv_obj_align(ldesc, lnum, LV_ALIGN_OUT_BOTTOM_MID, 0, 8);
+    lv_label_set_align(ldesc, LV_LABEL_ALIGN_CENTER);
+    lv_label_set_long_mode(ldesc, LV_LABEL_LONG_SROLL);
+    lv_obj_set_width(ldesc, 128);
     data->ldesc = ldesc;
 
     lv_obj_t *lval = lv_label_create(lv_scr_act(), lnum);
@@ -67,7 +72,7 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_UPDATE;
                         break;
 
-                    case BUTTON_CALDO:
+                    case BUTTON_SINISTRA:
                         data->parameter = (data->parameter + 1) % data->num_parameters;
                         msg.vmsg.code   = VIEW_PAGE_COMMAND_CODE_UPDATE;
                         break;

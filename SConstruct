@@ -76,8 +76,8 @@ STRING_TRANSLATIONS = f"{MAIN}/view/intl"
 
 TRANSLATIONS = [
     {
-        "res": [f"{PARMAC_DESCRIPTIONS}/AUTOGEN_FILE_parmac.c", f"{PARMAC_DESCRIPTIONS}/AUTOGEN_FILE_parmac.h"],
-        "input": f"{ASSETS}/translations/parmac",
+        "res": [f"{PARMAC_DESCRIPTIONS}/AUTOGEN_FILE_pars.c", f"{PARMAC_DESCRIPTIONS}/AUTOGEN_FILE_pars.h"],
+        "input": f"{ASSETS}/translations/pars",
         "output": PARMAC_DESCRIPTIONS,
     },
     {

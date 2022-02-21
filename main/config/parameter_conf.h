@@ -7,11 +7,12 @@
 
 typedef struct {
     const char **descrizione;
-    void (*format)(char *string, const void *);
-    size_t *opzioni;
-    char ** unita;
+    void (*format)(char *string, uint16_t, const void *);
+    const char   *fmt;
+    const char ***valori;
 } parameter_user_data_t;
 
 #define GEL_PARAMETER_USER_DATA parameter_user_data_t
+#define GEL_PARAMETER_MAX_SIZE  2
 
 #endif

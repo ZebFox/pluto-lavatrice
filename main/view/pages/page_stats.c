@@ -127,7 +127,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
                         break;
 
-                    case BUTTON_CALDO:
+                    case BUTTON_SINISTRA:
                         data->index = (data->index + 1) % 8;
                         update_page(pmodel, data);
                         break;

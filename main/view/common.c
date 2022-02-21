@@ -99,10 +99,7 @@ lv_task_t *view_common_register_timer(unsigned long period) {
 }
 
 
-lv_obj_t *view_common_horizontal_line(void) {
-    /*Create an array for the points of the line*/
-    static lv_point_t line_points[] = {{0, 0}, {128, 0}};
-
+lv_obj_t *view_common_line(lv_point_t *points, size_t len) {
     /*Create new style (thick dark blue)*/
     static lv_style_t style_line;
     lv_style_copy(&style_line, &lv_style_plain);
@@ -113,9 +110,16 @@ lv_obj_t *view_common_horizontal_line(void) {
     /*Copy the previous line and apply the new style*/
     lv_obj_t *line1;
     line1 = lv_line_create(lv_scr_act(), NULL);
-    lv_line_set_points(line1, line_points, 2); /*Set the points*/
+    lv_line_set_points(line1, points, len); /*Set the points*/
     lv_line_set_style(line1, LV_LINE_STYLE_MAIN, &style_line);
     return line1;
+}
+
+
+lv_obj_t *view_common_horizontal_line(void) {
+    /*Create an array for the points of the line*/
+    static lv_point_t line_points[] = {{0, 0}, {128, 0}};
+    return view_common_line(line_points, 2);
 }
 
 

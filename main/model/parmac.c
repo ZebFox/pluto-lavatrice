@@ -1,20 +1,4 @@
-/******************************************************************************/
-/*                                                                            */
-/*  HSW snc - Casalecchio di Reno (BO) ITALY                                  */
-/*  ----------------------------------------                                  */
-/*                                                                            */
-/*  modulo: parmac.c                                                          */
-/*                                                                            */
-/*      definizione e gestione parametri macchina                             */
-/*                                                                            */
-/*  Autore: Maldus (Mattia MALDINI) & Virginia NEGRI & Massimo ZANNA          */
-/*                                                                            */
-/*  Data  : 19/07/2021      REV  : 00.0                                       */
-/*                                                                            */
-/*  U.mod.: 02/08/2021      REV  : 01.0                                       */
-/*                                                                            */
-/******************************************************************************/
-
+#include <string.h>
 #include <assert.h>
 #include <stdio.h>
 #include "config/parameter_conf.h"
@@ -22,14 +6,16 @@
 
 #include "model.h"
 #include "parmac.h"
-#include "descriptions/AUTOGEN_FILE_parmac.h"
+#include "descriptions/AUTOGEN_FILE_pars.h"
 
-#define NUM_PARAMETERS 1
+#define NUM_PARAMETERS 5
 
 #define AL_USER 0x01
 #define AL_TECH 0x02
 
-#define FINT(i) ((parameter_user_data_t){parmac_descriptions[i], formatta, NULL, NULL})
+#define FFINT(i, fmt) ((parameter_user_data_t){pars_descriptions[i], formatta_int, fmt, NULL})
+#define FINT(i)       ((parameter_user_data_t){pars_descriptions[i], formatta_int, NULL, NULL})
+#define FOPT(i, vals) ((parameter_user_data_t){pars_descriptions[i], formatta_opt, NULL, (const char ***)vals})
 
 enum {
     LIVELLO_ACCESSO_ESTESI  = 0,
@@ -39,17 +25,24 @@ enum {
 
 parameter_handle_t parameters[NUM_PARAMETERS];
 
-static void                formatta(char *string, const void *arg);
+static void                formatta_int(char *string, uint16_t language, const void *arg);
+static void                formatta_opt(char *string, uint16_t language, const void *arg);
 static parameter_handle_t *get_actual_parameter(model_t *pmodel, size_t parameter, uint8_t al);
 static uint8_t             get_livello_accesso(uint8_t parametri_ridotti);
 
 
 void parmac_init(model_t *pmodel, int reset) {
-    size_t    i = 0;
-    parmac_t *p = &pmodel->prog.parmac;
+    size_t              i  = 0;
+    parmac_t           *p  = &pmodel->prog.parmac;
+    parameter_handle_t *ps = parameters;
 
-    parameters[i++] = PARAMETER(&p->lingua, 0, 1, 0, FINT(PARMAC_DESCRIPTIONS_LINGUA), AL_USER);
-    // parameters[i++] = PARAMETER(&p->lingua_max_bandiera, 0, 1, 1, FINT(PARMAC_DESCRIPTIONS_LINGUA), AL_USER);
+    char *fmt_sec = "%i s";
+
+    ps[i++] = PARAMETER(&p->lingua, 0, NUM_LINGUE - 1, 0, FOPT(PARS_DESCRIPTIONS_LINGUA, pars_lingue), AL_USER);
+    ps[i++] = PARAMETER(&p->logo, 0, 5, 0, FOPT(PARS_DESCRIPTIONS_LOGO, pars_loghi), AL_USER);
+    ps[i++] = PARAMETER(&p->livello_accesso, 0, 3, 0, FOPT(PARS_DESCRIPTIONS_LIVELLO_ACCESSO, pars_loghi), AL_TECH);
+    ps[i++] = PARAMETER(&p->secondi_pausa, 0, 10, 1, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_PAUSA, fmt_sec), AL_USER);
+    ps[i++] = PARAMETER(&p->secondi_stop, 0, 10, 3, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_STOP, fmt_sec), AL_USER);
 
 #if 0
     parameter_data_t tmp[NUMP] = {
@@ -202,7 +195,7 @@ void parmac_format_value(model_t *pmodel, char *string, size_t parameter, uint8_
     parameter_handle_t   *par  = get_actual_parameter(pmodel, parameter, al);
     parameter_user_data_t data = parameter_get_user_data(par);
 
-    data.format(string, par);
+    data.format(string, model_get_language(pmodel), par);
 }
 
 size_t parmac_get_tot_parameters(uint8_t al) {
@@ -210,21 +203,34 @@ size_t parmac_get_tot_parameters(uint8_t al) {
 }
 
 
-static void formatta(char *string, const void *arg) {
-    const parameter_handle_t *par = arg;
+static void formatta_int(char *string, uint16_t language, const void *arg) {
+    (void)language;
+    const parameter_handle_t   *par   = arg;
+    const parameter_user_data_t udata = parameter_get_user_data((parameter_handle_t *)par);
 
     switch (par->type) {
-        case PARAMETER_TYPE_UINT8:
-            sprintf(string, "%i", *(uint8_t *)par->pointer);
-            break;
         case PARAMETER_TYPE_UINT16:
-            sprintf(string, "%i", *(uint16_t *)par->pointer);
+            if (udata.fmt != NULL) {
+                sprintf(string, udata.fmt, *(uint16_t *)par->pointer);
+            } else {
+                sprintf(string, "%i", *(uint16_t *)par->pointer);
+            }
             break;
         default:
             sprintf(string, "Errore!");
             break;
     }
 }
+
+
+static void formatta_opt(char *string, uint16_t language, const void *arg) {
+    const parameter_handle_t   *par   = arg;
+    const parameter_user_data_t udata = parameter_get_user_data((parameter_handle_t *)par);
+    size_t                      value = parameter_to_index((parameter_handle_t *)par);
+    char *(*values)[NUM_LINGUE]       = (char *(*)[NUM_LINGUE])udata.valori;
+    strcpy(string, values[language][value]);
+}
+
 
 
 static uint8_t get_livello_accesso(uint8_t parametri_ridotti) {

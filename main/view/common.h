@@ -11,9 +11,9 @@
 #define VIEW_PASSWORD_SET_DATETIME ((button_t[]){BUTTON_MENU, BUTTON_MENU})
 #define VIEW_PASSWORD_PLUS         ((button_t[]){BUTTON_PIU, BUTTON_PIU})
 #define VIEW_PASSWORD_RIGHT        ((button_t[]){BUTTON_DESTRA, BUTTON_DESTRA})
-#define VIEW_PASSWORD_LEFT         ((button_t[]){BUTTON_CALDO, BUTTON_CALDO})
+#define VIEW_PASSWORD_LEFT         ((button_t[]){BUTTON_SINISTRA, BUTTON_SINISTRA})
 #define VIEW_PASSWORD_TIEPIDO      ((button_t[]){BUTTON_PIU, BUTTON_PIU})
-#define VIEW_PASSWORD_RESET        ((button_t[]){BUTTON_PIU, BUTTON_DESTRA, BUTTON_CALDO, BUTTON_FREDDO})
+#define VIEW_PASSWORD_RESET        ((button_t[]){BUTTON_PIU, BUTTON_DESTRA, BUTTON_SINISTRA, BUTTON_FREDDO})
 #define VIEW_SHORT_PASSWORD_LEN    2
 #define VIEW_LONG_PASSWORD_LEN     4
 
@@ -33,5 +33,6 @@ lv_task_t *view_common_register_timer(unsigned long period);
 int        view_common_check_password_started(view_common_password_t *inserted);
 void      *view_common_malloc_page_data(size_t size);
 lv_obj_t  *view_common_horizontal_line(void);
+lv_obj_t  *view_common_line(lv_point_t *points, size_t len);
 
 #endif
