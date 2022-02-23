@@ -86,7 +86,7 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
                         msg.cmsg.test = 0;*/
                         break;
                     }
-                    case BUTTON_FREDDO: {
+                    case BUTTON_MENO: {
                         page_data.digout_state = 0;
                         if (page_data.digout_index < 20)
                             page_data.digout_index++;
@@ -121,7 +121,6 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
                         page_data.digout_state = 0;
                         lv_task_set_prio(page_data.task, LV_TASK_PRIO_OFF);
                         lv_task_reset(page_data.task);
-                        msg.vmsg.code  = VIEW_PAGE_COMMAND_CODE_UPDATE;
                         page_data.time = 5;
                         update_page(model);
 
@@ -131,7 +130,6 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
                     case BUTTON_LINGUA: {
                         page_data.digout_state = 1;
                         lv_task_set_prio(page_data.task, LV_TASK_PRIO_MID);
-                        msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_UPDATE;
                         update_page(model);
 
                         msg.cmsg.code   = VIEW_CONTROLLER_COMMAND_CODE_TEST_DIGOUT;

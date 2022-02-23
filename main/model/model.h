@@ -48,6 +48,10 @@
 
 #define NUM_LINGUE 2
 
+#if NUM_LINGUE > MAX_LINGUE
+#error "Too many languages!"
+#endif
+
 enum {
     PAGAMENTO_NESSUNO = 0,
     PAGAMENTO_1_LINEA_NA,
@@ -331,6 +335,7 @@ typedef struct {
 
     struct {
         parmac_t              parmac;
+        size_t                num_programma_caricato;
         programma_lavatrice_t programma_caricato;
         size_t                num_programmi;
         programma_preview_t   preview_programmi[MAX_PROGRAMMI];
@@ -394,6 +399,9 @@ const programma_preview_t *model_get_preview(model_t *pmodel, size_t i);
 void                       model_unpack_test(test_data_t *test, uint8_t *buffer);
 size_t                     model_pack_parametri_macchina(uint8_t *buffer, parmac_t *p);
 char                      *model_new_unique_filename(model_t *model, char *filename, unsigned long seed);
+programma_lavatrice_t     *model_get_program(model_t *pmodel);
+void                       model_sync_program_preview(model_t *pmodel);
+parametri_step_t          *model_get_program_step(model_t *pmodel, size_t num);
 
 
 #endif

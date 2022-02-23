@@ -37,7 +37,7 @@ void parmac_init(model_t *pmodel, int reset) {
     parameter_handle_t *ps = parameters;
 
     char *fmt_sec = "%i s";
-
+    
     ps[i++] = PARAMETER(&p->lingua, 0, NUM_LINGUE - 1, 0, FOPT(PARS_DESCRIPTIONS_LINGUA, pars_lingue), AL_USER);
     ps[i++] = PARAMETER(&p->logo, 0, 5, 0, FOPT(PARS_DESCRIPTIONS_LOGO, pars_loghi), AL_USER);
     ps[i++] = PARAMETER(&p->livello_accesso, 0, 3, 0, FOPT(PARS_DESCRIPTIONS_LIVELLO_ACCESSO, pars_loghi), AL_TECH);

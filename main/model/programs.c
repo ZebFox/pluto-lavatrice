@@ -18,7 +18,6 @@ static void init_names(name_t *names, uint16_t num);
 void update_program_name(programma_lavatrice_t *p, const char *str, int lingua) {
     if (strlen(str) > 0) {
         strcpy(p->nomi[lingua], str);
-        p->modificato = 1;
     }
 }
 
@@ -34,32 +33,33 @@ void update_program_price(programma_lavatrice_t *p, const char *string) {
     }
     *dst = '\0';
 
-    p->prezzo     = atoi(tmp);
-    p->modificato = 1;
+    p->prezzo = atoi(tmp);
     free(tmp);
 }
 
+
 void update_program_type(programma_lavatrice_t *p, unsigned char type) {
-    p->tipo       = type;
-    p->modificato = 1;
+    p->tipo = type;
 }
 
-void add_step(programma_lavatrice_t *p, int tipo, int delicato_energetico) {
-    insert_step(p, tipo, p->num_steps, delicato_energetico);
+
+void program_add_step(programma_lavatrice_t *p, int tipo) {
+    program_insert_step(p, tipo, p->num_steps);
 }
 
-void insert_step(programma_lavatrice_t *p, int tipo, size_t index, int delicato_energetico) {
+
+void program_insert_step(programma_lavatrice_t *p, int tipo, size_t index) {
     if (p->num_steps < MAX_STEPS && index <= p->num_steps) {
         for (int i = (int)p->num_steps - 1; i >= (int)index; i--)
             p->steps[i + 1] = p->steps[i];
 
-        p->steps[index] = default_step(tipo, delicato_energetico);
+        p->steps[index] = default_step(tipo, DELICATO);
         p->num_steps++;
-        p->modificato = 1;
     }
 }
 
-void remove_step(programma_lavatrice_t *p, int index) {
+
+void programs_remove_step(programma_lavatrice_t *p, int index) {
     int len = p->num_steps;
 
     for (int i = index; i < len - 1; i++) {
@@ -68,7 +68,6 @@ void remove_step(programma_lavatrice_t *p, int index) {
 
     if (p->num_steps > 0) {
         p->num_steps--;
-        p->modificato = 1;
     }
 }
 
@@ -77,7 +76,6 @@ void swap_steps(programma_lavatrice_t *p, int first, int second) {
         parametri_step_t s = p->steps[first];
         p->steps[first]    = p->steps[second];
         p->steps[second]   = s;
-        p->modificato      = 1;
     }
 }
 

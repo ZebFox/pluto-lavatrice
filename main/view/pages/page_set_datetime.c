@@ -124,7 +124,7 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                     case BUTTON_PIU:     // più
                         time_op(model, data, 1);
                         break;
-                    case BUTTON_FREDDO:     // meno
+                    case BUTTON_MENO:     // meno
                         time_op(model, data, -1);
                         break;
                     default:

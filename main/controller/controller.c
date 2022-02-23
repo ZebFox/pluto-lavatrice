@@ -63,6 +63,19 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
             view_event((view_event_t){.code = VIEW_EVENT_CODE_DATA_REFRESH});
             break;
 
+        case VIEW_CONTROLLER_COMMAND_CODE_LOAD_PROGRAM:
+            if (configuration_load_program(pmodel, msg->num)) {
+                break;
+            }
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_PROGRAM_LOADED, .num = msg->num});
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_UPDATE_PROGRAM:
+            configuration_update_program(model_get_program(pmodel));
+            model_sync_program_preview(pmodel);
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_PROGRAM_SAVED});
+            break;
+
         case VIEW_CONTROLLER_COMMAND_CODE_TEST:
             machine_test(msg->test);
             break;

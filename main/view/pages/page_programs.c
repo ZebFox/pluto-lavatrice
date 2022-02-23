@@ -21,6 +21,8 @@ struct page_data {
     lv_obj_t *lbl_nome;
     lv_obj_t *lbl_nuovo_programma;
     lv_obj_t *lbl_index;
+
+    void *destination;
 };
 
 
@@ -74,6 +76,11 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
     (void)pdata;
 
     switch (event.code) {
+        case VIEW_EVENT_CODE_PROGRAM_LOADED:
+            msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
+            msg.vmsg.page = pdata->destination;
+            break;
+
         case VIEW_EVENT_CODE_KEYPAD: {
             if (event.key_event.event == KEY_CLICK) {
                 switch (event.key_event.code) {
@@ -82,8 +89,9 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         break;
 
                     case BUTTON_MENU:
-                        msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
-                        msg.vmsg.page = (void *)&page_program_name;
+                        msg.cmsg.code      = VIEW_CONTROLLER_COMMAND_CODE_LOAD_PROGRAM;
+                        msg.cmsg.num       = pdata->index;
+                        pdata->destination = (void *)&page_program_name;
                         break;
 
                     case BUTTON_DESTRA:
@@ -103,6 +111,10 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                     case BUTTON_LINGUA:
                         if (pdata->index == model_get_num_programs(pmodel)) {
                             msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_CREATE_PROGRAM;
+                        } else {
+                            msg.cmsg.code      = VIEW_CONTROLLER_COMMAND_CODE_LOAD_PROGRAM;
+                            msg.cmsg.num       = pdata->index;
+                            pdata->destination = (void *)&page_program_steps;
                         }
                         break;
 

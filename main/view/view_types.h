@@ -23,7 +23,6 @@ typedef enum {
     VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE,
     VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE_EXTRA,
     VIEW_PAGE_COMMAND_CODE_BACK,
-    VIEW_PAGE_COMMAND_CODE_UPDATE,
 } view_page_command_code_t;
 
 typedef struct {
@@ -51,6 +50,8 @@ typedef enum {
     VIEW_CONTROLLER_COMMAND_CODE_UPDATE_CONTRAST,
     VIEW_CONTROLLER_COMMAND_CODE_PRIVATE_PARAMETERS_SAVE,
     VIEW_CONTROLLER_COMMAND_CODE_CREATE_PROGRAM,
+    VIEW_CONTROLLER_COMMAND_CODE_LOAD_PROGRAM,
+    VIEW_CONTROLLER_COMMAND_CODE_UPDATE_PROGRAM,
 } view_controller_command_code_t;
 
 
@@ -61,7 +62,8 @@ typedef struct {
             int output;
             int value;
         };
-        int test;
+        int      test;
+        uint16_t num;
     };
 } view_controller_command_t;
 
@@ -81,6 +83,8 @@ typedef enum {
     VIEW_EVENT_CODE_STATO_UPDATE,
     VIEW_EVENT_CODE_ALARM,
     VIEW_EVENT_CODE_DATA_REFRESH,
+    VIEW_EVENT_CODE_PROGRAM_SAVED,
+    VIEW_EVENT_CODE_PROGRAM_LOADED,
     VIEW_EVENT_CODE_TIMER,
     VIEW_EVENT_CODE_OPEN,
 } view_event_code_t;
@@ -92,6 +96,7 @@ typedef struct {
         keypad_update_t key_event;
         int             timer_id;
         unsigned int    coins;
+        uint16_t        num;
     };
 } view_event_t;
 

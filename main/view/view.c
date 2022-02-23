@@ -130,10 +130,6 @@ int view_process_msg(view_page_command_t vmsg, model_t *model) {
             view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
             break;
 
-        case VIEW_PAGE_COMMAND_CODE_UPDATE:
-            pman_page_update(&pman, model);
-            return 1;
-
         case VIEW_PAGE_COMMAND_CODE_NOTHING:
             break;
     }

@@ -2,13 +2,26 @@
 #include "common.h"
 #include "gel/timer/timecheck.h"
 #include "styles.h"
+#include "model/programs.h"
+#include "intl/intl.h"
 
 
 static void timer_task(lv_task_t *task);
 static int  find_password_start(view_common_password_t *password);
 
 
-static const button_t preamble[3] = {BUTTON_STOP, BUTTON_STOP, BUTTON_STOP};
+static const button_t  preamble[3]         = {BUTTON_STOP, BUTTON_STOP, BUTTON_STOP};
+static const strings_t step2str[NUM_STEPS] = {
+    STRINGS_AMMOLLO, STRINGS_PRELAVAGGIO, STRINGS_LAVAGGIO,     STRINGS_RISCIACQUO,
+    STRINGS_SCARICO, STRINGS_CENTRIFUGA,  STRINGS_SROTOLAMENTO, STRINGS_ATTESA_OPERATORE,
+};
+
+
+const char *view_common_step2str(model_t *pmodel, uint16_t step) {
+    assert(step <= NUM_STEPS && step > 0);
+    return view_intl_get_string(pmodel, step2str[step - 1]);
+}
+
 
 
 lv_obj_t *view_common_title(lv_obj_t *root, const char *str) {

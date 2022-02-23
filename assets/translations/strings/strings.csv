@@ -54,3 +54,16 @@ MODIF_PROGRAMMA, MODIF. PROGRAMMA, MODIFY PROG.
 NESSUN_PROGRAMMA, Nessun programma, No programs
 NUOVO_PROGRAMMA, Crea un nuovo programma, Create a new program
 PARAMETRI_MAC, PARAMETRI MAC., MAC. PARAMETERS
+PREZZO, PREZZO, PRICE
+TIPO, TIPO, TYPE
+PASSI_PROGRAMMA, PASSI PROGRAMMA, PROGRAM STEPS
+PASSO, Passo, Step
+PROGRAMMA_VUOTO, Programma vuoto, Empty program
+AMMOLLO, Ammollo, Soaking
+PRELAVAGGIO, Prelavaggio, Prewash
+LAVAGGIO, Lavaggio, Washing
+RISCIACQUO, Risciacquo, Flushing
+SCARICO, Scarico, Drain
+CENTRIFUGA, Centrifuga, Centrifuge
+SROTOLAMENTO, Srotolamento, Unrolling
+ATTESA_OPERATORE, Attesa operatore, Waiting

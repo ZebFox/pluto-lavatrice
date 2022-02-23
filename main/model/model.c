@@ -13,6 +13,34 @@ void model_init(model_t *pmodel) {
 }
 
 
+programma_lavatrice_t *model_get_program(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return &pmodel->prog.programma_caricato;
+}
+
+
+parametri_step_t *model_get_program_step(model_t *pmodel, size_t num) {
+    assert(pmodel != NULL);
+    if (num < pmodel->prog.programma_caricato.num_steps) {
+        return &pmodel->prog.programma_caricato.steps[num];
+    } else {
+        return NULL;
+    }
+}
+
+
+void model_sync_program_preview(model_t *pmodel) {
+    assert(pmodel != NULL);
+
+    programma_lavatrice_t *pr = &pmodel->prog.programma_caricato;
+    programma_preview_t   *pv = &pmodel->prog.preview_programmi[pmodel->prog.num_programma_caricato];
+    strcpy(pv->filename, pr->filename);
+    strcpy(pv->name, pr->nomi[model_get_language(pmodel)]);
+    pv->prezzo = pr->prezzo;
+    pv->tipo   = pv->tipo;
+}
+
+
 size_t model_get_language(model_t *pmodel) {
     assert(pmodel != NULL);
     return pmodel->prog.parmac.lingua;

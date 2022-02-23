@@ -52,7 +52,6 @@ void app_main(void) {
 
 
     ESP_LOGI(TAG, "Begin main loop");
-    ESP_LOGI(TAG, "");
 
     for (;;) {
         controller_gui_process(&model);

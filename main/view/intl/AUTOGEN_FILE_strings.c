@@ -1,4 +1,4 @@
-const char *strings[55][2] = {
+const char *strings[68][2] = {
     {"Inserire moneta", "Insert coin", },
     {"Inserire gettone", "Insert token", },
     {"Pagare cassa", "Pay at desk", },
@@ -54,5 +54,18 @@ const char *strings[55][2] = {
     {"Nessun programma", "No programs", },
     {"Crea un nuovo programma", "Create a new program", },
     {"PARAMETRI MAC.", "MAC. PARAMETERS", },
+    {"PREZZO", "PRICE", },
+    {"TIPO", "TYPE", },
+    {"PASSI PROGRAMMA", "PROGRAM STEPS", },
+    {"Passo", "Step", },
+    {"Programma vuoto", "Empty program", },
+    {"Ammollo", "Soaking", },
+    {"Prelavaggio", "Prewash", },
+    {"Lavaggio", "Washing", },
+    {"Risciacquo", "Flushing", },
+    {"Scarico", "Drain", },
+    {"Centrifuga", "Centrifuge", },
+    {"Srotolamento", "Unrolling", },
+    {"Attesa operatore", "Waiting", },
 };
 

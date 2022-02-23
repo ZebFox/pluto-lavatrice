@@ -199,20 +199,26 @@ int configuration_create_empty_program(model_t *pmodel) {
 
 
 int configuration_update_program(programma_lavatrice_t *p) {
-    char    filename[128];
-    uint8_t buffer[MAX_PROGRAM_SIZE];
-    int     res = 0;
+    char path[128];
+    int  res = 0;
 
+    snprintf(path, sizeof(path), "%s/%s", PROGRAMS_PATH, p->filename);
+    FILE *fp = fopen(path, "w");
+    if (fp == NULL) {
+        ESP_LOGE(TAG, "Non sono riuscito ad aprire il file %s in scrittura: %s", path, strerror(errno));
+        return -1;
+    }
+
+    uint8_t *buffer = malloc(MAX_PROGRAM_SIZE);
+    assert(buffer != NULL);
     size_t size = serialize_program(buffer, p);
-
-    snprintf(filename, sizeof(filename), "%s/%s", PROGRAMS_PATH, p->filename);
-    FILE *fp = fopen(filename, "w");
     if (fwrite(buffer, 1, size, fp) == 0) {
         res = 1;
-        ESP_LOGE(TAG, "Non sono riuscito a scrivere il file %s : %s", filename, strerror(errno));
+        ESP_LOGE(TAG, "Non sono riuscito a scrivere il file %s : %s", path, strerror(errno));
     }
 
     fclose(fp);
+    free(buffer);
     return res;
 }
 
@@ -302,12 +308,16 @@ int list_saved_programs(programma_preview_t *previews, size_t len) {
 }
 
 
-int configuration_load_program(model_t *pmodel) {
+int configuration_load_program(model_t *pmodel, size_t num) {
     programma_lavatrice_t *programma = &pmodel->prog.programma_caricato;
-    uint8_t                buffer[MAX_PROGRAM_SIZE];
     char                   path[PATH_MAX];
     int                    count = 0;
 
+    if (num >= model_get_num_programs(pmodel)) {
+        return -1;
+    }
+
+    strcpy(programma->filename, pmodel->prog.preview_programmi[num].filename);
     sprintf(path, "%s/%s", PROGRAMS_PATH, programma->filename);
 
     if (is_file(path)) {
@@ -319,23 +329,26 @@ int configuration_load_program(model_t *pmodel) {
             return -1;
         }
 
-        size_t read = fread(buffer, 1, MAX_PROGRAM_SIZE, fp);
+        uint8_t *buffer = malloc(MAX_PROGRAM_SIZE);
+        size_t   read   = fread(buffer, 1, MAX_PROGRAM_SIZE, fp);
 
         if (read == 0) {
             ESP_LOGE(TAG, "Non sono riuscito a leggere il file %s: %s", path, strerror(errno));
         } else {
+            program_deserialize_preview(&pmodel->prog.preview_programmi[num], buffer, model_get_language(pmodel));
             deserialize_program(programma, buffer);
-            programma->modificato = 0;
 
             // Controllo dei limiti
             for (size_t i = 0; i < programma->num_steps; i++) {
-                programma->modificato = parlav_init(&pmodel->prog.parmac, &programma->steps[i]);
+                parlav_init(&pmodel->prog.parmac, &programma->steps[i]);
             }
 
             count++;
         }
+        pmodel->prog.num_programma_caricato = num;
 
         fclose(fp);
+        free(buffer);
     }
     return 0;
 }

@@ -6,8 +6,8 @@
 
 #define MAX_LINGUE          10
 #define MAX_PROGRAMMI       100
-#define MAX_NAME_SIZE       32
-#define STRING_NAME_SIZE    (MAX_NAME_SIZE + 1)
+#define MAX_NAME_LENGTH     32
+#define STRING_NAME_SIZE    (MAX_NAME_LENGTH + 1)
 #define MAX_STEPS           36
 #define STEP_SIZE           256
 #define PROGRAM_SIZE(steps) ((size_t)(338 + STEP_SIZE * steps))
@@ -24,7 +24,7 @@ typedef char name_t[STRING_NAME_SIZE];
 #define STEP_CENTRIFUGA   6
 #define STEP_SROTOLAMENTO 7
 #define STEP_ATTESA       8
-#define STEP_NUM          8
+#define NUM_STEPS         8
 
 #define DELICATO 0
 #define ENERGICO 1
@@ -109,8 +109,6 @@ typedef struct {
 
     size_t           num_steps;
     parametri_step_t steps[MAX_STEPS];
-
-    int modificato;
 } programma_lavatrice_t;
 
 
@@ -126,10 +124,10 @@ void init_new_program(programma_lavatrice_t *p, int num);
 void update_program_name(programma_lavatrice_t *p, const char *str, int lingua);
 void update_program_price(programma_lavatrice_t *p, const char *string);
 void update_program_type(programma_lavatrice_t *p, unsigned char type);
-void add_step(programma_lavatrice_t *p, int tipo, int delicato_energetico);
+void program_add_step(programma_lavatrice_t *p, int tipo);
 void swap_steps(programma_lavatrice_t *p, int first, int second);
-void remove_step(programma_lavatrice_t *p, int index);
-void insert_step(programma_lavatrice_t *p, int tipo, size_t index, int delicato_energetico);
+void programs_remove_step(programma_lavatrice_t *p, int index);
+void program_insert_step(programma_lavatrice_t *p, int tipo, size_t index);
 
 parametri_step_t default_step(int tipo, int delicato_energico);
 int              pack_step(uint8_t *buffer, const parametri_step_t *step, int num);

@@ -197,7 +197,7 @@ static int task_gestisci_richiesta(machine_request_t request) {
                 strncpy(risposta_task.presentazioni.machine_fw_date, dash, STRING_NAME_SIZE);
             }
             memset(risposta_task.presentazioni.machine_fw_version, 0, STRING_NAME_SIZE);
-            strncpy(risposta_task.presentazioni.machine_fw_version, string, MAX_NAME_SIZE);
+            strncpy(risposta_task.presentazioni.machine_fw_version, string, MAX_NAME_LENGTH);
 
             free(risposta_pacchetto.data);
 
