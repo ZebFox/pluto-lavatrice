@@ -380,6 +380,9 @@ typedef struct {
         int     num_archivi;
         name_t *archivi;
 
+        int errore_comunicazione;
+        int comunicazione_abilitata;
+
         unsigned int debug_code;
     } system;     // Dati del sistema Linux sottostante
 } model_t;
@@ -398,10 +401,11 @@ size_t                     model_get_num_programs(model_t *pmodel);
 const programma_preview_t *model_get_preview(model_t *pmodel, size_t i);
 void                       model_unpack_test(test_data_t *test, uint8_t *buffer);
 size_t                     model_pack_parametri_macchina(uint8_t *buffer, parmac_t *p);
-char                      *model_new_unique_filename(model_t *model, char *filename, unsigned long seed);
-programma_lavatrice_t     *model_get_program(model_t *pmodel);
+char *                     model_new_unique_filename(model_t *model, char *filename, unsigned long seed);
+programma_lavatrice_t *    model_get_program(model_t *pmodel);
 void                       model_sync_program_preview(model_t *pmodel);
-parametri_step_t          *model_get_program_step(model_t *pmodel, size_t num);
+parametri_step_t *         model_get_program_step(model_t *pmodel, size_t num);
+void                       model_deserialize_statistics(statistics_t *stats, uint8_t *buffer);
 
 
 #endif

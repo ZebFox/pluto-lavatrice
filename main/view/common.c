@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "common.h"
 #include "gel/timer/timecheck.h"
+#include "src/lv_objx/lv_label.h"
 #include "styles.h"
 #include "model/programs.h"
 #include "intl/intl.h"
@@ -50,6 +51,23 @@ lv_obj_t *view_common_title(lv_obj_t *root, const char *str) {
     lv_obj_align(title, NULL, LV_ALIGN_CENTER, 0, 0);
 
     return title;
+}
+
+lv_obj_t *view_common_popup(lv_obj_t *root,const char *str) {
+    lv_obj_t *cont = lv_cont_create(root, NULL);
+    lv_obj_set_size(cont, 110, 50);
+    lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style(cont, &style_container_bordered);
+    lv_obj_t *cont_in = lv_cont_create(cont, NULL);
+    lv_obj_set_size(cont_in, 105, 45);
+    lv_obj_align(cont_in, cont, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style(cont_in, &style_container_bordered);
+
+    lv_obj_t *label = lv_label_create(cont, NULL);
+    lv_label_set_text(label,str);
+    lv_obj_align(label, cont, LV_ALIGN_CENTER, 0, 0);
+
+    return cont;
 }
 
 

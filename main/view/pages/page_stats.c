@@ -13,8 +13,8 @@
 
 struct page_data {
     lv_task_t *task;
-    lv_obj_t  *label;
-    lv_obj_t  *lbl_stat;
+    lv_obj_t * label;
+    lv_obj_t * lbl_stat;
     size_t     index;
 };
 
@@ -139,6 +139,10 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                             data->index = 7;
                         }
                         update_page(pmodel, data);
+                        break;
+
+                    case BUTTON_LINGUA:
+                        msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_UPDATE_STATISTICS;
                         break;
 
                     default:

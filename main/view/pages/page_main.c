@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <assert.h>
+#include "controller/com/machine.h"
 #include "lvgl/lvgl.h"
+#include "src/lv_core/lv_obj.h"
 #include "view/view.h"
 #include "view/images/legacy.h"
 #include "view/view_types.h"
@@ -11,6 +13,7 @@
 #include "view/styles.h"
 #include "view/intl/intl.h"
 #include "utils/utils.h"
+#include "esp_log.h"
 
 
 enum {
@@ -24,6 +27,8 @@ struct page_data {
 
     lv_obj_t *lbl_name;
     lv_obj_t *lbl_index;
+
+    lv_obj_t *popup_comunication_error;
 };
 
 
@@ -58,6 +63,12 @@ static void open_page(model_t *pmodel, void *args) {
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
     pdata->lbl_index = lbl;
 
+    // stringa testo
+    lv_obj_t *popup                 = view_common_popup(lv_scr_act(), "ERRORE");
+    pdata->popup_comunication_error = popup;
+    lv_obj_set_hidden(pdata->popup_comunication_error, 1);
+
+
     update_prog_data(pmodel, pdata);
 }
 
@@ -65,6 +76,13 @@ static void open_page(model_t *pmodel, void *args) {
 static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_t event) {
     view_message_t    msg   = VIEW_EMPTY_MSG;
     struct page_data *pdata = arg;
+
+    if (pmodel->system.errore_comunicazione && lv_obj_get_hidden(pdata->popup_comunication_error)) {
+        lv_obj_set_hidden(pdata->popup_comunication_error, 0);
+    }
+    if (!pmodel->system.errore_comunicazione && !lv_obj_get_hidden(pdata->popup_comunication_error)) {
+        lv_obj_set_hidden(pdata->popup_comunication_error, 1);
+    }
 
     switch (event.code) {
         case VIEW_EVENT_CODE_KEYPAD: {
@@ -97,9 +115,13 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                     break;
                 } else if (view_common_check_password(&pdata->password, VIEW_PASSWORD_SET_DATETIME,
                                                       VIEW_SHORT_PASSWORD_LEN, get_millis())) {
-                    // uuuuu
                     msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                     msg.vmsg.page = &page_set_datetime;
+                    break;
+                } else if (view_common_check_password(&pdata->password, VIEW_PASSWORD_LANA, VIEW_LONG_PASSWORD_LEN,
+                                                      get_millis())) {
+                    msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
+                    msg.vmsg.page = &page_communication_settings;
                     break;
                 } else if (view_common_check_password_started(&pdata->password)) {
                     break;
@@ -111,14 +133,24 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         break;
                     }
 
-                    case BUTTON_DESTRA:
+                    case BUTTON_STOP: {
+                        if (pmodel->system.errore_comunicazione &&
+                            !lv_obj_get_hidden(pdata->popup_comunication_error)) {
+                            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_RETRY_COMMUNICATION;
+                        }
+                        break;
+                    }
+
+                    case BUTTON_DESTRA: {
                         if (model_get_num_programs(pmodel) > 1) {
                             pdata->index = (pdata->index + 1) % model_get_num_programs(pmodel);
                             update_prog_data(pmodel, pdata);
                         }
                         break;
+                    }
 
-                    case BUTTON_SINISTRA:
+
+                    case BUTTON_SINISTRA: {
                         if (model_get_num_programs(pmodel) > 1) {
                             if (pdata->index > 0) {
                                 pdata->index--;
@@ -128,6 +160,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                             update_prog_data(pmodel, pdata);
                         }
                         break;
+                    }
 
                     default:
                         break;

@@ -63,6 +63,17 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
             view_event((view_event_t){.code = VIEW_EVENT_CODE_DATA_REFRESH});
             break;
 
+        case VIEW_CONTROLLER_COMMAND_CODE_RETRY_COMMUNICATION:
+            machine_riavvia_comunicazione();
+            pmodel->system.errore_comunicazione = 0;
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_MODEL_UPDATE});
+
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_CHANGE_AB_COMMUNICATION:
+            machine_abilita_comunicazione(msg->value);
+            break;
+
         case VIEW_CONTROLLER_COMMAND_CODE_LOAD_PROGRAM:
             if (configuration_load_program(pmodel, msg->num)) {
                 break;
@@ -82,6 +93,10 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
 
         case VIEW_CONTROLLER_COMMAND_CODE_TEST_REFRESH:
             machine_richiedi_dati_test();
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_UPDATE_STATISTICS:
+            machine_read_stats(pmodel);
             break;
 
         case VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF:
@@ -110,7 +125,10 @@ void controller_manage(model_t *pmodel) {
     if (machine_ricevi_risposta(&risposta)) {
         switch (risposta.code) {
             case MACHINE_RESPONSE_CODE_ERRORE_COMUNICAZIONE:
-                // TODO: segnala errore di comunicazione
+
+                pmodel->system.errore_comunicazione = 1;
+                view_event((view_event_t){.code = VIEW_EVENT_CODE_MODEL_UPDATE});
+
                 break;
 
             case MACHINE_RESPONSE_CODE_PRESENTAZIONI: {
@@ -146,6 +164,12 @@ void controller_manage(model_t *pmodel) {
 
             case MACHINE_RESPONSE_CODE_STATO:
                 machine_read_state(pmodel);
+                break;
+
+            case MACHINE_RESPONSE_CODE_STATS:
+                pmodel->stats = *risposta.stats;
+                free(risposta.stats);
+                view_event((view_event_t){.code = VIEW_EVENT_CODE_MODEL_UPDATE});
                 break;
         }
     }

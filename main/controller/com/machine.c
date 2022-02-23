@@ -22,6 +22,7 @@ typedef enum {
     MACHINE_REQUEST_CODE_TEST,
     MACHINE_REQUEST_CODE_TEST_DATA,
     MACHINE_REQUEST_CODE_STATO,
+    MACHINE_REQUEST_CODE_STATS,
     MACHINE_REQUEST_CODE_RIAVVIA_COMUNICAZIONE,
     MACHINE_REQUEST_CODE_IMPOSTA_USCITA,
     MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA,
@@ -49,12 +50,12 @@ static int  invia_pacchetto(int comando, uint8_t *dati, uint8_t lunghezza_dati, 
 static int  task_gestisci_richiesta(machine_request_t request);
 
 
-static const char       *TAG       = "Machine";
+static const char *      TAG       = "Machine";
 static QueueHandle_t     requestq  = NULL;
 static QueueHandle_t     responseq = NULL;
 static SemaphoreHandle_t sem       = NULL;
 static stato_macchina_t  stato     = {0};
-
+static int               communication_ab;
 
 void machine_init(void) {
     static StaticQueue_t static_requestq_queue;
@@ -62,6 +63,7 @@ void machine_init(void) {
     requestq = xQueueCreateStatic(sizeof(requestq_queue_buffer) / sizeof(machine_request_t), sizeof(machine_request_t),
                                   requestq_queue_buffer, &static_requestq_queue);
 
+    communication_ab = 1;
     static StaticQueue_t static_responseq_queue;
     static uint8_t       responseq_queue_buffer[sizeof(machine_response_t) * 4] = {0};
     responseq = xQueueCreateStatic(sizeof(responseq_queue_buffer) / sizeof(machine_response_t),
@@ -80,6 +82,11 @@ void machine_read_state(model_t *pmodel) {
     xSemaphoreTake(sem, portMAX_DELAY);
     memcpy(&pmodel->run.macchina, &stato, sizeof(stato_macchina_t));
     xSemaphoreGive(sem);
+}
+
+void machine_read_stats(model_t *pmodel) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_STATS};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
 
 
@@ -142,6 +149,9 @@ static void communication_task(void *args) {
 
     for (;;) {
         machine_request_t request = {0};
+        xSemaphoreTake(sem, portMAX_DELAY);
+        int ab_local = communication_ab;
+        xSemaphoreGive(sem);
 
         if (xQueueReceive(requestq, &request, portMAX_DELAY)) {
             if (errore_comunicazione && request.code == MACHINE_REQUEST_CODE_RIAVVIA_COMUNICAZIONE) {
@@ -151,7 +161,7 @@ static void communication_task(void *args) {
                     xQueueSend(responseq, &risposta_errore, portMAX_DELAY);
                     continue;
                 }
-            } else if (!errore_comunicazione) {
+            } else if (!errore_comunicazione && ab_local) {
                 errore_comunicazione = task_gestisci_richiesta(request);
                 if (errore_comunicazione) {
                     ESP_LOGW(TAG, "Risposta assente o non valida!");
@@ -167,6 +177,11 @@ static void communication_task(void *args) {
     vTaskDelete(NULL);
 }
 
+void machine_abilita_comunicazione(size_t en) {
+    xSemaphoreTake(sem, portMAX_DELAY);
+    communication_ab = en;
+    xSemaphoreGive(sem);
+}
 
 static int task_gestisci_richiesta(machine_request_t request) {
     packet_t           risposta_pacchetto = {0};
@@ -220,6 +235,19 @@ static int task_gestisci_richiesta(machine_request_t request) {
             model_unpack_stato_macchina(&stato, &risposta_pacchetto.data[1]);
             xSemaphoreGive(sem);
             free(risposta_pacchetto.data);
+            xQueueSend(responseq, &risposta_task, portMAX_DELAY);
+            break;
+
+        case MACHINE_REQUEST_CODE_STATS:
+            res = invia_pacchetto_semplice(COMANDO_LEGGI_STATISTICHE, &risposta_pacchetto, -1);
+            if (res) {
+                break;
+            }
+
+            risposta_task.code  = MACHINE_RESPONSE_CODE_STATS;
+            risposta_task.stats = malloc(sizeof(statistics_t));
+            assert(risposta_task.stats != NULL);
+            model_deserialize_statistics(risposta_task.stats, &risposta_pacchetto.data[1]);
             xQueueSend(responseq, &risposta_task, portMAX_DELAY);
             break;
 

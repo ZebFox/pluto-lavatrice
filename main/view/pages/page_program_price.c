@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 #include "lvgl/lvgl.h"
 #include "src/lv_core/lv_obj.h"
 #include "src/lv_misc/lv_task.h"
@@ -26,8 +27,13 @@ enum {
 struct page_data {
     int        flag;
     lv_task_t *task;
+    lv_obj_t * lprice;
+    size_t     index;
 };
 
+static uint32_t take_int(uint8_t *digits);
+static void     take_digits(uint8_t *res, uint32_t intero);
+static void     price_update(model_t *pmodel, struct page_data *data);
 
 static void update_page(model_t *pmodel, struct page_data *pdata);
 
@@ -44,11 +50,24 @@ static void open_page(model_t *pmodel, void *args) {
 
     view_common_title(lv_scr_act(), view_intl_get_string(pmodel, STRINGS_PREZZO));
 
+    lv_task_set_prio(data->task, LV_TASK_PRIO_MID);
+    data->flag  = 1;
+    data->index = 0;
+
     lv_obj_t *cont = lv_cont_create(lv_scr_act(), NULL);
     lv_obj_set_size(cont, 110, 20);
-    lv_obj_align(cont, NULL, LV_ALIGN_IN_TOP_MID, 0, 1);
+    lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 1);
     lv_obj_set_style(cont, &style_container_bordered);
 
+    lv_obj_t *lprice = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_set_auto_realign(lprice, 1);
+    lv_obj_align(lprice, cont, LV_ALIGN_CENTER, 0, 0);
+    data->lprice = lprice;
+
+    uint8_t digits[6] = {0};
+    take_digits(digits, pmodel->prog.programma_caricato.prezzo);
+    lv_label_set_text_fmt(data->lprice, "%c%c%c%c%c%c", digits[5] + 48, digits[4] + 48, digits[3] + 48, digits[2] + 48,
+                          digits[1] + 48, digits[0] + 48);
     update_page(pmodel, data);
 }
 
@@ -76,36 +95,58 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         break;
                     }
 
-                    case BUTTON_DESTRA: {
+                    case BUTTON_SINISTRA:     // skip sx
+                        if (data->index < 5) {
+                            data->index++;
+                            data->flag = 1;
+                            price_update(pmodel, data);
+                        }
+                        break;
+                    case BUTTON_DESTRA:     // skip dx
+                        if (data->index > 0) {
+                            data->index--;
+                            data->flag = 1;
+                            price_update(pmodel, data);
+                        }
+                        break;
+                    case BUTTON_PIU: {     // più
+                        uint8_t digits[6] = {0};
+                        take_digits(digits, pmodel->prog.programma_caricato.prezzo);
+                        if (digits[data->index] < 9) {
+                            digits[data->index]++;
+                            pmodel->prog.programma_caricato.prezzo = take_int(digits);
+                        } else if (digits[data->index] == 9) {
+                            digits[data->index]                    = 0;
+                            pmodel->prog.programma_caricato.prezzo = take_int(digits);
+                        }
+                        data->flag = 0;
+                        price_update(pmodel, data);
                     }
 
-                    case BUTTON_SINISTRA: {
-                        break;
-                    }
+                    break;
+                    case BUTTON_MENO: {     // meno
+                        uint8_t digits[6] = {0};
+                        take_digits(digits, pmodel->prog.programma_caricato.prezzo);
+                        if (digits[data->index] > 0) {
+                            digits[data->index]--;
+                            pmodel->prog.programma_caricato.prezzo = take_int(digits);
+                        } else if (digits[data->index] == 0) {
+                            digits[data->index]                    = 9;
+                            pmodel->prog.programma_caricato.prezzo = take_int(digits);
+                        }
+                        data->flag = 0;
+                        price_update(pmodel, data);
 
-                    case BUTTON_MENO: {
+                    } break;
+                    default:
                         break;
-                    }
-
-                    case BUTTON_PIU: {
-                        break;
-                    }
-
-                    case BUTTON_LANA:
-                        break;
-
-                    case BUTTON_LINGUA: {
-                        break;
-                    }
                 }
             }
             break;
         }
 
         case VIEW_EVENT_CODE_TIMER: {
-            lv_task_reset(data->task);
-            data->flag = !data->flag;
-            update_page(pmodel, data);
+            price_update(pmodel, data);
         }
 
         break;
@@ -115,7 +156,6 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
     }
     return msg;
 }
-
 
 static void close_page(void *arg) {
     struct page_data *data = arg;
@@ -142,3 +182,30 @@ const pman_page_t page_program_price = {
     .close         = close_page,
     .destroy       = destroy_page,
 };
+
+static void take_digits(uint8_t *res, uint32_t intero) {
+    for (size_t i = 0; i < 6; i++) {
+        res[i] = ((int)intero % ((int)pow(10, (i + 1)))) / ((int)pow(10, i));
+    }
+}
+
+static uint32_t take_int(uint8_t *digits) {
+    uint32_t res = 0;
+    for (size_t i = 0; i < 6; i++) {
+        res += (digits[i]) * ((int)pow(10, i));
+    }
+    return res;
+}
+
+static void price_update(model_t *pmodel, struct page_data *data) {
+    uint8_t digits[6] = {0};
+    take_digits(digits, pmodel->prog.programma_caricato.prezzo);
+    if (data->flag) {
+        digits[data->index] = '_' - 48;
+    }
+    data->flag = !data->flag;
+
+    lv_label_set_text_fmt(data->lprice, "%c%c%c%c%c%c", digits[5] + 48, digits[4] + 48, digits[3] + 48, digits[2] + 48,
+                          digits[1] + 48, digits[0] + 48);
+    lv_task_reset(data->task);
+}

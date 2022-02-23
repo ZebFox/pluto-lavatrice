@@ -11,6 +11,7 @@ typedef enum {
     MACHINE_RESPONSE_CODE_ERRORE_COMUNICAZIONE,
     MACHINE_RESPONSE_CODE_PRESENTAZIONI,
     MACHINE_RESPONSE_CODE_STATO,
+    MACHINE_RESPONSE_CODE_STATS,
     MACHINE_RESPONSE_CODE_TEST,
 } machine_response_code_t;
 
@@ -26,7 +27,8 @@ typedef struct {
             name_t  machine_fw_version;
             name_t  machine_fw_date;
         } presentazioni;
-        test_data_t test;
+        test_data_t   test;
+        statistics_t *stats;
     };
 } machine_response_t;
 
@@ -40,6 +42,7 @@ void machine_test(int test);
 void machine_richiedi_stato(void);
 void machine_read_state(model_t *pmodel);
 void machine_richiedi_dati_test(void);
-
+void machine_abilita_comunicazione(size_t en);
+void machine_read_stats(model_t *pmodel);
 
 #endif

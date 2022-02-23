@@ -10,6 +10,7 @@ static char *new_unique_filename(model_t *model, char *filename, unsigned long s
 
 void model_init(model_t *pmodel) {
     memset(pmodel, 0, sizeof(model_t));
+    pmodel->system.comunicazione_abilitata = 1;
 }
 
 
@@ -331,6 +332,29 @@ size_t model_deserialize_parmac(parmac_t *p, uint8_t *buffer) {
     return i;
 }
 
+
+void model_deserialize_statistics(statistics_t *stats, uint8_t *buffer) {
+    size_t i = 0;
+
+    i += deserialize_uint32_be(&stats->cicli_eseguiti, &buffer[i]);
+    i += deserialize_uint32_be(&stats->cicli_interrotti, &buffer[i]);
+    i += deserialize_uint32_be(&stats->cicli_loop, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_accensione, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_lavoro, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_moto, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_riscaldamento, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_h2o_fredda, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_h2o_calda, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_h2o_rec_dep, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_h2o_flusso, &buffer[i]);
+
+    for (size_t j = 0; j < NUM_MAX_SAPONI; j++) {
+        i += deserialize_uint32_be(&stats->tempo_saponi[j], &buffer[i]);
+    }
+
+    i += deserialize_uint32_be(&stats->chiusure_oblo, &buffer[i]);
+    i += deserialize_uint32_be(&stats->aperture_oblo, &buffer[i]);
+}
 
 void model_unpack_stato_macchina(stato_macchina_t *stato, uint8_t *buffer) {
     int i = 0;
