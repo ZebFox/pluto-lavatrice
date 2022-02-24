@@ -113,10 +113,15 @@ typedef struct {
 
 
 typedef struct {
+    uint32_t prezzo;
+    uint16_t lavaggi;
+    uint16_t velocita;
+    uint16_t temperatura;
+    uint16_t livello;
+    uint16_t durata;
+    uint8_t  tipo;
     name_t   filename;
     name_t   name;
-    uint32_t prezzo;
-    uint8_t  tipo;
 } programma_preview_t;
 
 

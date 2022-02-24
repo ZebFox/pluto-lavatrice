@@ -3,19 +3,12 @@
 #include <stdio.h>
 #include "config/parameter_conf.h"
 #include "gel/parameter/parameter.h"
-
+#include "descriptions/parstring.h"
 #include "model.h"
 #include "parmac.h"
 #include "descriptions/AUTOGEN_FILE_pars.h"
 
-#define NUM_PARAMETERS 5
-
-#define AL_USER 0x01
-#define AL_TECH 0x02
-
-#define FFINT(i, fmt) ((parameter_user_data_t){pars_descriptions[i], formatta_int, fmt, NULL})
-#define FINT(i)       ((parameter_user_data_t){pars_descriptions[i], formatta_int, NULL, NULL})
-#define FOPT(i, vals) ((parameter_user_data_t){pars_descriptions[i], formatta_opt, NULL, (const char ***)vals})
+#define NUM_PARAMETERS 14
 
 enum {
     LIVELLO_ACCESSO_ESTESI  = 0,
@@ -25,8 +18,6 @@ enum {
 
 parameter_handle_t parameters[NUM_PARAMETERS];
 
-static void                formatta_int(char *string, uint16_t language, const void *arg);
-static void                formatta_opt(char *string, uint16_t language, const void *arg);
 static parameter_handle_t *get_actual_parameter(model_t *pmodel, size_t parameter, uint8_t al);
 static uint8_t             get_livello_accesso(uint8_t parametri_ridotti);
 
@@ -36,13 +27,24 @@ void parmac_init(model_t *pmodel, int reset) {
     parmac_t           *p  = &pmodel->prog.parmac;
     parameter_handle_t *ps = parameters;
 
+    pmodel->prog.parmac.livello_accesso = 3;
+
     char *fmt_sec = "%i s";
     
-    ps[i++] = PARAMETER(&p->lingua, 0, NUM_LINGUE - 1, 0, FOPT(PARS_DESCRIPTIONS_LINGUA, pars_lingue), AL_USER);
-    ps[i++] = PARAMETER(&p->logo, 0, 5, 0, FOPT(PARS_DESCRIPTIONS_LOGO, pars_loghi), AL_USER);
-    ps[i++] = PARAMETER(&p->livello_accesso, 0, 3, 0, FOPT(PARS_DESCRIPTIONS_LIVELLO_ACCESSO, pars_loghi), AL_TECH);
-    ps[i++] = PARAMETER(&p->secondi_pausa, 0, 10, 1, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_PAUSA, fmt_sec), AL_USER);
-    ps[i++] = PARAMETER(&p->secondi_stop, 0, 10, 3, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_STOP, fmt_sec), AL_USER);
+    ps[i++] = PARAMETER(&p->lingua, 0, NUM_LINGUE - 1, 0, FOPT(PARS_DESCRIPTIONS_LINGUA, pars_lingue), BIT_UTENTE);
+    ps[i++] = PARAMETER(&p->logo, 0, 5, 0, FOPT(PARS_DESCRIPTIONS_LOGO, pars_loghi), BIT_UTENTE);
+    ps[i++] = PARAMETER(&p->livello_accesso, 0, 3, 0, FOPT(PARS_DESCRIPTIONS_LIVELLO_ACCESSO, pars_loghi), BIT_TECNICO);
+    ps[i++] = PARAMETER(&p->tipo_gettoniera, 0, 8, 0, FOPT(PARS_DESCRIPTIONS_TIPO_GETTONIERA, pars_gettoniera), BIT_UTENTE);
+    ps[i++] = PARAMETER(&p->valore_impulso, 1, 0xFFFF, 10, FINT(PARS_DESCRIPTIONS_VALORE_IMPULSO), BIT_UTENTE);
+    ps[i++] = PARAMETER(&p->valore_prezzo_unico, 1, 0xFFFF, 500, FINT(PARS_DESCRIPTIONS_VALORE_PREZZO_UNICO), BIT_TECNICO);
+    ps[i++] = PARAMETER(&p->prezzo_unico, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_PREZZO_UNICO, pars_abilitazione), BIT_UTENTE);
+    ps[i++] = PARAMETER(&p->cifre_prezzo, 1, 6, 4, FINT(PARS_DESCRIPTIONS_CIFRE_PREZZO), BIT_TECNICO);
+    ps[i++] = PARAMETER_DLIMITS(&p->cifre_decimali_prezzo, NULL, &p->cifre_prezzo, 0, 6, 2, FINT(PARS_DESCRIPTIONS_CIFRE_DECIMALI_PREZZO), BIT_TECNICO);
+    ps[i++] = PARAMETER(&p->modo_vis_prezzo, 0, 4, 0, FOPT(PARS_DESCRIPTIONS_VISUALIZZAZIONE_PREZZO, pars_tipo_pagamento), BIT_TECNICO);
+    ps[i++] = PARAMETER(&p->richiesta_pagamento, 0, 2, 0, FOPT(PARS_DESCRIPTIONS_RICHIESTA_PAGAMENTO, pars_richiesta_pagamento), BIT_TECNICO);
+    ps[i++] = PARAMETER(&p->abilitazione_sblocco_get, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_SBLOCCO_GETTONIERA, pars_abilitazione), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->secondi_pausa, 0, 10, 1, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_PAUSA, fmt_sec), BIT_UTENTE);
+    ps[i++] = PARAMETER(&p->secondi_stop, 0, 10, 3, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_STOP, fmt_sec), BIT_UTENTE);
 
 #if 0
     parameter_data_t tmp[NUMP] = {
@@ -200,35 +202,6 @@ void parmac_format_value(model_t *pmodel, char *string, size_t parameter, uint8_
 
 size_t parmac_get_tot_parameters(uint8_t al) {
     return parameter_get_count(parameters, NUM_PARAMETERS, al);
-}
-
-
-static void formatta_int(char *string, uint16_t language, const void *arg) {
-    (void)language;
-    const parameter_handle_t   *par   = arg;
-    const parameter_user_data_t udata = parameter_get_user_data((parameter_handle_t *)par);
-
-    switch (par->type) {
-        case PARAMETER_TYPE_UINT16:
-            if (udata.fmt != NULL) {
-                sprintf(string, udata.fmt, *(uint16_t *)par->pointer);
-            } else {
-                sprintf(string, "%i", *(uint16_t *)par->pointer);
-            }
-            break;
-        default:
-            sprintf(string, "Errore!");
-            break;
-    }
-}
-
-
-static void formatta_opt(char *string, uint16_t language, const void *arg) {
-    const parameter_handle_t   *par   = arg;
-    const parameter_user_data_t udata = parameter_get_user_data((parameter_handle_t *)par);
-    size_t                      value = parameter_to_index((parameter_handle_t *)par);
-    char *(*values)[NUM_LINGUE]       = (char *(*)[NUM_LINGUE])udata.valori;
-    strcpy(string, values[language][value]);
 }
 
 

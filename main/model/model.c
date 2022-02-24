@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -5,7 +6,7 @@
 #include "gel/serializer/serializer.h"
 
 
-static char *new_unique_filename(model_t *model, char *filename, unsigned long seed);
+static unsigned int get_credito_macchina(model_t *model);
 
 
 void model_init(model_t *pmodel) {
@@ -59,6 +60,221 @@ const programma_preview_t *model_get_preview(model_t *pmodel, size_t i) {
         return NULL;
     }
     return &pmodel->prog.preview_programmi[i];
+}
+
+
+void model_avanza_step(model_t *model) {
+    const programma_lavatrice_t *p = model_get_program(model);
+
+    model->run.num_step_corrente = model->run.num_step_successivo;
+    if (p && model->run.num_step_successivo + 1 >= (int)p->num_steps) {
+        model->run.model_lavaggio_finito = 1;
+    }
+    model->run.num_step_successivo = (model->run.num_step_successivo + 1) % p->num_steps;
+}
+
+
+void model_azzera_lavaggio(model_t *pmodel) {
+    assert(pmodel != NULL);
+    pmodel->run.num_step_corrente     = 0;
+    pmodel->run.num_step_successivo   = 0;
+    pmodel->run.model_lavaggio_finito = 0;
+}
+
+
+int model_macchina_in_pausa(model_t *model) {
+    return model->run.macchina.stato == STATO_MACCHINA_PAUSA;
+}
+
+
+int model_macchina_in_frenata(model_t *model) {
+    return model->run.macchina.stato == STATO_MACCHINA_FRENATA;
+}
+
+
+int model_macchina_in_scarico_forzato(model_t *model) {
+    return model->run.macchina.stato == STATO_MACCHINA_SCARICO_FORZATO;
+}
+
+
+int model_macchina_in_stop(model_t *model) {
+    return model->run.macchina.stato == STATO_MACCHINA_STOP;
+}
+
+
+int model_macchina_in_marcia(model_t *model) {
+    return model->run.macchina.stato == STATO_MACCHINA_MARCIA;
+}
+
+
+int model_step_finito(model_t *model) {
+    return model->run.macchina.sottostato_step == 0;
+}
+
+
+int model_lavaggio_finito(model_t *model) {
+    // Se il loop e' abilitato non ho mai finito
+    if (model->prog.parmac.abilitazione_loop_prog) {
+        return 0;
+    }
+
+    return model_step_finito(model) && model->run.macchina.stato != STATO_MACCHINA_STOP &&
+           model->run.macchina.stato != STATO_MACCHINA_PAUSA && model->run.model_lavaggio_finito;
+}
+
+
+uint16_t model_get_livello_centimetri(model_t *pmodel) {
+    return pmodel->run.macchina.livello;
+}
+
+
+uint16_t model_get_current_step_number(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return pmodel->run.num_step_corrente;
+}
+
+
+parametri_step_t *model_get_current_step(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return &pmodel->prog.programma_caricato.steps[model_get_current_step_number(pmodel)];
+}
+
+
+int model_select_program_step(model_t *model, size_t i, size_t step) {
+    if (i < model->prog.num_programmi) {
+        model->run.num_prog_corrente = i;
+        // model->run.prog_corrente     = model->prog.programmi[model->run.num_prog_corrente];
+        const programma_lavatrice_t *p = model_get_program(model);
+
+        if (p && step < p->num_steps)
+            model->run.num_step_corrente = step;
+        else
+            model->run.num_step_corrente = 0;
+
+        model->run.num_step_successivo = model->run.num_step_corrente;
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
+
+uint16_t model_get_preparation_time(model_t *pmodel) {
+    assert(pmodel != NULL);
+    if (pmodel->prog.parmac.abilitazione_preparazione_rotazione) {
+        return pmodel->prog.parmac.tempo_marcia_preparazione_rotazione * 2 +
+               pmodel->prog.parmac.tempo_sosta_preparazione_rotazione * 2;
+    } else {
+        return 0;
+    }
+}
+
+
+void model_formatta_prezzo(char *string, model_t *model, unsigned int prezzo) {
+    unsigned int cifre    = model->prog.parmac.cifre_prezzo;
+    unsigned int decimali = model->prog.parmac.cifre_decimali_prezzo;
+    char         format[32];
+    double       fprezzo;
+    sprintf(format, "%%0%i.%if", cifre + (decimali > 0 ? 1 : 0), decimali);
+    fprezzo = (double)prezzo / pow(10, decimali);
+    sprintf(string, format, fprezzo);
+}
+
+
+unsigned int model_get_credito_gettoniera_digitale(model_t *model) {
+    assert(model != NULL);
+    size_t             d      = model->prog.parmac.cifre_decimali_prezzo;
+    unsigned int       m      = (unsigned int)pow(10, d);
+    const unsigned int mult[] = {1 * m, (5 * m) / 10, (2 * m) / 10, (1 * m) / 10, 2 * m};
+    unsigned int       tot    = 0;
+    for (size_t i = LINEA_1_GETTONIERA_DIGITALE; i < LINEA_1_GETTONIERA_DIGITALE + LINEE_GETTONIERA_DIGITALE; i++) {
+        size_t ti = i - LINEA_1_GETTONIERA_DIGITALE;
+        tot += mult[ti] * model->run.macchina.credito[i];
+    }
+    return tot;
+}
+
+
+unsigned int model_get_credito_gettoniera_impulsi(model_t *model, size_t linee) {
+    assert(model != NULL);
+    unsigned int tot = 0;
+
+    if (linee > 2)
+        return tot;
+
+    for (size_t i = LINEA_1_GETTONIERA_IMPULSI; i < LINEA_1_GETTONIERA_IMPULSI + linee; i++)
+        tot += model->run.macchina.credito[i] * model->prog.parmac.valore_impulso;
+
+    return tot;
+}
+
+
+unsigned int model_get_credito(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return get_credito_macchina(pmodel) + pmodel->run.credito;
+}
+
+
+int model_gettoniera_digitale_abilitata(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return pmodel->prog.parmac.tipo_gettoniera == PAGAMENTO_DIGITALE ||
+           pmodel->prog.parmac.tipo_gettoniera == PAGAMENTO_DIGITALE_LINEA_SINGOLA;
+}
+
+
+int model_lavaggio_pagato(model_t *pmodel) {
+    assert(pmodel != NULL);
+    if (pmodel->prog.parmac.tipo_gettoniera == PAGAMENTO_NESSUNO) {
+        return 1;
+    } else if (pmodel->run.macchina.pagato) {
+        return 1;
+    } else if (pmodel->prog.parmac.prezzo_unico) {
+        return model_get_credito(pmodel) >= pmodel->prog.parmac.valore_prezzo_unico;
+    } else {
+        const programma_lavatrice_t *p = model_get_program(pmodel);
+        if (p) {
+            return model_get_credito(pmodel) >= p->prezzo;
+        } else {
+            return 0;
+        }
+    }
+    return 0;
+}
+
+
+int model_pagamento_abilitato(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return pmodel->prog.parmac.tipo_gettoniera != PAGAMENTO_NESSUNO;
+}
+
+
+void model_scala_credito(model_t *pmodel) {
+    assert(pmodel != NULL);
+    if (pmodel->prog.parmac.tipo_gettoniera == PAGAMENTO_NESSUNO) {
+        return;
+    }
+    if (pmodel->run.macchina.pagato) {
+        return;
+    }
+
+#ifdef INTEGRITA_MORALE
+    unsigned int consumato = 0;
+    if (model->prog.parmac.prezzo_unico) {
+        consumato = model->prog.parmac.valore_prezzo_unico;
+    } else {
+        const programma_lavatrice_t *p = model_get_programma_corrente(model);
+        if (p)
+            consumato = p->prezzo;
+    }
+
+    model->run.credito += get_credito_macchina(model);
+    if (model->run.credito > consumato)
+        model->run.credito -= consumato;
+    else
+        model->run.credito = 0;
+#else
+    pmodel->run.credito = 0;
+#endif
 }
 
 
@@ -662,4 +878,32 @@ char *model_new_unique_filename(model_t *model, char *filename, unsigned long se
     } while (found);
 
     return filename;
+}
+
+
+static unsigned int get_credito_macchina(model_t *model) {
+    switch (model->prog.parmac.tipo_gettoniera) {
+        case PAGAMENTO_NESSUNO:
+            return 0;
+
+        case PAGAMENTO_1_LINEA_NA:
+        case PAGAMENTO_1_LINEA_NC:
+            return model_get_credito_gettoniera_impulsi(model, 1);
+
+        case PAGAMENTO_2_LINEA_NA:
+        case PAGAMENTO_2_LINEA_NC:
+            return model_get_credito_gettoniera_impulsi(model, 2);
+
+        case PAGAMENTO_DIGITALE:
+            return model_get_credito_gettoniera_digitale(model);
+
+        case PAGAMENTO_DIGITALE_LINEA_SINGOLA:
+            return model->run.macchina.credito[LINEA_GETTONIERA_SINGOLA] * model->prog.parmac.valore_impulso;
+
+        case PAGAMENTO_CASSA_NA:
+        case PAGAMENTO_CASSA_NC:
+            return model->run.macchina.credito[LINEA_GETTONIERA_CASSA] * model->prog.parmac.valore_impulso;
+    }
+
+    return 0;
 }

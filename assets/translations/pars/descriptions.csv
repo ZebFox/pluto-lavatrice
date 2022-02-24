@@ -1,6 +1,30 @@
 Identificatore, Italiano, Inglese
+PARAMETRO, PARAMETRO, Parameter
 LINGUA, LINGUA, LANGUAGE
 LOGO, LOGO, LOGO
 LIVELLO_ACCESSO, LIVELLO DI ACCESSO, ACCESS LEVEL
 TEMPO_TASTO_PAUSA, TEMPO TASTO PAUSA, PAUSE BUTTON TIME
 TEMPO_TASTO_STOP, TEMPO TASTO STOP, STOP BUTTON TIME
+DURATA, Durata, Duration
+TEMPO_ATTIVO, Tempo attivo, Active time
+MOTO_IN_RIEMPIMENTO, Moto in riempimento, Fillup motion
+VELOCITA_RIEMPIMENTO, Velocita' riempimento, Fillup speed
+INVERSIONE_RIEMPIMENTO, Inversione riempimento, Fillup reversal
+TEMPO_MOTO_RIEMPIMENTO, T. moto riempimento, Fillup motion time
+TEMPO_PAUSA_RIEMPIMENTO, T. pausa riempimento, Fillup pause time
+VELOCITA_LAVAGGIO, Velocita' lavaggio, Wash speed
+INVERSIONE_LAVAGGIO, Inversione lavaggio, Wash reversal
+GIRO_LAVAGGIO, T. moto lavaggio, Wash motion time
+PAUSA_LAVAGGIO, T. pausa lavaggio, Wash pause time
+RISCALDAMENTO, Riscaldamento, Heating
+TEMPERATURA, Temperatura, Temperature
+TIPO_RISCALDAMENTO, Tipo riscaldamento, Heating type
+TIPO_GETTONIERA, Tipo gettoniera, Payment type
+VALORE_IMPULSO, Valore impulso, Pulse value
+VALORE_PREZZO_UNICO, Valore prezzo unico, Absolute price value
+PREZZO_UNICO, Prezzo unico, Absolute price
+CIFRE_PREZZO, Cifre prezzo, Price digits
+CIFRE_DECIMALI_PREZZO, Cifre decimali prezzo, Decimal price digits
+VISUALIZZAZIONE_PREZZO, Visualizzazione prezzo, Price display
+RICHIESTA_PAGAMENTO, Richiesta pagamento, Payment request
+SBLOCCO_GETTONIERA, Sblocco gettoniera, Coin acc. unlock

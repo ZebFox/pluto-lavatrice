@@ -1,0 +1,10 @@
+Identificatore, Italiano, Inglese
+NESSUNO,Nessuno, None
+GETT1_NA, 1 gettoniera NA, 1 Coint count. NO
+GETT1_NC, 1 gettoniera NC, 1 Coin count. NC
+GETT2_NA, 2 gettoniera NA, 2 Coin count. NO
+GETT2_NC, 2 gettoniera NC, 2 Coin count. NC
+GETT_DIG, Gettoniera digitale, Digital coin count.
+GETT_DIG_SINGOLA, G. dig. a linea singola, D. c.c. single line
+CASSA_NA, Cassa NA, Cash Desk NA
+CASSA_NC, Cassa NC, Cash Desk NC

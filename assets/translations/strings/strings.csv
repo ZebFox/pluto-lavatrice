@@ -1,8 +1,10 @@
 Identificatore, Italiano, Inglese
+,,
 INSERIRE_MONETA, Inserire moneta, Insert coin
 INSERIRE_GETTONE, Inserire gettone, Insert token
 PAGARE_CASSA, Pagare cassa, Pay at desk
 SCELTA_PROGRAMMA, Scelta programma, Choose program
+E_PREMERE_START, e premere start, and press start
 MACCHINA_AL_LAVORO, al  lavoro, al  lavoro
 MACCHINA_IN_PAUSA, pausa lavoro, pausa lavoro
 PROGRAMMA_CALDO, CALDO, HOT
@@ -54,7 +56,9 @@ MODIF_PROGRAMMA, MODIF. PROGRAMMA, MODIFY PROG.
 NESSUN_PROGRAMMA, Nessun programma, No programs
 NUOVO_PROGRAMMA, Crea un nuovo programma, Create a new program
 PARAMETRI_MAC, PARAMETRI MAC., MAC. PARAMETERS
+PARAMETRI_PASSO, PARAMETRI PASSO, STEP PARAMETERS
 PREZZO, PREZZO, PRICE
+PREZZO_LOWER, Prezzo, Price
 TIPO, TIPO, TYPE
 PASSI_PROGRAMMA, PASSI PROGRAMMA, PROGRAM STEPS
 PASSO, Passo, Step
@@ -67,3 +71,20 @@ SCARICO, Scarico, Drain
 CENTRIFUGA, Centrifuga, Centrifuge
 SROTOLAMENTO, Srotolamento, Unrolling
 ATTESA_OPERATORE, Attesa operatore, Waiting
+FASE, FASE, PHASE
+PRECARICA_IN_CORSO, Precarica in corso, Preloading
+ATTESA_LIVELLO_E_TEMPERATURA, Attesa livello e temperatura, Waiting for temperature and water level
+ATTESA_LIVELLO, Attesa livello, Waiting for the water level
+ATTESA_TEMPERATURA, Attesa temperatura, Waiting for temperature
+RIEMPIMENTO, Riempimento, Filling up
+ATTESA_TERMODEGRADAZIONE, Attesa termodegradazione, Waiting for thermal breakdown
+ATTESA_LIVELLO_SCARICO, Attesa livello scarico, Waiting for drain level
+PRESCARICO, Prescarico, Pre-draining
+PREPARAZIONE, Preparazione, Preparing
+RAGGIUNGIMENTO_VELOCITA, Raggiungimento velocità, Reaching speed
+IN_FRENATA, In frenata, Stopping due to lurching
+ATTESA_FRENATA, Attesa frenata, Waiting for full stop
+SCARICO_FORZATO, Scarico forzato, Forced drain
+RECUPERO, Recupero, Recovery
+USCITA_LAVAGGIO, Uscita lavaggio, Washing exit
+PAUSA_LAVAGGIO, Pausa lavaggio, Cycle pause

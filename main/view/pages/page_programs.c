@@ -12,8 +12,6 @@
 #include "utils/utils.h"
 #include "view/styles.h"
 
-// enum { };
-
 
 struct page_data {
     size_t index;
@@ -21,6 +19,7 @@ struct page_data {
     lv_obj_t *lbl_nome;
     lv_obj_t *lbl_nuovo_programma;
     lv_obj_t *lbl_index;
+    lv_obj_t *lbl_prezzo;
 
     void *destination;
 };
@@ -54,6 +53,15 @@ static void open_page(model_t *pmodel, void *args) {
 
     line = view_common_horizontal_line();
     lv_obj_align(line, NULL, LV_ALIGN_CENTER, 0, 4);
+
+    static lv_point_t other_points[2] = {{0, 0}, {0, 26}};
+    line                              = view_common_line(other_points, 2);
+    lv_obj_align(line, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 26, 0);
+
+    lbl = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_set_style(lbl, &style_label_6x8);
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 32, -18);
+    pdata->lbl_prezzo = lbl;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 20, 15);
@@ -157,10 +165,14 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
     if (pdata->index >= model_get_num_programs(pmodel)) {
         lv_obj_set_hidden(pdata->lbl_nuovo_programma, 0);
         lv_obj_set_hidden(pdata->lbl_nome, 1);
+        lv_obj_set_hidden(pdata->lbl_prezzo, 1);
     } else {
         lv_obj_set_hidden(pdata->lbl_nuovo_programma, 1);
         lv_obj_set_hidden(pdata->lbl_nome, 0);
+        lv_obj_set_hidden(pdata->lbl_prezzo, 0);
         lv_label_set_text(pdata->lbl_nome, model_get_preview(pmodel, pdata->index)->name);
+        lv_label_set_text_fmt(pdata->lbl_prezzo, "%s: %i", view_intl_get_string(pmodel, STRINGS_PREZZO_LOWER),
+                              model_get_program(pmodel)->prezzo);
     }
     lv_label_set_text_fmt(pdata->lbl_index, "%02i", pdata->index + 1);
 }

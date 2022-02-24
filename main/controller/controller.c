@@ -20,6 +20,7 @@ static void           pwoff_callback(void *arg);
 static rtc_time_t     rtc_time;
 static struct timeval tv;
 static struct tm      tm;
+static int            pending_state_change = 0;
 
 
 void controller_init(model_t *pmodel) {
@@ -55,6 +56,45 @@ void controller_init(model_t *pmodel) {
 
 void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
     switch (msg->code) {
+        case VIEW_CONTROLLER_COMMAND_CODE_START_PROGRAM:
+            if (pending_state_change) {
+                break;
+            }
+            if (model_get_current_step_number(pmodel) > 0) {
+                // Se eri fermo assicurati di ripartire da 0, in pausa potrei aver
+                // selezionato un nuovo step
+                if (model_macchina_in_stop(pmodel)) {
+                    model_azzera_lavaggio(pmodel);
+                }
+
+                pending_state_change = 1;
+                machine_start(pmodel->run.num_prog_corrente);
+
+                // Se nel frattempo ho scelto un altro step devo mandare quello nuovo
+                if (model_macchina_in_pausa(pmodel) &&
+                    (int)pmodel->run.macchina.numero_step != pmodel->run.num_step_corrente) {
+                    machine_esegui_step(model_get_current_step(pmodel), model_get_current_step_number(pmodel));
+                    model_avanza_step(pmodel);
+                } else {     // Altrimenti l'ho cominciato e devo mandare i parametri macchina
+                    machine_invia_parmac(&pmodel->prog.parmac);
+                }
+            }
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_PAUSE:
+            if (!pending_state_change) {
+                pending_state_change = 1;
+                machine_pause();
+            }
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_STOP:
+            if (!pending_state_change) {
+                pending_state_change = 1;
+                machine_stop();
+            }
+            break;
+
         case VIEW_CONTROLLER_COMMAND_CODE_CREATE_PROGRAM:
             configuration_create_empty_program(pmodel);
             pmodel->prog.num_programmi = configuration_load_programs_preview(pmodel->prog.preview_programmi,
@@ -99,7 +139,8 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
 
 
 void controller_manage(model_t *pmodel) {
-    static unsigned long stato_ts = 0;
+    static int           initial_level_check = 0;
+    static unsigned long stato_ts            = 0;
     machine_response_t   risposta;
 
     if (is_expired(stato_ts, get_millis(), 250)) {
@@ -114,26 +155,28 @@ void controller_manage(model_t *pmodel) {
                 break;
 
             case MACHINE_RESPONSE_CODE_PRESENTAZIONI: {
-                // uint8_t buffer[256];
                 //  Invia i parametri macchina
-                // size_t len = model_pack_parametri_macchina(buffer, &pmodel->prog.parmac);
-                //  machine_request(request_pipe, COMANDO_SCRIVI_PARMAC, buffer, len);
+                machine_invia_parmac(&pmodel->prog.parmac);
 
                 if (risposta.presentazioni.n_all == 0 || risposta.presentazioni.n_all == 2) {
                     // allarme poweroff; se l'autoavvio e' configurato devo ripartire
                     if (risposta.presentazioni.n_all == 0x02 && pmodel->prog.parmac.autoavvio) {
-                        // simple_machine_request(request_pipe, COMANDO_AZZERA_ALLARMI);
+                        machine_azzera_allarmi();
                     }
 
                     if (risposta.presentazioni.stato != STATO_MACCHINA_STOP) {
-                        // uint8_t lavaggio = risposta.presentazioni.nro_programma;
-                        // int     step     = risposta.presentazioni.nro_step;
-                        //  if (model_select_program_step(pmodel, lavaggio, step) >= 0) {
-                        //  ESP_LOGI(TAG, "Macchina spenta in azione: lavaggio %i e step %i", lavaggio + 1, step + 1);
+                        uint8_t lavaggio = risposta.presentazioni.nro_programma;
+                        int     step     = risposta.presentazioni.nro_step;
 
-                        // richiedi_nuovo_stato_macchina(model, STATO_MACCHINA_MARCIA);
-                        // machine_request(request_pipe, START_LAVAGGIO, &lavaggio, 1);
-                        //}
+                        if (lavaggio < model_get_num_programs(pmodel)) {
+                            configuration_load_program(pmodel, lavaggio);
+                            if (model_select_program_step(pmodel, lavaggio, step) >= 0) {
+                                ESP_LOGI(TAG, "Macchina spenta in azione: lavaggio %i e step %i", lavaggio + 1,
+                                         step + 1);
+                                pending_state_change = 1;
+                                machine_start(lavaggio);
+                            }
+                        }
                     }
                 }
                 break;
@@ -146,6 +189,36 @@ void controller_manage(model_t *pmodel) {
 
             case MACHINE_RESPONSE_CODE_STATO:
                 machine_read_state(pmodel);
+
+                if (model_get_livello_centimetri(pmodel) > 0 && !initial_level_check) {
+                    pmodel->run.f_richiedi_scarico = 1;
+                }
+                initial_level_check = 1;
+
+                if (pmodel->run.macchina.richiesto_aggiornamento_tempo) {
+                    // TODO: controller_send_time(request_pipe);
+                    pmodel->run.macchina.richiesto_aggiornamento_tempo = 0;
+                }
+
+                view_event((view_event_t){.code = VIEW_EVENT_CODE_MODEL_UPDATE});
+
+                if (pending_state_change) {
+                    break;
+                }
+
+                // Passaggio allo step successivo se sono sincronizzato con il quadro, in marcia e senza step
+                if (model_macchina_in_marcia(pmodel) && model_step_finito(pmodel)) {
+                    if (model_lavaggio_finito(pmodel)) {
+                        pending_state_change = 1;
+                        machine_stop();
+                    } else {
+                        machine_esegui_step(model_get_current_step(pmodel), model_get_current_step_number(pmodel));
+                    }
+                }
+
+                if (model_macchina_in_scarico_forzato(pmodel)) {
+                    pmodel->run.f_richiedi_scarico = 0;
+                }
                 break;
         }
     }

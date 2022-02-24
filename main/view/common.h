@@ -35,5 +35,6 @@ void       *view_common_malloc_page_data(size_t size);
 lv_obj_t   *view_common_horizontal_line(void);
 lv_obj_t   *view_common_line(lv_point_t *points, size_t len);
 const char *view_common_step2str(model_t *pmodel, uint16_t step);
+const char *view_common_pedantic_string(model_t *pmodel);
 
 #endif

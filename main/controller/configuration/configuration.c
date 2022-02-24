@@ -355,10 +355,9 @@ int configuration_load_program(model_t *pmodel, size_t num) {
 
 
 int configuration_load_programs_preview(programma_preview_t *previews, size_t len, uint16_t lingua) {
-    uint8_t buffer[512];
-    int     num = list_saved_programs(previews, len);
-    char    path[PATH_MAX];
-    int     count = 0;
+    int  num = list_saved_programs(previews, len);
+    char path[PATH_MAX];
+    int  count = 0;
 
     if (num < 0) {
         remove(PATH_FILE_INDICE);
@@ -366,6 +365,7 @@ int configuration_load_programs_preview(programma_preview_t *previews, size_t le
     }
     ESP_LOGI(TAG, "%i programs found", num);
 
+    uint8_t *buffer = malloc(MAX_PROGRAM_SIZE);
     for (size_t i = 0; i < num; i++) {
         sprintf(path, "%s/%s", PROGRAMS_PATH, previews[i].filename);
 
@@ -377,7 +377,7 @@ int configuration_load_programs_preview(programma_preview_t *previews, size_t le
                 continue;
             }
 
-            size_t read = fread(buffer, 1, sizeof(buffer), fp);
+            size_t read = fread(buffer, 1, MAX_PROGRAM_SIZE, fp);
 
             if (read == 0) {
                 ESP_LOGE(TAG, "Non sono riuscito a leggere il file %s: %s", path, strerror(errno));
@@ -393,6 +393,7 @@ int configuration_load_programs_preview(programma_preview_t *previews, size_t le
         }
     }
 
+    free(buffer);
     return count;
 }
 

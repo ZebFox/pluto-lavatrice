@@ -45,4 +45,12 @@ extern const GSYMBOL legacy_img_logo_msgroup;
 extern const GSYMBOL legacy_img_logo_schulthess;
 extern const GSYMBOL legacy_img_logo_rotondi;
 
+extern const GSYMBOL legacy_img_left;
+extern const GSYMBOL legacy_img_right;
+extern const GSYMBOL legacy_img_wash_sm;
+extern const GSYMBOL legacy_img_level;
+extern const GSYMBOL legacy_img_time;
+extern const GSYMBOL legacy_img_temperature;
+extern const GSYMBOL legacy_img_speed;
+
 #endif

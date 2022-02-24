@@ -25,6 +25,11 @@ typedef enum {
     MACHINE_REQUEST_CODE_RIAVVIA_COMUNICAZIONE,
     MACHINE_REQUEST_CODE_IMPOSTA_USCITA,
     MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA,
+    MACHINE_REQUEST_CODE_AZZERA_ALLARMI,
+    MACHINE_REQUEST_CODE_START,
+    MACHINE_REQUEST_CODE_PAUSA,
+    MACHINE_REQUEST_CODE_STOP,
+    MACHINE_REQUEST_CODE_ESEGUI_STEP,
 } machine_request_code_t;
 
 
@@ -38,13 +43,18 @@ typedef struct {
         };
         int       test;
         parmac_t *parmac;
+        uint8_t   num;
+        struct {
+            parametri_step_t pars;
+            uint8_t          num;
+        } step;
     };
 } machine_request_t;
 
 
 static void communication_task(void *args);
 static int  invia_pacchetto_semplice(int comando, packet_t *risposta, int lunghezza_dati_prevista);
-static int  invia_pacchetto(int comando, uint8_t *dati, uint8_t lunghezza_dati, packet_t *risposta,
+static int  invia_pacchetto(int comando, uint8_t *dati, uint16_t lunghezza_dati, packet_t *risposta,
                             int lunghezza_dati_prevista);
 static int  task_gestisci_richiesta(machine_request_t request);
 
@@ -68,7 +78,7 @@ void machine_init(void) {
                                    sizeof(machine_response_t), responseq_queue_buffer, &static_responseq_queue);
 
     static StaticTask_t static_task;
-    static StackType_t  task_stack[BASE_TASK_STACK_SIZE * 6] = {0};
+    static StackType_t  task_stack[BASE_TASK_STACK_SIZE * 7] = {0};
     xTaskCreateStatic(communication_task, TAG, sizeof(task_stack), NULL, 1, task_stack, &static_task);
 
     static StaticSemaphore_t static_semaphore;
@@ -87,6 +97,36 @@ void machine_invia_parmac(parmac_t *parmac) {
     machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA};
     richiesta.parmac            = malloc(sizeof(parmac_t));
     memcpy(richiesta.parmac, parmac, sizeof(parmac_t));
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_esegui_step(parametri_step_t *step, uint8_t num) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_ESEGUI_STEP, .step = {.pars = *step, .num = num}};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_azzera_allarmi(void) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_AZZERA_ALLARMI};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_start(uint8_t num_program) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_START, .num = num_program};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_stop(void) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_STOP};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_pause(void) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_PAUSA};
     xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
 
@@ -205,9 +245,13 @@ static int task_gestisci_richiesta(machine_request_t request) {
             break;
         }
 
-        case MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA:
-            // TODO:
+        case MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA: {
+            uint8_t buffer[PARMAC_SIZE] = {0};
+            model_serialize_parmac(buffer, request.parmac);
+            free(request.parmac);
+            res = invia_pacchetto(COMANDO_SCRIVI_PARMAC, buffer, sizeof(buffer), &risposta_pacchetto, -1);
             break;
+        }
 
         case MACHINE_REQUEST_CODE_STATO:
             res = invia_pacchetto_semplice(COMANDO_LEGGI_STATO, &risposta_pacchetto, -1);
@@ -221,6 +265,29 @@ static int task_gestisci_richiesta(machine_request_t request) {
             xSemaphoreGive(sem);
             free(risposta_pacchetto.data);
             xQueueSend(responseq, &risposta_task, portMAX_DELAY);
+            break;
+
+        case MACHINE_REQUEST_CODE_ESEGUI_STEP: {
+            uint8_t buffer[256];
+            size_t  len = pack_step(buffer, &request.step.pars, request.step.num);
+            res         = invia_pacchetto(ESEGUI_STEP, buffer, len, &risposta_pacchetto, -1);
+            break;
+        }
+
+        case MACHINE_REQUEST_CODE_AZZERA_ALLARMI:
+            res = invia_pacchetto_semplice(COMANDO_AZZERA_ALLARMI, &risposta_pacchetto, -1);
+            break;
+
+        case MACHINE_REQUEST_CODE_START:
+            res = invia_pacchetto(START_LAVAGGIO, &request.num, 1, &risposta_pacchetto, -1);
+            break;
+
+        case MACHINE_REQUEST_CODE_STOP:
+            res = invia_pacchetto_semplice(STOP_LAVAGGIO, &risposta_pacchetto, -1);
+            break;
+
+        case MACHINE_REQUEST_CODE_PAUSA:
+            res = invia_pacchetto_semplice(PAUSA_LAVAGGIO, &risposta_pacchetto, -1);
             break;
 
         case MACHINE_REQUEST_CODE_TEST:
@@ -258,7 +325,7 @@ static int invia_pacchetto_semplice(int comando, packet_t *risposta, int lunghez
 }
 
 
-static int invia_pacchetto(int comando, uint8_t *dati, uint8_t lunghezza_dati, packet_t *risposta,
+static int invia_pacchetto(int comando, uint8_t *dati, uint16_t lunghezza_dati, packet_t *risposta,
                            int lunghezza_dati_prevista) {
     uint8_t buffer[MAX_PACKET] = {0};
     size_t  tentativi          = 0;

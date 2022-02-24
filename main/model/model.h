@@ -402,6 +402,23 @@ char                      *model_new_unique_filename(model_t *model, char *filen
 programma_lavatrice_t     *model_get_program(model_t *pmodel);
 void                       model_sync_program_preview(model_t *pmodel);
 parametri_step_t          *model_get_program_step(model_t *pmodel, size_t num);
+int                        model_select_program_step(model_t *model, size_t i, size_t step);
+uint16_t                   model_get_preparation_time(model_t *pmodel);
+void                       model_formatta_prezzo(char *string, model_t *model, unsigned int prezzo);
+unsigned int               model_get_credito(model_t *pmodel);
+parametri_step_t          *model_get_current_step(model_t *pmodel);
+uint16_t                   model_get_current_step_number(model_t *pmodel);
+int                        model_macchina_in_pausa(model_t *model);
+int                        model_macchina_in_frenata(model_t *model);
+int                        model_macchina_in_scarico_forzato(model_t *model);
+int                        model_macchina_in_stop(model_t *model);
+void                       model_azzera_lavaggio(model_t *pmodel);
+void                       model_avanza_step(model_t *model);
+int                        model_macchina_in_marcia(model_t *model);
+int                        model_step_finito(model_t *model);
+int                        model_lavaggio_finito(model_t *model);
+uint16_t                   model_get_livello_centimetri(model_t *pmodel);
+int                        model_lavaggio_pagato(model_t *pmodel);
 
 
 #endif

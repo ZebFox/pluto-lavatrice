@@ -40,6 +40,12 @@ void machine_test(int test);
 void machine_richiedi_stato(void);
 void machine_read_state(model_t *pmodel);
 void machine_richiedi_dati_test(void);
+void machine_invia_parmac(parmac_t *parmac);
+void machine_azzera_allarmi(void);
+void machine_start(uint8_t num_program);
+void machine_esegui_step(parametri_step_t *step, uint8_t num);
+void machine_stop(void);
+void machine_pause(void);
 
 
 #endif

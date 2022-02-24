@@ -178,6 +178,10 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                                 }
                             }
                             update_page(pmodel, pdata);
+                        } else {
+                            msg.vmsg.code  = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE_EXTRA;
+                            msg.vmsg.page  = (void *)&page_parlav;
+                            msg.vmsg.extra = &model_get_program(pmodel)->steps[pdata->index];
                         }
                         break;
                 }

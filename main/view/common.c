@@ -10,18 +10,46 @@ static void timer_task(lv_task_t *task);
 static int  find_password_start(view_common_password_t *password);
 
 
-static const button_t  preamble[3]         = {BUTTON_STOP, BUTTON_STOP, BUTTON_STOP};
-static const strings_t step2str[NUM_STEPS] = {
-    STRINGS_AMMOLLO, STRINGS_PRELAVAGGIO, STRINGS_LAVAGGIO,     STRINGS_RISCIACQUO,
-    STRINGS_SCARICO, STRINGS_CENTRIFUGA,  STRINGS_SROTOLAMENTO, STRINGS_ATTESA_OPERATORE,
-};
+static const button_t preamble[3] = {BUTTON_STOP, BUTTON_STOP, BUTTON_STOP};
 
 
 const char *view_common_step2str(model_t *pmodel, uint16_t step) {
+    const strings_t step2str[NUM_STEPS] = {
+        STRINGS_AMMOLLO, STRINGS_PRELAVAGGIO, STRINGS_LAVAGGIO,     STRINGS_RISCIACQUO,
+        STRINGS_SCARICO, STRINGS_CENTRIFUGA,  STRINGS_SROTOLAMENTO, STRINGS_ATTESA_OPERATORE,
+    };
+
     assert(step <= NUM_STEPS && step > 0);
     return view_intl_get_string(pmodel, step2str[step - 1]);
 }
 
+
+const char *view_common_pedantic_string(model_t *pmodel) {
+    const strings_t pedantic2str[] = {
+        STRINGS_,
+        STRINGS_PRECARICA_IN_CORSO,
+        STRINGS_ATTESA_LIVELLO_E_TEMPERATURA,
+        STRINGS_ATTESA_LIVELLO,
+        STRINGS_ATTESA_TEMPERATURA,
+        STRINGS_RIEMPIMENTO,
+        STRINGS_ATTESA_TERMODEGRADAZIONE,
+        STRINGS_ATTESA_LIVELLO_SCARICO,
+        STRINGS_PRESCARICO,
+        STRINGS_PREPARAZIONE,
+        STRINGS_RAGGIUNGIMENTO_VELOCITA,
+        STRINGS_IN_FRENATA,
+        STRINGS_ATTESA_FRENATA,
+        STRINGS_SCARICO_FORZATO,
+        STRINGS_RECUPERO,
+        STRINGS_USCITA_LAVAGGIO,
+    };
+
+    if (pmodel->run.macchina.descrizione_pedante >= sizeof(pedantic2str) / sizeof(pedantic2str[0])) {
+        return "";
+    } else {
+        return view_intl_get_string(pmodel, pedantic2str[pmodel->run.macchina.descrizione_pedante]);
+    }
+}
 
 
 lv_obj_t *view_common_title(lv_obj_t *root, const char *str) {
