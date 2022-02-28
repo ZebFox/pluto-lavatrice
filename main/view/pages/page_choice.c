@@ -10,16 +10,31 @@
 #include "view/widgets/custom_lv_img.h"
 #include "view/intl/intl.h"
 #include "peripherals/keyboard.h"
+#include "esp_log.h"
+
+
+static const char *TAG = "PageChoice";
 
 
 struct page_data {
     lv_task_t *timer;
+    lv_obj_t  *lbl_status;
 
+    uint16_t allarme;
     uint16_t number;
 };
 
 
-static void update_page(model_t *pmodel, struct page_data *data) {}
+static void update_page(model_t *pmodel, struct page_data *pdata) {
+    if (pmodel->run.macchina.codice_allarme > 0) {
+        if (pdata->allarme != pmodel->run.macchina.codice_allarme) {
+            pdata->allarme = pmodel->run.macchina.codice_allarme;
+            lv_label_set_text(pdata->lbl_status, view_common_alarm_description(pmodel));
+        }
+    } else {
+        lv_label_set_text(pdata->lbl_status, view_intl_get_string(pmodel, STRINGS_SCELTA_PROGRAMMA));
+    }
+}
 
 
 static void *create_page(model_t *model, void *extra) {
@@ -32,6 +47,7 @@ static void *create_page(model_t *model, void *extra) {
 
 static void open_page(model_t *pmodel, void *args) {
     struct page_data *pdata = args;
+    pdata->allarme          = 0;
     lv_task_set_prio(pdata->timer, LV_TASK_PRIO_MID);
 
     const programma_preview_t *preview = model_get_preview(pmodel, pdata->number);
@@ -50,9 +66,11 @@ static void open_page(model_t *pmodel, void *args) {
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_8x16);
+    lv_label_set_long_mode(lbl, LV_LABEL_LONG_SROLL_CIRC);
+    lv_obj_set_width(lbl, 128);
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
-    lv_label_set_text(lbl, view_intl_get_string(pmodel, STRINGS_SCELTA_PROGRAMMA));
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
+    pdata->lbl_status = lbl;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_8x16);
@@ -80,7 +98,6 @@ static void open_page(model_t *pmodel, void *args) {
     line = view_common_horizontal_line();
     lv_obj_align(line, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -16);
 
-
     update_page(pmodel, pdata);
 }
 
@@ -95,9 +112,11 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
             break;
 
         case VIEW_EVENT_CODE_MODEL_UPDATE:
-            if (!model_macchina_in_stop(pmodel)) {
+            if (!model_macchina_in_stop(pmodel) && model_can_work(pmodel)) {
                 msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                 msg.vmsg.page = (void *)&page_work;
+            } else {
+                update_page(pmodel, pdata);
             }
             break;
 
@@ -116,9 +135,11 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                     case BUTTON_DESTRA:
                         break;
 
-                    case BUTTON_LANA:
+                    case BUTTON_START:
                         if (model_lavaggio_pagato(pmodel)) {
                             msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_START_PROGRAM;
+                        } else {
+                            ESP_LOGI(TAG, "Missing credit!");
                         }
                         break;
 

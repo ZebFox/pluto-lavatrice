@@ -44,7 +44,7 @@ struct page_data {
 static void        time_op(model_t *pmodel, struct page_data *data, int op);
 static const char *get_string_day(model_t *pmodel, struct page_data *data);
 static void        timedata_update(model_t *pmodel, struct page_data *data);
-//static int         check_date(struct tm tm);
+// static int         check_date(struct tm tm);
 
 
 static void *create_page(model_t *model, void *extra) {
@@ -106,9 +106,12 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                 switch (event.key_event.code) {
                     case BUTTON_STOP:
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
+                        utils_set_system_time(data->datetime);
+                        utils_set_rtc_time(data->datetime);
                         break;
+
                     case BUTTON_DESTRA:     // skip destra
-                        if (data->index < 12) {
+                        if (data->index < 11) {
                             data->index++;
                             data->flag = 1;
                             timedata_update(model, data);
@@ -263,15 +266,6 @@ static void time_op(model_t *pmodel, struct page_data *data, int op) {
             }
             break;
         }
-        case (12): {
-            /*int newday = data->datetime.tm_wday + op;
-            if (newday >= 0 && newday <= 6) {
-                data->datetime.tm_wday = newday;
-            }*/
-            data->datetime.tm_wday = data->datetime.tm_wday + op;
-            mktime(&data->datetime);
-            break;
-        }
     }
 
     data->flag = 0;
@@ -299,10 +293,8 @@ static void timedata_update(model_t *pmodel, struct page_data *data) {
     memcpy(weekday, get_string_day(pmodel, data), strlen(get_string_day(pmodel, data)));
 
     if (data->flag) {
-        if (data->index < 12) {
+        if (data->index < 11) {
             timedata[data->index] = '_';
-        } else if (data->index == 12) {
-            lv_obj_set_style(data->lday, &style_label_reverse);
         }
     } else {
         lv_obj_set_style(data->lday, &style_label_normal);

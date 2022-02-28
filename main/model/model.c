@@ -11,19 +11,22 @@ static unsigned int get_credito_macchina(model_t *model);
 
 void model_init(model_t *pmodel) {
     memset(pmodel, 0, sizeof(model_t));
+    pmodel->system.comunicazione_abilitata = 1;
+    pmodel->run.maybe_programma            = 0;
+    pmodel->run.f_richiedi_scarico         = 0;
 }
 
 
 programma_lavatrice_t *model_get_program(model_t *pmodel) {
     assert(pmodel != NULL);
-    return &pmodel->prog.programma_caricato;
+    return &pmodel->run.programma_caricato;
 }
 
 
 parametri_step_t *model_get_program_step(model_t *pmodel, size_t num) {
     assert(pmodel != NULL);
-    if (num < pmodel->prog.programma_caricato.num_steps) {
-        return &pmodel->prog.programma_caricato.steps[num];
+    if (num < model_get_program(pmodel)->num_steps) {
+        return &model_get_program(pmodel)->steps[num];
     } else {
         return NULL;
     }
@@ -33,12 +36,18 @@ parametri_step_t *model_get_program_step(model_t *pmodel, size_t num) {
 void model_sync_program_preview(model_t *pmodel) {
     assert(pmodel != NULL);
 
-    programma_lavatrice_t *pr = &pmodel->prog.programma_caricato;
-    programma_preview_t   *pv = &pmodel->prog.preview_programmi[pmodel->prog.num_programma_caricato];
+    programma_lavatrice_t *pr = model_get_program(pmodel);
+    programma_preview_t   *pv = &pmodel->prog.preview_programmi[model_get_program_num(pmodel)];
     strcpy(pv->filename, pr->filename);
     strcpy(pv->name, pr->nomi[model_get_language(pmodel)]);
     pv->prezzo = pr->prezzo;
     pv->tipo   = pv->tipo;
+}
+
+
+uint16_t model_get_program_num(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return pmodel->run.num_programma_caricato;
 }
 
 
@@ -136,25 +145,38 @@ uint16_t model_get_current_step_number(model_t *pmodel) {
 
 parametri_step_t *model_get_current_step(model_t *pmodel) {
     assert(pmodel != NULL);
-    return &pmodel->prog.programma_caricato.steps[model_get_current_step_number(pmodel)];
+    assert(pmodel->run.maybe_programma);
+    return &model_get_program(pmodel)->steps[model_get_current_step_number(pmodel)];
 }
 
 
-int model_select_program_step(model_t *model, size_t i, size_t step) {
-    if (i < model->prog.num_programmi) {
-        model->run.num_prog_corrente = i;
-        // model->run.prog_corrente     = model->prog.programmi[model->run.num_prog_corrente];
-        const programma_lavatrice_t *p = model_get_program(model);
+int model_select_program_step(model_t *pmodel, size_t i, size_t step) {
+    assert(pmodel != NULL);
 
-        if (p && step < p->num_steps)
-            model->run.num_step_corrente = step;
-        else
-            model->run.num_step_corrente = 0;
+    if (model_get_program_num(pmodel) == i) {
+        const programma_lavatrice_t *p = model_get_program(pmodel);
 
-        model->run.num_step_successivo = model->run.num_step_corrente;
+        if (p && step < p->num_steps) {
+            pmodel->run.num_step_corrente = step;
+        } else {
+            pmodel->run.num_step_corrente = 0;
+        }
+
+        pmodel->run.num_step_successivo = pmodel->run.num_step_corrente;
         return 0;
     } else {
         return -1;
+    }
+}
+
+
+int model_can_work(model_t *pmodel) {
+    if (model_get_num_programs(pmodel) > 0 && pmodel->run.maybe_programma && pmodel->system.comunicazione_abilitata &&
+        !pmodel->system.errore_comunicazione) {
+        return pmodel->run.macchina.numero_programma == model_get_program_num(pmodel) &&
+               pmodel->run.macchina.numero_step < model_get_program(pmodel)->num_steps;
+    } else {
+        return 0;
     }
 }
 
@@ -275,6 +297,28 @@ void model_scala_credito(model_t *pmodel) {
 #else
     pmodel->run.credito = 0;
 #endif
+}
+
+
+uint8_t model_get_bit_accesso(uint8_t al) {
+    if (al > 3) {
+        return 0;
+    } else {
+        const uint8_t lvls[] = {LVL_UTENTE, LVL_TECNICO, LVL_DISTRIBUTORE, LVL_COSTRUTTORE};
+        return lvls[al];
+    }
+}
+
+
+int model_is_communication_ok(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return !pmodel->system.errore_comunicazione || !pmodel->system.comunicazione_abilitata;
+}
+
+
+void model_update_preview(model_t *pmodel) {
+    assert(pmodel != NULL);
+    pmodel->prog.preview_programmi[pmodel->run.num_programma_caricato].tipo = pmodel->run.programma_caricato.tipo;
 }
 
 
@@ -547,6 +591,29 @@ size_t model_deserialize_parmac(parmac_t *p, uint8_t *buffer) {
     return i;
 }
 
+
+void model_deserialize_statistics(statistics_t *stats, uint8_t *buffer) {
+    size_t i = 0;
+
+    i += deserialize_uint32_be(&stats->cicli_eseguiti, &buffer[i]);
+    i += deserialize_uint32_be(&stats->cicli_interrotti, &buffer[i]);
+    i += deserialize_uint32_be(&stats->cicli_loop, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_accensione, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_lavoro, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_moto, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_riscaldamento, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_h2o_fredda, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_h2o_calda, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_h2o_rec_dep, &buffer[i]);
+    i += deserialize_uint32_be(&stats->tempo_h2o_flusso, &buffer[i]);
+
+    for (size_t j = 0; j < NUM_MAX_SAPONI; j++) {
+        i += deserialize_uint32_be(&stats->tempo_saponi[j], &buffer[i]);
+    }
+
+    i += deserialize_uint32_be(&stats->chiusure_oblo, &buffer[i]);
+    i += deserialize_uint32_be(&stats->aperture_oblo, &buffer[i]);
+}
 
 void model_unpack_stato_macchina(stato_macchina_t *stato, uint8_t *buffer) {
     int i = 0;

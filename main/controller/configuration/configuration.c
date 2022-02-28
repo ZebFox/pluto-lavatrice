@@ -75,12 +75,6 @@ static int is_file(const char *path) {
     return S_ISREG(path_stat.st_mode);
 }
 
-static int is_drive(const char *path) {
-    struct stat path_stat;
-    if (stat(path, &path_stat) < 0)
-        return 0;
-    return S_ISBLK(path_stat.st_mode);
-}
 
 static int dir_exists(char *name) {
     DIR *dir = opendir(name);
@@ -143,6 +137,11 @@ static int cp(const char *to, const char *from) {
  */
 
 void configuration_init(void) {
+    (void)cp;
+    (void)is_dir;
+    (void)nth_strrchr;
+    (void)count_occurrences;
+
     if (!dir_exists(DATA_PATH)) {
         create_dir(DATA_PATH);
     }
@@ -259,7 +258,7 @@ void configuration_clear_orphan_programs(programma_preview_t *previews, int num)
                 continue;
             }
 
-            for (int i = 0; i < num; i++) {
+            for (size_t i = 0; i < num; i++) {
                 if (strcmp(previews[i].filename, dir->d_name) == 0) {
                     orphan = 0;
                     break;
@@ -309,7 +308,7 @@ int list_saved_programs(programma_preview_t *previews, size_t len) {
 
 
 int configuration_load_program(model_t *pmodel, size_t num) {
-    programma_lavatrice_t *programma = &pmodel->prog.programma_caricato;
+    programma_lavatrice_t *programma = model_get_program(pmodel);
     char                   path[PATH_MAX];
     int                    count = 0;
 
@@ -345,12 +344,42 @@ int configuration_load_program(model_t *pmodel, size_t num) {
 
             count++;
         }
-        pmodel->prog.num_programma_caricato = num;
+        pmodel->run.num_programma_caricato = num;
+        pmodel->run.maybe_programma        = 1;
 
         fclose(fp);
         free(buffer);
     }
     return 0;
+}
+
+
+void configuration_delete_all(void) {
+    remove(PARAMS_PATH);
+    remove(PATH_FILE_INDICE);
+    configuration_clear_orphan_programs(NULL, 0);
+}
+
+
+void configuration_remove_program(programma_preview_t *previews, size_t len, size_t num) {
+    remove(previews[num].filename);
+
+    for (size_t i = num; i < len - 1; i++) {
+        previews[i] = previews[i + 1];
+    }
+
+    FILE *findex = fopen(PATH_FILE_INDICE, "w");
+    if (findex == NULL) {
+        ESP_LOGE(TAG, "Unable to open index: %s", strerror(errno));
+        return;
+    }
+
+    for (size_t i = 0; i < len - 1; i++) {
+        fwrite(previews[i].filename, 1, strlen(previews[i].filename), findex);
+        fwrite("\n", 1, 1, findex);
+    }
+
+    fclose(findex);
 }
 
 
@@ -419,13 +448,14 @@ static int load_parmac(parmac_t *parmac) {
         if (res == 0) {
             return -1;
         } else {
+            model_deserialize_parmac(parmac, buffer);
             return 0;
         }
     }
 }
 
 
-int save_parmac(parmac_t *parmac) {
+int configuration_save_parmac(parmac_t *parmac) {
     uint8_t buffer[PARMAC_SIZE] = {0};
     int     res                 = 0;
 
@@ -471,7 +501,7 @@ int configuration_load_all_data(model_t *pmodel) {
     if (err) {
         // change_machine_name(model, NOME_MACCHINA_NUOVA);
         parmac_init(pmodel, 1);
-        save_parmac(&pmodel->prog.parmac);
+        configuration_save_parmac(&pmodel->prog.parmac);
     } else {
         parmac_init(pmodel, 0);
     }

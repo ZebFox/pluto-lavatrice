@@ -32,6 +32,7 @@ static void *create_page(model_t *model, void *extra) {
     return NULL;
 }
 
+
 static void open_page(model_t *model, void *data) {
     view_common_title(lv_scr_act(), "TEST USCITE");
 

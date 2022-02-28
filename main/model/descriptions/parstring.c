@@ -30,5 +30,5 @@ void formatta_opt(char *string, uint16_t language, const void *arg) {
     const parameter_user_data_t udata = parameter_get_user_data((parameter_handle_t *)par);
     size_t                      value = parameter_to_index((parameter_handle_t *)par);
     char *(*values)[NUM_LINGUE]       = (char *(*)[NUM_LINGUE])udata.valori;
-    strcpy(string, values[language][value]);
+    strcpy(string, values[value][language]);
 }

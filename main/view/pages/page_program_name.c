@@ -247,7 +247,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         break;
                     }
 
-                    case BUTTON_LANA:
+                    case BUTTON_START:
                         data->keyboard = (data->keyboard + 1) % NUM_KEYBOARDS;
                         labels_set_text(data);
                         break;

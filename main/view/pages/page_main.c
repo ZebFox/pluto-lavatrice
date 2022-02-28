@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <assert.h>
+#include "controller/com/machine.h"
 #include "lvgl/lvgl.h"
+#include "src/lv_core/lv_obj.h"
 #include "view/view.h"
 #include "view/images/legacy.h"
 #include "view/view_types.h"
@@ -35,16 +37,21 @@ struct page_data {
     lv_obj_t *img_right;
     lv_obj_t *img_washes_sm;
     lv_obj_t *img_info;
+    lv_obj_t *img_tipo;
 
     size_t index_info;
 
     int      flag_status;
     uint16_t counter;
+
+    lv_obj_t *popup_comunication_error;
+    uint16_t  allarme;
 };
 
 
-static void update_prog_data(model_t *pmodel, struct page_data *data);
+static void update_prog_data(model_t *pmodel, struct page_data *pdata);
 static void update_timer_data(model_t *pmodel, struct page_data *pdata);
+static void update_status(model_t *pmodel, struct page_data *pdata);
 
 
 static void *create_page(model_t *pmodel, void *extra) {
@@ -60,11 +67,11 @@ static void open_page(model_t *pmodel, void *args) {
     struct page_data *pdata = args;
     pdata->flag_status      = 0;
     pdata->index_info       = 0;
+    pdata->allarme          = 0;
 
     lv_task_set_prio(pdata->timer, LV_TASK_PRIO_MID);
 
     view_common_password_reset(&pdata->password, get_millis());
-
 
     lv_obj_t *lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_8x16);
@@ -73,8 +80,16 @@ static void open_page(model_t *pmodel, void *args) {
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, -14);
     pdata->lbl_name = lbl;
 
+    lv_obj_t *img = custom_lv_img_create(lv_scr_act(), NULL);
+    lv_obj_set_auto_realign(img, 1);
+    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_LEFT, 16, 9);
+    pdata->img_tipo = img;
+
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_8x16);
+    lv_label_set_long_mode(lbl, LV_LABEL_LONG_SROLL_CIRC);
+    lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
+    lv_obj_set_width(lbl, 128);
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
     pdata->lbl_status = lbl;
 
@@ -84,7 +99,7 @@ static void open_page(model_t *pmodel, void *args) {
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);
     pdata->lbl_time = lbl;
 
-    lv_obj_t *img = custom_lv_img_create(lv_scr_act(), NULL);
+    img = custom_lv_img_create(lv_scr_act(), NULL);
     custom_lv_img_set_src(img, &legacy_img_left);
     lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_LEFT, 1, 16);
     pdata->img_left = img;
@@ -116,6 +131,7 @@ static void open_page(model_t *pmodel, void *args) {
     pdata->lbl_info = lbl;
 
     pdata->flag_status = 0;
+
     update_prog_data(pmodel, pdata);
     update_timer_data(pmodel, pdata);
 
@@ -142,6 +158,11 @@ static void open_page(model_t *pmodel, void *args) {
     static lv_point_t hor_points[2] = {{0, 0}, {65, 0}};
     line                            = view_common_line(hor_points, 2);
     lv_obj_align(line, NULL, LV_ALIGN_IN_TOP_MID, 15, 22);
+
+    // stringa testo
+    lv_obj_t *popup                 = view_common_popup(lv_scr_act(), "ERRORE");
+    pdata->popup_comunication_error = popup;
+    lv_obj_set_hidden(pdata->popup_comunication_error, 1);
 }
 
 
@@ -149,17 +170,26 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
     view_message_t    msg   = VIEW_EMPTY_MSG;
     struct page_data *pdata = arg;
 
+    if (!model_is_communication_ok(pmodel) && lv_obj_get_hidden(pdata->popup_comunication_error)) {
+        lv_obj_set_hidden(pdata->popup_comunication_error, 0);
+    } else if (model_is_communication_ok(pmodel) && !lv_obj_get_hidden(pdata->popup_comunication_error)) {
+        lv_obj_set_hidden(pdata->popup_comunication_error, 1);
+    }
+
     switch (event.code) {
         case VIEW_EVENT_CODE_PROGRAM_LOADED:
+            msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_AZZERA_ALLARMI;
             msg.vmsg.code  = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE_EXTRA;
-            msg.vmsg.extra = (void *)(uintptr_t)pmodel->run.num_prog_corrente;
+            msg.vmsg.extra = (void *)(uintptr_t)model_get_program_num(pmodel);
             msg.vmsg.page  = (void *)&page_choice;
             break;
 
         case VIEW_EVENT_CODE_MODEL_UPDATE:
-            if (!model_macchina_in_stop(pmodel)) {
+            if (!model_macchina_in_stop(pmodel) && model_can_work(pmodel)) {
                 msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                 msg.vmsg.page = (void *)&page_work;
+            } else {
+                update_status(pmodel, pdata);
             }
             break;
 
@@ -196,6 +226,11 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                     msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                     msg.vmsg.page = &page_set_datetime;
                     break;
+                } else if (view_common_check_password(&pdata->password, VIEW_PASSWORD_LANA, VIEW_LONG_PASSWORD_LEN,
+                                                      get_millis())) {
+                    msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
+                    msg.vmsg.page = &page_communication_settings;
+                    break;
                 } else if (view_common_check_password_started(&pdata->password)) {
                     break;
                 }
@@ -206,14 +241,23 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         break;
                     }
 
-                    case BUTTON_DESTRA:
+                    case BUTTON_STOP: {
+                        if (pmodel->system.errore_comunicazione) {
+                            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_RETRY_COMMUNICATION;
+                        }
+                        break;
+                    }
+
+                    case BUTTON_DESTRA: {
                         if (model_get_num_programs(pmodel) > 1) {
                             pdata->index = (pdata->index + 1) % model_get_num_programs(pmodel);
                             update_prog_data(pmodel, pdata);
                         }
                         break;
+                    }
 
-                    case BUTTON_SINISTRA:
+
+                    case BUTTON_SINISTRA: {
                         if (model_get_num_programs(pmodel) > 1) {
                             if (pdata->index > 0) {
                                 pdata->index--;
@@ -223,8 +267,9 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                             update_prog_data(pmodel, pdata);
                         }
                         break;
+                    }
 
-                    case BUTTON_LANA:
+                    case BUTTON_START:
                         if (pdata->index < model_get_num_programs(pmodel)) {
                             msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_LOAD_PROGRAM;
                             msg.cmsg.num  = pdata->index;
@@ -277,26 +322,30 @@ static void destroy_page(void *arg, void *extra) {
 }
 
 
-static void update_prog_data(model_t *pmodel, struct page_data *data) {
+static void update_prog_data(model_t *pmodel, struct page_data *pdata) {
     if (model_get_num_programs(pmodel) == 0) {
-        lv_label_set_text(data->lbl_name, view_intl_get_string(pmodel, STRINGS_NESSUN_PROGRAMMA));
-        lv_obj_set_hidden(data->img_left, 1);
-        lv_obj_set_hidden(data->img_right, 1);
-        lv_obj_set_hidden(data->img_washes_sm, 1);
-        lv_obj_set_hidden(data->lbl_washes, 1);
-        lv_obj_set_hidden(data->img_info, 1);
-        lv_obj_set_hidden(data->lbl_info, 1);
+        lv_label_set_text(pdata->lbl_name, view_intl_get_string(pmodel, STRINGS_NESSUN_PROGRAMMA));
+        lv_obj_set_hidden(pdata->img_left, 1);
+        lv_obj_set_hidden(pdata->img_right, 1);
+        lv_obj_set_hidden(pdata->img_washes_sm, 1);
+        lv_obj_set_hidden(pdata->lbl_washes, 1);
+        lv_obj_set_hidden(pdata->img_tipo, 1);
+        lv_obj_set_hidden(pdata->img_info, 1);
+        lv_obj_set_hidden(pdata->lbl_info, 1);
     } else {
-        const programma_preview_t *preview = model_get_preview(pmodel, data->index);
+        const programma_preview_t *preview = model_get_preview(pmodel, pdata->index);
 
-        lv_label_set_text_fmt(data->lbl_name, "%02i-%s", data->index + 1, preview->name);
-        lv_obj_set_hidden(data->img_left, 0);
-        lv_obj_set_hidden(data->img_right, 0);
-        lv_obj_set_hidden(data->img_washes_sm, 0);
-        lv_obj_set_hidden(data->lbl_washes, 0);
-        lv_obj_set_hidden(data->img_info, 0);
-        lv_obj_set_hidden(data->lbl_info, 0);
-        lv_label_set_text_fmt(data->lbl_washes, "x%02i", preview->lavaggi);
+        lv_label_set_text_fmt(pdata->lbl_name, "%02i-%s", pdata->index + 1, preview->name);
+        lv_obj_set_hidden(pdata->img_left, 0);
+        lv_obj_set_hidden(pdata->img_right, 0);
+        lv_obj_set_hidden(pdata->img_washes_sm, 0);
+        lv_obj_set_hidden(pdata->lbl_washes, 0);
+        lv_obj_set_hidden(pdata->img_tipo, 0);
+        lv_obj_set_hidden(pdata->img_info, 0);
+        lv_obj_set_hidden(pdata->lbl_info, 0);
+        lv_label_set_text_fmt(pdata->lbl_washes, "x%02i", preview->lavaggi);
+
+        view_common_program_type_image(pdata->img_tipo, model_get_preview(pmodel, pdata->index)->tipo);
     }
 }
 
@@ -307,11 +356,7 @@ static void update_timer_data(model_t *pmodel, struct page_data *pdata) {
     lv_label_set_text_fmt(pdata->lbl_time, "%02i/%02i/%02i %02i:%02i:%02i", time.tm_mday, time.tm_mon,
                           time.tm_year - 100, time.tm_hour, time.tm_min, time.tm_sec);
 
-    if (pdata->flag_status) {
-        lv_label_set_text(pdata->lbl_status, view_intl_get_string(pmodel, STRINGS_SCELTA_PROGRAMMA));
-    } else {
-        lv_label_set_text(pdata->lbl_status, view_intl_get_string(pmodel, STRINGS_E_PREMERE_START));
-    }
+    update_status(pmodel, pdata);
 
     if (model_get_num_programs(pmodel) > 0) {
         const programma_preview_t *preview   = model_get_preview(pmodel, pdata->index);
@@ -337,6 +382,22 @@ static void update_timer_data(model_t *pmodel, struct page_data *pdata) {
                 break;
             default:
                 assert(0);
+        }
+    }
+}
+
+
+static void update_status(model_t *pmodel, struct page_data *pdata) {
+    if (pmodel->run.macchina.codice_allarme > 0) {
+        if (pdata->allarme != pmodel->run.macchina.codice_allarme) {
+            pdata->allarme = pmodel->run.macchina.codice_allarme;
+            lv_label_set_text(pdata->lbl_status, view_common_alarm_description(pmodel));
+        }
+    } else {
+        if (pdata->flag_status) {
+            lv_label_set_text(pdata->lbl_status, view_intl_get_string(pmodel, STRINGS_SCELTA_PROGRAMMA));
+        } else {
+            lv_label_set_text(pdata->lbl_status, view_intl_get_string(pmodel, STRINGS_E_PREMERE_START));
         }
     }
 }

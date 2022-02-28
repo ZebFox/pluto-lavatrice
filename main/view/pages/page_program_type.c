@@ -24,8 +24,8 @@ enum {
 
 
 struct page_data {
-    int        flag;
-    lv_task_t *task;
+    lv_obj_t *img;
+    lv_obj_t *lbl;
 };
 
 
@@ -34,17 +34,29 @@ static void update_page(model_t *pmodel, struct page_data *pdata);
 
 static void *create_page(model_t *pmodel, void *extra) {
     struct page_data *pdata = malloc(sizeof(struct page_data));
-    pdata->task             = view_register_periodic_task(500UL, LV_TASK_PRIO_OFF, TIMEOUT_TIMER_ID);
     return pdata;
 }
 
 
 static void open_page(model_t *pmodel, void *args) {
-    struct page_data *data = args;
+    struct page_data *pdata = args;
 
     view_common_title(lv_scr_act(), view_intl_get_string(pmodel, STRINGS_TIPO));
 
-    update_page(pmodel, data);
+    lv_obj_t *img = custom_lv_img_create(lv_scr_act(), NULL);
+    lv_obj_set_auto_realign(img, 1);
+    lv_obj_set_size(img, 32, 28);
+    lv_obj_align(img, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
+    pdata->img = img;
+
+    lv_obj_t *lbl = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_set_auto_realign(lbl, 1);
+    lv_label_set_long_mode(lbl, LV_LABEL_LONG_BREAK);
+    lv_obj_set_width(lbl, 96);
+    lv_obj_align(lbl, img, LV_ALIGN_OUT_RIGHT_MID, 4, 0);
+    pdata->lbl = lbl;
+
+    update_page(pmodel, pdata);
 }
 
 
@@ -79,14 +91,24 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                     }
 
                     case BUTTON_MENO: {
+                        if (model_get_program(pmodel)->tipo > 0) {
+                            model_get_program(pmodel)->tipo--;
+                        } else {
+                            model_get_program(pmodel)->tipo = NUM_TIPI_PROGRAMMA - 1;
+                        }
+                        model_update_preview(pmodel);
+                        update_page(pmodel, data);
                         break;
                     }
 
                     case BUTTON_PIU: {
+                        model_get_program(pmodel)->tipo = (model_get_program(pmodel)->tipo + 1) % NUM_TIPI_PROGRAMMA;
+                        model_update_preview(pmodel);
+                        update_page(pmodel, data);
                         break;
                     }
 
-                    case BUTTON_LANA:
+                    case BUTTON_START:
                         break;
 
                     case BUTTON_LINGUA: {
@@ -98,9 +120,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
         }
 
         case VIEW_EVENT_CODE_TIMER: {
-            lv_task_reset(data->task);
-            data->flag = !data->flag;
-            update_page(pmodel, data);
+            break;
         }
 
         break;
@@ -112,28 +132,38 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
 }
 
 
-static void close_page(void *arg) {
-    struct page_data *data = arg;
-    lv_task_set_prio(data->task, LV_TASK_PRIO_OFF);
-    lv_obj_clean(lv_scr_act());
+static void update_page(model_t *pmodel, struct page_data *pdata) {
+    const strings_t labels[] = {
+        STRINGS_MOLTO_SPORCHI_CON_PRELAVAGGIO,
+        STRINGS_SPORCHI_CON_PRELAVAGGIO,
+        STRINGS_MOLTO_SPORCHI,
+        STRINGS_SPORCHI,
+        STRINGS_COLORATI,
+        STRINGS_SINTETICI,
+        STRINGS_PIUMONI,
+        STRINGS_DELICATI,
+        STRINGS_LANA,
+        STRINGS_LINO_E_TENDAGGI,
+        STRINGS_CENTRIFUGA,
+        STRINGS_CENTRIFUGA_PER_DELICATI,
+        STRINGS_SANIFICAZIONE,
+        STRINGS_AMMOLLO,
+        STRINGS_PRELAVAGGIO,
+        STRINGS_RISCIACQUO,
+    };
+
+    uint8_t type = model_get_program(pmodel)->tipo;
+    printf("%i\n", type);
+
+    view_common_program_type_image(pdata->img, type);
+    lv_label_set_text(pdata->lbl, view_intl_get_string(pmodel, labels[type]));
 }
-
-
-static void destroy_page(void *arg, void *extra) {
-    struct page_data *data = arg;
-    lv_task_del(data->task);
-    free(data);
-    free(extra);
-}
-
-
-static void update_page(model_t *pmodel, struct page_data *pdata) {}
 
 
 const pman_page_t page_program_type = {
     .create        = create_page,
     .open          = open_page,
     .process_event = process_page_event,
-    .close         = close_page,
-    .destroy       = destroy_page,
+    .close         = view_close_all,
+    .destroy       = view_destroy_all,
 };

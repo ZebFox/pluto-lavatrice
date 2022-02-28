@@ -160,5 +160,5 @@ lv_task_t *view_register_periodic_task(size_t period, lv_task_prio_t prio, int i
 
 
 static void periodic_task(lv_task_t *task) {
-    view_event((view_event_t){.code = VIEW_EVENT_CODE_TIMER, .timer_id = (int)(uintptr_t)task->user_data});
+    view_event((view_event_t){.code = VIEW_EVENT_CODE_TIMER, .timer_id = (uintptr_t)task->user_data});
 }

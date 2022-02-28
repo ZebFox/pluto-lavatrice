@@ -7,11 +7,6 @@ SCELTA_PROGRAMMA, Scelta programma, Choose program
 E_PREMERE_START, e premere start, and press start
 MACCHINA_AL_LAVORO, al  lavoro, al  lavoro
 MACCHINA_IN_PAUSA, pausa lavoro, pausa lavoro
-PROGRAMMA_CALDO, CALDO, HOT
-PROGRAMMA_MEDIO, MEDIO, WARM
-PROGRAMMA_TIEPIDO, TIEPIDO, LUKEWARM
-PROGRAMMA_FREDDO, FREDDO, COLD
-PROGRAMMA_LANA, LANA, WHOOL
 ALLARME_ERRORE_RAM, *  RAM   KO  *, *  RAM   KO  *
 ALLARME_OBLO_APERTO, OBLO' APERTO, OBLO' APERTO
 ALLARME_OBLO_SBLOCCATO, OBLO' SBLOCCATO, OBLO' SBLOCCATO
@@ -39,8 +34,6 @@ TEMPO_RISCALDAMENTO, Tempo riscald., Heating time
 CICLI_PARZIALI, Cicli parziali, Partial cycles
 CICLI_TOTALI, Cicli totali, Total cycles
 GETTONI_TOTALI, Gettoni totali, Total coins
-ERRORE_FATALE_RAM, Si e' verificato un malfunzionamento fatale della eeprom. I parametri non verranno caricati,
-ERRORE_LIEVE_RAM, I parametri caricati dalla eeprom non erano validi. Sono stati corretti,
 SALVATAGGIO_IN_CORSO, Salvataggio in corso..., Saving...
 TEMPO_CICLO, TEMPO CICLO, CYCLE TIME
 TEMPERATURA, TEMPERATURA, TEMPERATURE
@@ -88,3 +81,23 @@ SCARICO_FORZATO, Scarico forzato, Forced drain
 RECUPERO, Recupero, Recovery
 USCITA_LAVAGGIO, Uscita lavaggio, Washing exit
 PAUSA_LAVAGGIO, Pausa lavaggio, Cycle pause
+SCARICO_NECESSARIO, Scarico necessario, Drain required
+MOLTO_SPORCHI_CON_PRELAVAGGIO, Molto sporchi con prelavaggio, Very dirty with prewash
+SPORCHI_CON_PRELAVAGGIO, Sportchi con prelavaggio, Dirty with prewash
+MOLTO_SPORCHI, Molto sporchi, Very dirty
+SPORCHI, Sporchi, Dirty
+COLORATI, Colorati, Coloured
+SINTETICI, Sintetici, Artificial
+PIUMONI, Piumoni, Duvets
+DELICATI, Delicati, Delicates
+LANA, Lana, Whool
+LINO_E_TENDAGGI, Lino e tendaggi, Linen and curtains
+CENTRIFUGA, Centrifuga, Centrifuge
+CENTRIFUGA_PER_DELICATI, Centrifuga per delicati, Centrifuge for delicates
+SANIFICAZIONE, Sanificazione, Sanification
+ERRORE_EEPROM, Errore EEPROM, EEPROM error
+ALLARME_SPEGNIMENTO, Allarme spegnimento, Power off alarm
+ALLARME_COMUNICAZIONE, Allarme comunicazione, Communication alarm
+ALLARME, Allarme, Alarm
+CANCELLARE_IL_PROGRAMMA, Cancellare il programma?, Delete the program?
+INIZIO_PROGRAMMA, Inizio programma, Program start

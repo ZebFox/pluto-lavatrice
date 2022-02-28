@@ -32,7 +32,9 @@ void invioprova();
 
 void app_main(void) {
     keypad_update_t event;
-    unsigned long t=0;
+    unsigned long   t = 0;
+
+    vTaskDelay(pdMS_TO_TICKS(1000));
 
     system_i2c_init();
     nt7534_init();
@@ -61,7 +63,7 @@ void app_main(void) {
             view_event((view_event_t){.code = VIEW_EVENT_CODE_KEYPAD, .key_event = event});
         }
         if (is_expired(t, get_millis(), 5000)) {
-           //invioprova();
+            // invioprova();
             t = get_millis();
         }
 

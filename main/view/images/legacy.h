@@ -44,6 +44,7 @@ extern const GSYMBOL legacy_img_logo_hoover;
 extern const GSYMBOL legacy_img_logo_msgroup;
 extern const GSYMBOL legacy_img_logo_schulthess;
 extern const GSYMBOL legacy_img_logo_rotondi;
+extern const GSYMBOL legacy_img_logo_hsw;
 
 extern const GSYMBOL legacy_img_left;
 extern const GSYMBOL legacy_img_right;
@@ -52,5 +53,20 @@ extern const GSYMBOL legacy_img_level;
 extern const GSYMBOL legacy_img_time;
 extern const GSYMBOL legacy_img_temperature;
 extern const GSYMBOL legacy_img_speed;
+
+extern const GSYMBOL legacy_img_molto_sporchi;
+extern const GSYMBOL legacy_img_sporchi;
+extern const GSYMBOL legacy_img_colorati;
+extern const GSYMBOL legacy_img_sintetici;
+extern const GSYMBOL legacy_img_piumoni;
+extern const GSYMBOL legacy_img_delicati;
+extern const GSYMBOL legacy_img_lana;
+extern const GSYMBOL legacy_img_lino_tendaggi;
+extern const GSYMBOL legacy_img_solo_centrifuga;
+extern const GSYMBOL legacy_img_solo_centrifuga_delicati;
+extern const GSYMBOL legacy_img_sanificazione;
+extern const GSYMBOL legacy_img_ammollo;
+extern const GSYMBOL legacy_img_prelavaggio;
+extern const GSYMBOL legacy_img_risciacquo;
 
 #endif

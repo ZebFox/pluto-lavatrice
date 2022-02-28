@@ -112,7 +112,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                             break;
                         }
 
-                        pdata->index = (pdata->index + 1) % model_get_program(pmodel)->num_steps;
+                        pdata->index = (pdata->index + 1) % (model_get_program(pmodel)->num_steps + 1);
                         update_page(pmodel, pdata);
                         break;
                     }
@@ -125,7 +125,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         if (pdata->index > 0) {
                             pdata->index--;
                         } else {
-                            pdata->index = model_get_program(pmodel)->num_steps - 1;
+                            pdata->index = model_get_program(pmodel)->num_steps;
                         }
                         update_page(pmodel, pdata);
                         break;
@@ -139,7 +139,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                                 pdata->step_code = NUM_STEPS - 1;
                             }
                             update_page(pmodel, pdata);
-                        } else if (pdata->operation == OP_NONE) {
+                        } else if (pdata->operation == OP_NONE && pdata->index > 0) {
                             pdata->operation = OP_DEL;
                             update_page(pmodel, pdata);
                         }
@@ -160,28 +160,28 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         break;
                     }
 
-                    case BUTTON_LANA:
+                    case BUTTON_START:
                         break;
 
                     case BUTTON_LINGUA:
                         if (pdata->operation == OP_ADD) {
                             program_insert_step(model_get_program(pmodel), pdata->step_code + 1, pdata->index + 1);
-                            pdata->index     = (pdata->index + 1) % model_get_program(pmodel)->num_steps;
+                            pdata->index     = (pdata->index + 1) % (model_get_program(pmodel)->num_steps + 1);
                             pdata->operation = OP_NONE;
                             update_page(pmodel, pdata);
                         } else if (pdata->operation == OP_DEL) {
                             pdata->operation = OP_NONE;
-                            programs_remove_step(model_get_program(pmodel), pdata->index);
+                            programs_remove_step(model_get_program(pmodel), pdata->index - 1);
                             if (pdata->index >= model_get_program(pmodel)->num_steps) {
                                 if (pdata->index > 0) {
                                     pdata->index--;
                                 }
                             }
                             update_page(pmodel, pdata);
-                        } else {
+                        } else if (pdata->index > 0 && pdata->index < model_get_program(pmodel)->num_steps + 1) {
                             msg.vmsg.code  = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE_EXTRA;
                             msg.vmsg.page  = (void *)&page_parlav;
-                            msg.vmsg.extra = &model_get_program(pmodel)->steps[pdata->index];
+                            msg.vmsg.extra = &model_get_program(pmodel)->steps[pdata->index - 1];
                         }
                         break;
                 }
@@ -210,25 +210,32 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
 
     if (num_steps == 0) {
         lv_label_set_text(pdata->lbl_index, view_intl_get_string(pmodel, STRINGS_PROGRAMMA_VUOTO));
-        for (size_t i = 0; i < NUM_LINES; i++) {
+        lv_obj_set_style(pdata->lines[0], &style_label_6x8_reverse);
+        lv_obj_set_hidden(pdata->lines[0], 0);
+        lv_label_set_text(pdata->lines[0], view_intl_get_string(pmodel, STRINGS_INIZIO_PROGRAMMA));
+        for (size_t i = 1; i < NUM_LINES; i++) {
             lv_obj_set_hidden(pdata->lines[i], 1);
         }
     } else {
         lv_label_set_text_fmt(pdata->lbl_index, "%s: %02i/%02i", view_intl_get_string(pmodel, STRINGS_PASSO),
-                              pdata->index + 1, num_steps);
+                              pdata->index, num_steps);
         for (size_t i = 0; i < NUM_LINES; i++) {
-            size_t            position = pdata->start + i;
-            parametri_step_t *step     = model_get_program_step(pmodel, position);
-            if (step != NULL) {
-                if (position == pdata->index) {
-                    lv_obj_set_style(pdata->lines[i], &style_label_6x8_reverse);
-                } else {
-                    lv_obj_set_style(pdata->lines[i], &style_label_6x8);
-                }
-                lv_label_set_text(pdata->lines[i], view_common_step2str(pmodel, step->tipo));
-                lv_obj_set_hidden(pdata->lines[i], 0);
+            size_t position = pdata->start + i;
+            if (position == pdata->index) {
+                lv_obj_set_style(pdata->lines[i], &style_label_6x8_reverse);
             } else {
-                lv_obj_set_hidden(pdata->lines[i], 1);
+                lv_obj_set_style(pdata->lines[i], &style_label_6x8);
+            }
+            if (position == 0) {
+                lv_label_set_text(pdata->lines[i], view_intl_get_string(pmodel, STRINGS_INIZIO_PROGRAMMA));
+            } else {
+                parametri_step_t *step = model_get_program_step(pmodel, position - 1);
+                if (step != NULL) {
+                    lv_label_set_text(pdata->lines[i], view_common_step2str(pmodel, step->tipo));
+                    lv_obj_set_hidden(pdata->lines[i], 0);
+                } else {
+                    lv_obj_set_hidden(pdata->lines[i], 1);
+                }
             }
         }
     }
@@ -239,7 +246,7 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
     } else if (pdata->operation == OP_DEL) {
         lv_obj_set_hidden(pdata->lbl_addition, 0);
         lv_label_set_text_fmt(pdata->lbl_addition, "- %-18s ",
-                              view_common_step2str(pmodel, model_get_program_step(pmodel, pdata->index)->tipo));
+                              view_common_step2str(pmodel, model_get_program_step(pmodel, pdata->index - 1)->tipo));
     } else {
         lv_obj_set_hidden(pdata->lbl_addition, 1);
     }

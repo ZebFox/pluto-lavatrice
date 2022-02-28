@@ -8,6 +8,7 @@
 #define VIEW_PASSWORD_TIMEOUT      4000UL
 #define VIEW_PASSWORD_MAX_SIZE     7
 #define VIEW_PASSWORD_MINUS        ((button_t[]){BUTTON_MENO, BUTTON_MENO})
+#define VIEW_PASSWORD_LANA         ((button_t[]){BUTTON_START, BUTTON_START, BUTTON_START, BUTTON_START})
 #define VIEW_PASSWORD_SET_DATETIME ((button_t[]){BUTTON_MENU, BUTTON_MENU})
 #define VIEW_PASSWORD_PLUS         ((button_t[]){BUTTON_PIU, BUTTON_PIU})
 #define VIEW_PASSWORD_RIGHT        ((button_t[]){BUTTON_DESTRA, BUTTON_DESTRA})
@@ -36,5 +37,8 @@ lv_obj_t   *view_common_horizontal_line(void);
 lv_obj_t   *view_common_line(lv_point_t *points, size_t len);
 const char *view_common_step2str(model_t *pmodel, uint16_t step);
 const char *view_common_pedantic_string(model_t *pmodel);
+lv_obj_t   *view_common_popup(lv_obj_t *root, const char *str);
+void        view_common_program_type_image(lv_obj_t *img, uint8_t ptype);
+const char *view_common_alarm_description(model_t *pmodel);
 
 #endif

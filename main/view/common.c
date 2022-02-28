@@ -1,9 +1,13 @@
+#include <stdio.h>
 #include <assert.h>
 #include "common.h"
 #include "gel/timer/timecheck.h"
+#include "src/lv_objx/lv_label.h"
 #include "styles.h"
 #include "model/programs.h"
 #include "intl/intl.h"
+#include "images/legacy.h"
+#include "widgets/custom_lv_img.h"
 
 
 static void timer_task(lv_task_t *task);
@@ -11,6 +15,46 @@ static int  find_password_start(view_common_password_t *password);
 
 
 static const button_t preamble[3] = {BUTTON_STOP, BUTTON_STOP, BUTTON_STOP};
+
+
+const char *view_common_alarm_description(model_t *pmodel) {
+    static char codice_generico[32] = {0};
+    uint16_t    alarm_code          = pmodel->run.macchina.codice_allarme;
+
+    switch (alarm_code) {
+        case 1:
+            return view_intl_get_string(pmodel, STRINGS_ERRORE_EEPROM);
+        case 2:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_SPEGNIMENTO);
+        case 3:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_COMUNICAZIONE);
+        case 4:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_OBLO_APERTO);
+        case 5:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_OBLO_SBLOCCATO);
+        case 6 ... 7:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_EMERGENZA);
+
+        default:
+            snprintf(codice_generico, sizeof(codice_generico), "%s %i", view_intl_get_string(pmodel, STRINGS_ALLARME),
+                     alarm_code);
+            return codice_generico;
+    }
+}
+
+
+void view_common_program_type_image(lv_obj_t *img, uint8_t ptype) {
+    const GSYMBOL *images[] = {
+        &legacy_img_molto_sporchi, &legacy_img_sporchi,         &legacy_img_molto_sporchi,
+        &legacy_img_sporchi,       &legacy_img_colorati,        &legacy_img_sintetici,
+        &legacy_img_piumoni,       &legacy_img_delicati,        &legacy_img_lana,
+        &legacy_img_lino_tendaggi, &legacy_img_solo_centrifuga, &legacy_img_solo_centrifuga_delicati,
+        &legacy_img_sanificazione, &legacy_img_ammollo,         &legacy_img_prelavaggio,
+        &legacy_img_risciacquo,
+    };
+    assert(ptype < sizeof(images) / sizeof(images[0]));
+    custom_lv_img_set_src(img, images[ptype]);
+}
 
 
 const char *view_common_step2str(model_t *pmodel, uint16_t step) {
@@ -78,6 +122,23 @@ lv_obj_t *view_common_title(lv_obj_t *root, const char *str) {
     lv_obj_align(title, NULL, LV_ALIGN_CENTER, 0, 0);
 
     return title;
+}
+
+lv_obj_t *view_common_popup(lv_obj_t *root, const char *str) {
+    lv_obj_t *cont = lv_cont_create(root, NULL);
+    lv_obj_set_size(cont, 110, 50);
+    lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style(cont, &style_container_bordered);
+    lv_obj_t *cont_in = lv_cont_create(cont, NULL);
+    lv_obj_set_size(cont_in, 105, 45);
+    lv_obj_align(cont_in, cont, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style(cont_in, &style_container_bordered);
+
+    lv_obj_t *label = lv_label_create(cont, NULL);
+    lv_label_set_text(label, str);
+    lv_obj_align(label, cont, LV_ALIGN_CENTER, 0, 0);
+
+    return cont;
 }
 
 

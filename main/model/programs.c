@@ -8,8 +8,8 @@
 #include "gel/serializer/serializer.h"
 
 
-#define PACK_BYTE(buffer, num, i)     PACK_UINT8(&buffer[i], num)
-#define PACK_SHORT_BE(buffer, num, i) PACK_UINT16_BE(&buffer[i], num)
+#define PACK_BYTE(buffer, num, i)     i += PACK_UINT8(&buffer[i], num)
+#define PACK_SHORT_BE(buffer, num, i) i += PACK_UINT16_BE(&buffer[i], num)
 
 
 static void init_names(name_t *names, uint16_t num);

@@ -12,7 +12,7 @@ typedef enum {
     BUTTON_KEY,
     BUTTON_DESTRA,
     BUTTON_PIU,
-    BUTTON_LANA,
+    BUTTON_START,
     BUTTON_MENO,
     BUTTON_STOP,
     BUTTON_MENU,

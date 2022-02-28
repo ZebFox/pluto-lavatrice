@@ -31,7 +31,11 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
     uint16_t rimanente = pmodel->run.macchina.rimanente;
     lv_label_set_text_fmt(pdata->lbl_remaining, "%02im%02is", rimanente / 60, rimanente % 60);
 
-    if (model_macchina_in_pausa(pmodel)) {
+    if (pmodel->run.f_richiedi_scarico) {
+        lv_label_set_text(pdata->lbl_phase, view_intl_get_string(pmodel, STRINGS_SCARICO_NECESSARIO));
+    } else if (model_macchina_in_scarico_forzato(pmodel)) {
+        lv_label_set_text(pdata->lbl_phase, view_intl_get_string(pmodel, STRINGS_SCARICO_FORZATO));
+    } else if (model_macchina_in_pausa(pmodel)) {
         lv_label_set_text(pdata->lbl_phase, view_intl_get_string(pmodel, STRINGS_PAUSA_LAVAGGIO));
     } else {
         lv_label_set_text(pdata->lbl_phase, view_common_pedantic_string(pmodel));
@@ -55,7 +59,7 @@ static void open_page(model_t *pmodel, void *args) {
 
     lv_obj_t *lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_6x8);
-    lv_label_set_text_fmt(lbl, "%02i", pmodel->run.num_prog_corrente + 1);
+    lv_label_set_text_fmt(lbl, "%02i", model_get_program_num(pmodel) + 1);
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 1, 1);
 
     lbl = lv_label_create(lv_scr_act(), NULL);
@@ -69,10 +73,11 @@ static void open_page(model_t *pmodel, void *args) {
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
     lv_label_set_text_fmt(lbl, "# %s %02i/%02i #", view_intl_get_string(pmodel, STRINGS_PASSO),
                           model_get_current_step_number(pmodel) + 1, program->num_steps);
-    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 2);
     lv_obj_t *lbl_prev = lbl;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_set_auto_realign(lbl, 1);
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
     lv_obj_set_style(lbl, &style_label_6x8);
     lv_obj_align(lbl, lbl_prev, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
@@ -81,36 +86,21 @@ static void open_page(model_t *pmodel, void *args) {
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
     lv_label_set_text_fmt(lbl, "# %s #", view_intl_get_string(pmodel, STRINGS_FASE));
-    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 16);
+    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 18);
     lbl_prev = lbl;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_set_auto_realign(lbl, 1);
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
     lv_obj_set_style(lbl, &style_label_6x8);
     lv_obj_align(lbl, lbl_prev, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
     pdata->lbl_phase = lbl;
 
-    lbl = lv_label_create(lv_scr_act(), NULL);
-    lv_obj_set_style(lbl, &style_label_8x16);
-    lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
-    char string[32] = {0};
-    model_formatta_prezzo(string, pmodel, program->prezzo);
-    lv_label_set_text(lbl, string);
-    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, -10);
-
-    lbl = lv_label_create(lv_scr_act(), NULL);
-    lv_obj_set_style(lbl, &style_label_8x16);
-    lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
-    memset(string, 0, sizeof(string));
-    model_formatta_prezzo(string, pmodel, model_get_credito(pmodel));
-    lv_label_set_text(lbl, string);
-    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 2);
-
     lv_obj_t *img = custom_lv_img_create(lv_scr_act(), NULL);
     custom_lv_img_set_src(img, &legacy_img_time);
-    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_MID, -32, 20);
+    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_MID, -16, 12);
 
-    const programma_preview_t *preview = model_get_preview(pmodel, pmodel->run.num_prog_corrente);
+    const programma_preview_t *preview = model_get_preview(pmodel, model_get_program_num(pmodel));
     lbl                                = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_6x8);
     lv_obj_align(lbl, img, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
@@ -132,7 +122,6 @@ static void open_page(model_t *pmodel, void *args) {
     line = view_common_horizontal_line();
     lv_obj_align(line, NULL, LV_ALIGN_IN_TOP_MID, 0, 28);
 
-
     update_page(pmodel, pdata);
 }
 
@@ -143,7 +132,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
 
     switch (event.code) {
         case VIEW_EVENT_CODE_MODEL_UPDATE:
-            if (model_macchina_in_stop(pmodel)) {
+            if (model_macchina_in_stop(pmodel) || !model_can_work(pmodel)) {
                 msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_REBASE;
                 msg.vmsg.page = (void *)&page_main;
             }
@@ -184,6 +173,12 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         msg.cmsg.code    = VIEW_CONTROLLER_COMMAND_CODE_PAUSE;
                         pdata->timestamp = get_millis();
                     }
+                }
+            } else if (event.key_event.event == KEY_LONGCLICK) {
+                if (event.key_event.code == BUTTON_STOP && pmodel->run.f_richiedi_scarico) {
+                    pmodel->run.f_richiedi_scarico = 0;
+                    msg.cmsg.code                  = VIEW_CONTROLLER_COMMAND_CODE_FORCE_DRAIN;
+                    update_page(pmodel, pdata);
                 }
             }
             break;

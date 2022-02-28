@@ -31,7 +31,7 @@ static view_t update_page(model_t *pmodel, struct page_data *pdata);
 static void *create_page(model_t *model, void *extra) {
     struct page_data *pdata = malloc(sizeof(struct page_data));
     pdata->par_to_save      = 0;
-    pdata->livello_accesso  = LVL_COSTRUTTORE;
+    pdata->livello_accesso  = 3;
     pdata->step             = extra;
 
     parlav_init(&model->prog.parmac, pdata->step);
@@ -103,8 +103,6 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
 
                     case BUTTON_STOP:
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
-#warning "Rimuovere i parametri estesi in uscita dalla pagina!"
-                        // model->pmac.abilita_parametri_ridotti = 1;
                         if (data->par_to_save) {
                             msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                         }

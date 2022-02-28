@@ -9,6 +9,7 @@
 #include "peripherals/keyboard.h"
 #include "view/intl/intl.h"
 #include "view/styles.h"
+#include "esp_log.h"
 
 
 struct page_data {
@@ -26,10 +27,13 @@ struct page_data {
 static view_t update_page(model_t *pmodel, struct page_data *pdata);
 
 
+static const char *TAG = "PageParmac";
+
+
 static void *create_page(model_t *model, void *extra) {
     struct page_data *data = malloc(sizeof(struct page_data));
     data->par_to_save      = 0;
-    data->livello_accesso  = LVL_COSTRUTTORE;
+    data->livello_accesso  = 3;
     return data;
 }
 
@@ -39,7 +43,8 @@ static void open_page(model_t *pmodel, void *args) {
     view_common_title(lv_scr_act(), view_intl_get_string(pmodel, STRINGS_PARAMETRI_MAC));
 
     data->num_parameters = parmac_get_tot_parameters(data->livello_accesso);
-    data->parameter      = 0;
+    ESP_LOGI(TAG, "num %zu", data->num_parameters);
+    data->parameter = 0;
 
     lv_obj_t *lnum = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_auto_realign(lnum, 1);
@@ -97,12 +102,7 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                         break;
 
                     case BUTTON_STOP:
-                        msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
-#warning "Rimuovere i parametri estesi in uscita dalla pagina!"
-                        // model->pmac.abilita_parametri_ridotti = 1;
-                        if (data->par_to_save) {
-                            msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
-                        }
+                        msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_SAVE_PARMAC;
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
                         break;
                 }

@@ -32,7 +32,19 @@ static void open_page(model_t *pmodel, void *args) {
     lv_task_set_prio(pdata->task, LV_TASK_PRIO_MID);
 
     lv_obj_t *logo = custom_lv_img_create(lv_scr_act(), NULL);
-    custom_lv_img_set_src(logo, &legacy_img_logo_ciao);
+    switch (pmodel->prog.parmac.logo) {
+        case 3:
+            custom_lv_img_set_src(logo, &legacy_img_logo_rotondi);
+            break;
+
+        case 1:
+            custom_lv_img_set_src(logo, &legacy_img_logo_msgroup);
+            break;
+
+        default:
+            custom_lv_img_set_src(logo, &legacy_img_logo_hsw);
+            break;
+    }
     lv_obj_align(logo, NULL, LV_ALIGN_CENTER, 0, 0);
 }
 
@@ -43,21 +55,26 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
     (void)data;
 
     switch (event.code) {
+        case VIEW_EVENT_CODE_OPEN:
+            if (pmodel->prog.parmac.logo == 0) {
+                msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
+                msg.vmsg.page = &page_main;
+            }
+            break;
+
         case VIEW_EVENT_CODE_KEYPAD: {
             if (event.key_event.event == KEY_CLICK) {
                 switch (event.key_event.code) {
-                    case BUTTON_LANA: {
+                    case BUTTON_START: {
                         break;
                     }
                     default:
                         break;
                 }
             }
-        }
-        break;
+        } break;
 
         case VIEW_EVENT_CODE_TIMER:
-            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;
             msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
             msg.vmsg.page = &page_main;
             break;

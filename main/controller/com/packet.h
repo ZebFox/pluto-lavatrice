@@ -3,11 +3,10 @@
 
 #include <stdint.h>
 
-#define PREAMBLE_LEN      1
-#define HEADER_LEN        2
-#define CRC_SIZE          2
-#define MAX_SLAVE_PAYLOAD 255
-#define MAX_PACKET        (MAX_SLAVE_PAYLOAD + PREAMBLE_LEN + HEADER_LEN + CRC_SIZE)
+#define PREAMBLE_LEN         1
+#define HEADER_LEN           2
+#define CRC_SIZE             2
+#define PACKET_SIZE(payload) (payload + PREAMBLE_LEN + HEADER_LEN + CRC_SIZE + 1)
 
 #define NULL_COMMAND               0
 #define COMANDO_IMPOSTA_USCITA     0x10

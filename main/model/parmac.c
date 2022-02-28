@@ -8,7 +8,7 @@
 #include "parmac.h"
 #include "descriptions/AUTOGEN_FILE_pars.h"
 
-#define NUM_PARAMETERS 14
+#define NUM_PARAMETERS 67
 
 enum {
     LIVELLO_ACCESSO_ESTESI  = 0,
@@ -19,7 +19,6 @@ enum {
 parameter_handle_t parameters[NUM_PARAMETERS];
 
 static parameter_handle_t *get_actual_parameter(model_t *pmodel, size_t parameter, uint8_t al);
-static uint8_t             get_livello_accesso(uint8_t parametri_ridotti);
 
 
 void parmac_init(model_t *pmodel, int reset) {
@@ -27,13 +26,15 @@ void parmac_init(model_t *pmodel, int reset) {
     parmac_t           *p  = &pmodel->prog.parmac;
     parameter_handle_t *ps = parameters;
 
-    pmodel->prog.parmac.livello_accesso = 3;
+    char *fmt_sec  = "%i s";
+    char *fmt_cm   = "%i cm";
+    char *fmt_perc = "%i %%";
+    char *fmt_lt   = "%i lt";
 
-    char *fmt_sec = "%i s";
-    
+    // clang-format off
     ps[i++] = PARAMETER(&p->lingua, 0, NUM_LINGUE - 1, 0, FOPT(PARS_DESCRIPTIONS_LINGUA, pars_lingue), BIT_UTENTE);
     ps[i++] = PARAMETER(&p->logo, 0, 5, 0, FOPT(PARS_DESCRIPTIONS_LOGO, pars_loghi), BIT_UTENTE);
-    ps[i++] = PARAMETER(&p->livello_accesso, 0, 3, 0, FOPT(PARS_DESCRIPTIONS_LIVELLO_ACCESSO, pars_loghi), BIT_TECNICO);
+    ps[i++] = PARAMETER(&p->livello_accesso, 0, 3, 0, FOPT(PARS_DESCRIPTIONS_LIVELLO_ACCESSO, pars_livello_accesso), BIT_TECNICO);
     ps[i++] = PARAMETER(&p->tipo_gettoniera, 0, 8, 0, FOPT(PARS_DESCRIPTIONS_TIPO_GETTONIERA, pars_gettoniera), BIT_UTENTE);
     ps[i++] = PARAMETER(&p->valore_impulso, 1, 0xFFFF, 10, FINT(PARS_DESCRIPTIONS_VALORE_IMPULSO), BIT_UTENTE);
     ps[i++] = PARAMETER(&p->valore_prezzo_unico, 1, 0xFFFF, 500, FINT(PARS_DESCRIPTIONS_VALORE_PREZZO_UNICO), BIT_TECNICO);
@@ -45,6 +46,61 @@ void parmac_init(model_t *pmodel, int reset) {
     ps[i++] = PARAMETER(&p->abilitazione_sblocco_get, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_SBLOCCO_GETTONIERA, pars_abilitazione), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->secondi_pausa, 0, 10, 1, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_PAUSA, fmt_sec), BIT_UTENTE);
     ps[i++] = PARAMETER(&p->secondi_stop, 0, 10, 3, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_STOP, fmt_sec), BIT_UTENTE);
+    ps[i++] = PARAMETER(&p->inibizione_allarmi, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_INIBIZIONE_ALLARMI, pars_abilitazione), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->diametro_cesto, 0, 10000, 0, FFINT(PARS_DESCRIPTIONS_DIAMETRO_CESTO, fmt_cm), BIT_DISTRIBUTORE);
+    ps[i++] = PARAMETER(&p->profondita_cesto, 0, 10000, 0, FFINT(PARS_DESCRIPTIONS_PROFONDITA_CESTO, fmt_cm), BIT_DISTRIBUTORE);
+    ps[i++] = PARAMETER(&p->altezza_trappola, 0, 1000, 0, FFINT(PARS_DESCRIPTIONS_ALTEZZA_TRAPPOLA, fmt_cm), BIT_DISTRIBUTORE);
+    ps[i++] = PARAMETER(&p->f_proximity, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_SENSORE_PROSSIMITA, pars_abilitazione), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->numero_raggi, 1, 12, 6, FINT(PARS_DESCRIPTIONS_NUMERO_RAGGI), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->correzione_contagiri, 0, 200, 111, FINT(PARS_DESCRIPTIONS_CORREZIONE_CONTAGIRI), BIT_DISTRIBUTORE);
+    ps[i++] = PARAMETER(&p->scala_accelerometro, 0, 5, 3, FINT(PARS_DESCRIPTIONS_SCALA_ACCELEROMETRO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->soglia_x_accelerometro, 0, 511, 100, FINT(PARS_DESCRIPTIONS_SOGLIA_X_ACCELEROMETRO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->soglia_y_accelerometro, 0, 511, 90, FINT(PARS_DESCRIPTIONS_SOGLIA_Y_ACCELEROMETRO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->soglia_z_accelerometro, 0, 511, 110, FINT(PARS_DESCRIPTIONS_SOGLIA_Z_ACCELEROMETRO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->soglia_x_accelerometro_h, 0, 511, 155, FINT(PARS_DESCRIPTIONS_SOGLIA_X_ACCELEROMETRO_H), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->soglia_y_accelerometro_h, 0, 511, 135, FINT(PARS_DESCRIPTIONS_SOGLIA_Y_ACCELEROMETRO_H), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->soglia_z_accelerometro_h, 0, 511, 110, FINT(PARS_DESCRIPTIONS_SOGLIA_Z_ACCELEROMETRO_H), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->giri_accelerometro, 0, 1000, 200, FINT(PARS_DESCRIPTIONS_GIRI_ACCELEROMETRO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->giri_accelerometro_2, 0, 1000, 200, FINT(PARS_DESCRIPTIONS_GIRI_ACCELEROMETRO_2), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->delta_val_accelerometro, 0, 1000, 200, FFINT(PARS_DESCRIPTIONS_DELTA_ACCELEROMETRO, fmt_perc), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_attesa_accelerometro, 0, 60, 20, FFINT(PARS_DESCRIPTIONS_TEMPO_ATTESA_ACCELEROMETRO, fmt_sec), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->temperatura_massima, 0, 100, 90, FINT(PARS_DESCRIPTIONS_TEMPERATURA_MASSIMA), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->isteresi_temperatura, 0, 60, 2, FINT(PARS_DESCRIPTIONS_ISTERESI_TEMPERATURA), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->temperatura_sicurezza, 0, 99, 95, FINT(PARS_DESCRIPTIONS_TEMPERATURA_SICUREZZA), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->temperatura_termodegradazione, 0, 60, 45, FINT(PARS_DESCRIPTIONS_TEMPERATURA_TERMODEGRADAZIONE), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tipo_livello, 0, 2, 0, FINT(PARS_DESCRIPTIONS_TIPO_LIVELLO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_isteresi_livello, 1, 60, 3, FFINT(PARS_DESCRIPTIONS_TEMPO_ISTERESI_LIVELLO, fmt_sec), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->centimetri_max_livello, 2, 100, 48, FFINT(PARS_DESCRIPTIONS_MAX_LIVELLO, fmt_cm), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->livello_sfioro, 15, 10000, 50, FFINT(PARS_DESCRIPTIONS_LIVELLO_SFIORO, fmt_cm), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->centimetri_minimo_scarico, 0, 30, 1, FFINT(PARS_DESCRIPTIONS_LIVELLO_MINIMO_SCARICO, fmt_cm), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->centimetri_minimo_riscaldo, 0, 30, 1, FFINT(PARS_DESCRIPTIONS_LIVELLO_MINIMO_RISCALDAMENTO, fmt_cm), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->litri_massimi, 15, 10000, 50, FFINT(PARS_DESCRIPTIONS_LITRI_MASSIMI, fmt_lt), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->litri_minimi_riscaldo, 1, 1000, 20, FFINT(PARS_DESCRIPTIONS_LITRI_MINIMI_RISCALDAMENTO, fmt_lt), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->impulsi_litro, 0, 10000, 328, FINT(PARS_DESCRIPTIONS_IMPULSI_LITRI), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tipo_inverter, 0, 1, 0, FINT(PARS_DESCRIPTIONS_TIPO_INVERTER), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_servizio, 0, 100, 36, FINT(PARS_DESCRIPTIONS_VELOCITA_SERVIZIO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_minima_lavaggio, 0, 150, 20, FINT(PARS_DESCRIPTIONS_VELOCITA_MINIMA_LAVAGGIO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_massima_lavaggio, 0, 150, 60, FINT(PARS_DESCRIPTIONS_VELOCITA_MASSIMA_LAVAGGIO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->abilitazione_preparazione_rotazione, 0, 9, 3, FINT(PARS_DESCRIPTIONS_PREPARAZIONE_ROTAZIONE), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_marcia_preparazione_rotazione, 1, 200, 20, FFINT(PARS_DESCRIPTIONS_TEMPO_MARCIA_PREPARAZIONE_ROTAZIONE, fmt_sec), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_sosta_preparazione_rotazione, 1, 200, 20, FFINT(PARS_DESCRIPTIONS_TEMPO_SOSTA_PREPARAZIONE_ROTAZIONE, fmt_sec), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_minima_preparazione, 1, 200, 20, FINT(PARS_DESCRIPTIONS_VELOCITA_MINIMA_PREPARAZIONE), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_massima_preparazione, 1, 200, 50, FINT(PARS_DESCRIPTIONS_VELOCITA_MASSIMA_PREPARAZIONE), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_minima_centrifuga_1, 0, 1200, 1, FINT(PARS_DESCRIPTIONS_VELOCITA_MINIMA_CENTRIFUGA_1), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_massima_centrifuga_1, 1, 1200, 1, FINT(PARS_DESCRIPTIONS_VELOCITA_MASSIMA_CENTRIFUGA_1), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_minima_centrifuga_2, 0, 1200, 1, FINT(PARS_DESCRIPTIONS_VELOCITA_MINIMA_CENTRIFUGA_2), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_massima_centrifuga_2, 1, 1200, 1, FINT(PARS_DESCRIPTIONS_VELOCITA_MASSIMA_CENTRIFUGA_2), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_minima_centrifuga_3, 0, 1200, 1, FINT(PARS_DESCRIPTIONS_VELOCITA_MINIMA_CENTRIFUGA_3), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->velocita_massima_centrifuga_3, 1, 1200, 1, FINT(PARS_DESCRIPTIONS_VELOCITA_MASSIMA_CENTRIFUGA_3), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_minimo_rampa, 3, 1000, 15, FFINT(PARS_DESCRIPTIONS_TEMPO_MINIMO_RAMPA, fmt_sec), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_massimo_rampa, 3, 1000, 90, FFINT(PARS_DESCRIPTIONS_TEMPO_MASSIMO_RAMPA, fmt_sec), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->nro_max_sbilanciamenti, 1, 60, 35, FINT(PARS_DESCRIPTIONS_NUMERO_MAX_SBILANCIAMENTI), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->abilitazione_min_sec, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_MIN_SEC, pars_abilitazione), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tipo_serratura, 0, 3, 0, FINT(PARS_DESCRIPTIONS_TIPO_SERRATURA), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->durata_impulso_serratura, 5, 30, 8, FFINT(PARS_DESCRIPTIONS_DURATA_IMPULSO_SERRATURA, fmt_sec), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->numero_saponi_utilizzabili, 3, 10, 5, FINT(PARS_DESCRIPTIONS_NUMERO_SAPONI), BIT_TECNICO);
+    // clang-format on
+
 
 #if 0
     parameter_data_t tmp[NUMP] = {
@@ -201,21 +257,15 @@ void parmac_format_value(model_t *pmodel, char *string, size_t parameter, uint8_
 }
 
 size_t parmac_get_tot_parameters(uint8_t al) {
-    return parameter_get_count(parameters, NUM_PARAMETERS, al);
+    return parameter_get_count(parameters, NUM_PARAMETERS, model_get_bit_accesso(al));
 }
 
-
-
-static uint8_t get_livello_accesso(uint8_t parametri_ridotti) {
-    if (parametri_ridotti == 1)
-        return 0b01;
-    else
-        return 0b11;
-}
 
 
 static parameter_handle_t *get_actual_parameter(model_t *pmodel, size_t parameter, uint8_t al) {
-    return parameter_get_handle(parameters, NUM_PARAMETERS, parameter, get_livello_accesso(al));
+    parameter_handle_t *par = parameter_get_handle(parameters, NUM_PARAMETERS, parameter, model_get_bit_accesso(al));
+    assert(par != NULL);
+    return par;
 }
 
 

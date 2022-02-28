@@ -28,3 +28,103 @@ CIFRE_DECIMALI_PREZZO, Cifre decimali prezzo, Decimal price digits
 VISUALIZZAZIONE_PREZZO, Visualizzazione prezzo, Price display
 RICHIESTA_PAGAMENTO, Richiesta pagamento, Payment request
 SBLOCCO_GETTONIERA, Sblocco gettoniera, Coin acc. unlock
+INIBIZIONE_ALLARMI, Inibizione allarmi, Disable alarms
+DIAMETRO_CESTO, Diametro cesto, Basket diameter
+PROFONDITA_CESTO, Profondita' cesto, Basked depth
+ALTEZZA_TRAPPOLA, Altezza trappola, Trap height
+SENSORE_PROSSIMITA, Sensore prossimita', Proximity sensor
+NUMERO_RAGGI, Numero raggi, Radiuses
+CORREZIONE_CONTAGIRI, Correzione contagiri, Rounds corrector
+SCALA_ACCELEROMETRO, Scala accelerometro, Accelerometer scale
+SOGLIA_X_ACCELEROMETRO, Soglia x acc., Acc. x limit
+SOGLIA_Y_ACCELEROMETRO, Soglia y acc., Acc. y limit
+SOGLIA_Z_ACCELEROMETRO, Soglia z acc., Acc. z limit
+SOGLIA_X_ACCELEROMETRO_H, Soglia x acc. (h), Acc. x limit (h)
+SOGLIA_Y_ACCELEROMETRO_H, Soglia y acc. (h), Acc. y limit (h)
+SOGLIA_Z_ACCELEROMETRO_H, Soglia z acc. (h), Acc. z limit (h)
+GIRI_ACCELEROMETRO, Giri accelerometro, Accelerometer rounds
+GIRI_ACCELEROMETRO_2, Giri accelerometro 2, Accelerometer rounds 2
+DELTA_ACCELEROMETRO, Delta accelerometro, Delta accelerometer
+TEMPO_ATTESA_ACCELEROMETRO, Tempo attesa acc., Acc. wait time
+TEMPERATURA_MASSIMA, Temperatura massima, Maximum temperature
+ISTERESI_TEMPERATURA, Isteresi temperatura, Temperature hysteresis
+TEMPERATURA_SICUREZZA, Temperatura sicurezza, Safety temperature
+TEMPERATURA_TERMODEGRADAZIONE, Temperatura termodegradazione, Thermal degradation temperature
+TIPO_LIVELLO, Tipo livello, Level type
+TEMPO_ISTERESI_LIVELLO, Tempo isteresi livello, Level hysteresis time
+MAX_LIVELLO, Livello massimo, Max level
+LIVELLO_SFIORO, Livello sfioro, Touch level
+LIVELLO_MINIMO_SCARICO, Livello minimo scarico, Minimum drain level
+LIVELLO_MINIMO_RISCALDAMENTO, Livello minimo riscaldamento, Minimum heating level
+LITRI_MASSIMI, Litri massimi, Maximum liters
+LITRI_MINIMI_RISCALDAMENTO, Litri minimi riscaldamento, Minimum heating liters
+IMPULSI_LITRI, Impulsi litri, Pulses per liters
+TIPO_INVERTER, Tipo inverter, Inverter type
+VELOCITA_SERVIZIO, Velocita' servizio, Service speed
+VELOCITA_MINIMA_LAVAGGIO, Velocita' minima lavaggio, Minimum wash speed
+VELOCITA_MASSIMA_LAVAGGIO, Velocita' massima lavaggio, Maximum wash speed
+PREPARAZIONE_ROTAZIONE, Preparazione rotazione, Rotation preparation
+TEMPO_MARCIA_PREPARAZIONE_ROTAZIONE, T. marcia prep. rot., Run time rot. prep.
+TEMPO_SOSTA_PREPARAZIONE_ROTAZIONE, T. sosta prep. rot., Pause time rot. prep.
+VELOCITA_MINIMA_PREPARAZIONE, V. minima prep., Minimum prep. speed
+VELOCITA_MASSIMA_PREPARAZIONE, V. massima prep., Max prep. speed
+VELOCITA_MINIMA_CENTRIFUGA_1, V. min. centrifuga 1, Minimum c. 1 speed
+VELOCITA_MASSIMA_CENTRIFUGA_1, V. max centrifuga 1, Maximum c. 1 speed
+VELOCITA_MINIMA_CENTRIFUGA_2, V. min. centrifuga 2, Minimum c. 2 speed
+VELOCITA_MASSIMA_CENTRIFUGA_2, V. max centrifuga 2, Maximum c. 2 speed
+VELOCITA_MINIMA_CENTRIFUGA_3, V. min. centrifuga 3, Minimum c. 3 speed
+VELOCITA_MASSIMA_CENTRIFUGA_3, V. max centrifuga 3, Maximum c. 3 speed
+TEMPO_MINIMO_RAMPA, T. minimo rampa, Minium ramp time
+TEMPO_MASSIMO_RAMPA, T. massimo rampa, Maximum ramp time
+NUMERO_MAX_SBILANCIAMENTI, N. max sbilanciamenti, N. max sbilanciamenti
+MIN_SEC, Min/sec, Min/sec
+TIPO_SERRATURA, Tipo serratura, Lock type
+DURATA_IMPULSO_SERRATURA, Durata impulso serratura, Lock pulse duration
+CONTROLLO_TEMPERATURA_CONTINUO, Controllo t. continuo, Continous t. control
+LIVELLO, Livello, Level
+RICIRCOLO, Ricircolo, Recycling
+ACQUA_FREDDA, Acqua fredda, Cold water
+ACQUA_CALDA, Acqua calda, Hot water
+ACQUA_DEPURATA, Acqual depurata, Purified water
+SAPONE, Sapone, Detergent
+TEMPO_SAPONE_1, Tempo sapone 1, Detergent time 1
+RITARDO_SAPONE_1, Ritardo sapone 1, Detergent delay 1
+TEMPO_SAPONE_2, Tempo sapone 2, Detergent time 2
+RITARDO_SAPONE_2, Ritardo sapone 2, Detergent delay 2
+TEMPO_SAPONE_3, Tempo sapone 3, Detergent time 3
+RITARDO_SAPONE_3, Ritardo sapone 3, Detergent delay 3
+TEMPO_SAPONE_4, Tempo sapone 4, Detergent time 4
+RITARDO_SAPONE_4, Ritardo sapone 4, Detergent delay 4
+TEMPO_SAPONE_5, Tempo sapone 5, Detergent time 5
+RITARDO_SAPONE_5, Ritardo sapone 5, Detergent delay 5
+TEMPO_SAPONE_6, Tempo sapone 6, Detergent time 6
+RITARDO_SAPONE_6, Ritardo sapone 6, Detergent delay 6
+TEMPO_SAPONE_7, Tempo sapone 7, Detergent time 7
+RITARDO_SAPONE_7, Ritardo sapone 7, Detergent delay 7
+TEMPO_SAPONE_8, Tempo sapone 8, Detergent time 8
+RITARDO_SAPONE_8, Ritardo sapone 8, Detergent delay 8
+TEMPO_SAPONE_9, Tempo sapone 9, Detergent time 9
+RITARDO_SAPONE_9, Ritardo sapone 9, Detergent delay 9
+TEMPO_SAPONE_10, Tempo sapone 10, Detergent time 10
+RITARDO_SAPONE_10, Ritardo sapone 10, Detergent delay 10
+MOTO_FERMO, Moto fermo, Stopped motion
+RECUPERO, Recupero, Recovery
+TEMPO_PREPARAZIONE, Tempo preparazione, Preparation time
+VELOCITA_PREPARAZIONE, Preparation speed, Preparation speed
+TEMPO_SCARICO, Tempo scarico, Drain time
+VELOCITA_CENTRIFUGA_1, Velocita' c. 1, C. speed 1
+TEMPO_RAMPA_1, Tempo rampa 1, Ramp time 1
+VELOCITA_CENTRIFUGA_2, Velocita' c. 2, C. speed 2
+TEMPO_RAMPA_2, Tempo rampa 2, Ramp time 2
+VELOCITA_CENTRIFUGA_3, Velocita' c. 3, C. speed 3
+TEMPO_RAMPA_3, Tempo rampa 3, Ramp time 3
+TEMPO_FRENATA, Tempo frenata, Stop time
+TEMPO_ATTESA, Tempo attesa, Wait time
+TEMPO_AVVISO_ATTESA_ON, Tempo avviso attesa on, Tempo avviso attesa on
+TEMPO_AVVISO_ATTESA_OFF, Tempo avviso attesa off, Tempo avviso attesa off
+NUMERO_RAMPE, Numero rampe, Ramp number
+TEMPO_ATTIVO, Tempo attivo, Active time
+TEMPO_ATTIVO_SAPONE, Tempo attivo sapone, Detergent active time
+TEMPO_ATTESA_CENTRIFUGA_1, T. attesa c. 1, C. 1 wait time
+TEMPO_ATTESA_CENTRIFUGA_2, T. attesa c. 2, C. 2 wait time
+NUMERO_SAPONI, Numero saponi, Detergent count

@@ -334,16 +334,19 @@ typedef struct {
     test_data_t  test;     // Informazioni relative alle schermate di test
 
     struct {
-        parmac_t              parmac;
-        size_t                num_programma_caricato;
-        programma_lavatrice_t programma_caricato;
-        size_t                num_programmi;
-        programma_preview_t   preview_programmi[MAX_PROGRAMMI];
-        int                   ordine_modificato, parmac_modificati;
+        parmac_t            parmac;
+        size_t              num_programmi;
+        programma_preview_t preview_programmi[MAX_PROGRAMMI];
+        int                 ordine_modificato, parmac_modificati;
     } prog;     // Programmazione (parametri e lavaggi)
 
     struct {
-        int num_prog_corrente, num_step_corrente, num_step_successivo;
+        uint16_t num_step_corrente, num_step_successivo;
+
+        int                   maybe_programma;
+        uint16_t              num_programma_caricato;
+        programma_lavatrice_t programma_caricato;
+
         int model_lavaggio_finito;
         int f_richiedi_scarico;
         int lingua;
@@ -380,6 +383,9 @@ typedef struct {
         int     num_archivi;
         name_t *archivi;
 
+        int errore_comunicazione;
+        int comunicazione_abilitata;
+
         unsigned int debug_code;
     } system;     // Dati del sistema Linux sottostante
 } model_t;
@@ -401,7 +407,6 @@ size_t                     model_pack_parametri_macchina(uint8_t *buffer, parmac
 char                      *model_new_unique_filename(model_t *model, char *filename, unsigned long seed);
 programma_lavatrice_t     *model_get_program(model_t *pmodel);
 void                       model_sync_program_preview(model_t *pmodel);
-parametri_step_t          *model_get_program_step(model_t *pmodel, size_t num);
 int                        model_select_program_step(model_t *model, size_t i, size_t step);
 uint16_t                   model_get_preparation_time(model_t *pmodel);
 void                       model_formatta_prezzo(char *string, model_t *model, unsigned int prezzo);
@@ -419,6 +424,14 @@ int                        model_step_finito(model_t *model);
 int                        model_lavaggio_finito(model_t *model);
 uint16_t                   model_get_livello_centimetri(model_t *pmodel);
 int                        model_lavaggio_pagato(model_t *pmodel);
+parametri_step_t          *model_get_program_step(model_t *pmodel, size_t num);
+void                       model_deserialize_statistics(statistics_t *stats, uint8_t *buffer);
+int                        model_is_communication_ok(model_t *pmodel);
+uint8_t                    model_get_bit_accesso(uint8_t al);
+void                       model_avanza_step(model_t *model);
+uint16_t                   model_get_program_num(model_t *pmodel);
+int                        model_can_work(model_t *pmodel);
+void                       model_update_preview(model_t *pmodel);
 
 
 #endif
