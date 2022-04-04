@@ -106,6 +106,7 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                 switch (event.key_event.code) {
                     case BUTTON_STOP:
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
+                        msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_AGGIORNA_ORA_DATA;
                         utils_set_system_time(data->datetime);
                         utils_set_rtc_time(data->datetime);
                         break;

@@ -70,6 +70,10 @@
 #define CMD_NOP                0xE3
 #define CMD_TEST               0xF0
 
+#define MINIMUM_CONTRAST 0x10
+#define MAXIMUM_CONTRAST 0x30
+#define DEFAULT_CONTRAST 0x1A
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -118,11 +122,23 @@ void nt7534_init(void) {
     nt7534_command(CMD_SET_POWER_CONTROL | 0x7);
     nt7534_command(CMD_SET_COLUMN_UPPER);
     nt7534_command(CMD_SET_DISP_REVERSE);
-    nt7534_command(CMD_SET_VOLUME_FIRST);
-    nt7534_command(0x1A);
+    nt7534_set_contrast(DEFAULT_CONTRAST);
     nt7534_command(CMD_DISPLAY_ON);
     // LV_DRV_DISP_SPI_CS(1);
 }
+
+
+void nt7534_set_contrast(uint8_t contrast) {
+    if (contrast < MINIMUM_CONTRAST) {
+        contrast = MINIMUM_CONTRAST;
+    }
+    if (contrast > MAXIMUM_CONTRAST) {
+        contrast = MAXIMUM_CONTRAST;
+    }
+    nt7534_command(CMD_SET_VOLUME_FIRST);
+    nt7534_command(contrast);
+}
+
 
 void nt7534_set_px(struct _disp_drv_t *disp_drv, uint8_t *buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                    lv_color_t color, lv_opa_t opa) {

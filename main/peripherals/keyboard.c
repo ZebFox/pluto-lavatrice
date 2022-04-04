@@ -15,57 +15,61 @@
 #include "esp_log.h"
 #include "freertos/timers.h"
 
-static int               ignore_events = 0;
+static int ignore_events = 0;
 
-#define GPIO_INPUT_PIN_SEL  ((1ULL<<HAL_BUTTON_IN_1) | (1ULL<<HAL_BUTTON_IN_2) | (1ULL<<HAL_BUTTON_IN_3) | (1ULL<<HAL_BUTTON_IN_4) )
-#define GPIO_OUTPUT_PIN_SEL ((1ULL<<HAL_BUTTON_OUT_1) | (1ULL<<HAL_BUTTON_OUT_2) | (1ULL<<HAL_BUTTON_OUT_3) | (1ULL<<HAL_BUTTON_OUT_4) )
+#define GPIO_INPUT_PIN_SEL                                                                                             \
+    ((1ULL << HAL_BUTTON_IN_1) | (1ULL << HAL_BUTTON_IN_2) | (1ULL << HAL_BUTTON_IN_3) | (1ULL << HAL_BUTTON_IN_4))
+#define GPIO_OUTPUT_PIN_SEL                                                                                            \
+    ((1ULL << HAL_BUTTON_OUT_1) | (1ULL << HAL_BUTTON_OUT_2) | (1ULL << HAL_BUTTON_OUT_3) | (1ULL << HAL_BUTTON_OUT_4))
 
 
 static const char *TAG = "keyboard";
 
 static keypad_key_t keyboard[] = {
-    KEYPAD_KEY(0x6000, BUTTON_STOP_MENU),
-    KEYPAD_KEY(0x8000, BUTTON_LINGUA),
-    KEYPAD_KEY(0x800, BUTTON_MENO), //oK
-    KEYPAD_KEY(0x80, BUTTON_DESTRA), //OK
-    KEYPAD_KEY(0x4000, BUTTON_MENU), //OK
-    KEYPAD_KEY(0x400, BUTTON_START),
-    KEYPAD_KEY(0x40, BUTTON_KEY),
-    KEYPAD_KEY(0x2000, BUTTON_STOP), //OK
-    KEYPAD_KEY(0x200, BUTTON_PIU), //OK
-    KEYPAD_KEY(0x20, BUTTON_SINISTRA), //OK
+    KEYPAD_KEY(0x2400, BUTTON_STOP_START),
+    KEYPAD_KEY(0x6000, BUTTON_STOP_PIU),
+    KEYPAD_KEY(0x2040, BUTTON_STOP_MENO),
+    KEYPAD_KEY(0x0020, BUTTON_LINGUA),
+    KEYPAD_KEY(0x0040, BUTTON_MENO),       // oK
+    KEYPAD_KEY(0x0080, BUTTON_DESTRA),     // OK
+    KEYPAD_KEY(0x0200, BUTTON_MENU),       // OK
+    KEYPAD_KEY(0x0400, BUTTON_START),
+    KEYPAD_KEY(0x0800, BUTTON_KEY),
+    KEYPAD_KEY(0x2000, BUTTON_STOP),         // OK
+    KEYPAD_KEY(0x4000, BUTTON_PIU),          // OK
+    KEYPAD_KEY(0x8000, BUTTON_SINISTRA),     // OK
     KEYPAD_NULL_KEY,
 };
 
 void keyboard_init(void) {
     (void)TAG;
-//zero-initialize the config structure.
+    // zero-initialize the config structure.
     gpio_config_t io_conf_input = {};
-    //disable interrupt
+    // disable interrupt
     io_conf_input.intr_type = GPIO_INTR_DISABLE;
-    //bit mask of the pins, use GPIO4/5 here
+    // bit mask of the pins, use GPIO4/5 here
     io_conf_input.pin_bit_mask = GPIO_INPUT_PIN_SEL;
-    //set as input mode
+    // set as input mode
     io_conf_input.mode = GPIO_MODE_INPUT;
-    //disable pull-down mode
+    // disable pull-down mode
     io_conf_input.pull_down_en = 0;
-    //disable pull-up mode
+    // disable pull-up mode
     io_conf_input.pull_up_en = 0;
     gpio_config(&io_conf_input);
 
-    //zero-initialize the config structure.
+    // zero-initialize the config structure.
     gpio_config_t io_conf_output = {};
-    //disable interrupt
+    // disable interrupt
     io_conf_output.intr_type = GPIO_INTR_DISABLE;
-    //set as output mode
+    // set as output mode
     io_conf_output.mode = GPIO_MODE_INPUT_OUTPUT;
-    //bit mask of the pins that you want to set,e.g.GPIO18/19
+    // bit mask of the pins that you want to set,e.g.GPIO18/19
     io_conf_output.pin_bit_mask = GPIO_OUTPUT_PIN_SEL;
-    //disable pull-down mode
+    // disable pull-down mode
     io_conf_output.pull_down_en = 0;
-    //disable pull-up mode
+    // disable pull-up mode
     io_conf_output.pull_up_en = 0;
-    //configure GPIO with the given settings
+    // configure GPIO with the given settings
     gpio_config(&io_conf_output);
 }
 
@@ -79,30 +83,30 @@ unsigned int keyboard_read(void) {
 
     gpio_set_level(HAL_BUTTON_OUT_1, 1);
     res |= gpio_get_level(HAL_BUTTON_IN_1);
-    res |= gpio_get_level(HAL_BUTTON_IN_2)<<1;
-    res |= gpio_get_level(HAL_BUTTON_IN_3)<<2;
-    res |= gpio_get_level(HAL_BUTTON_IN_4)<<3;
+    res |= gpio_get_level(HAL_BUTTON_IN_2) << 1;
+    res |= gpio_get_level(HAL_BUTTON_IN_3) << 2;
+    res |= gpio_get_level(HAL_BUTTON_IN_4) << 3;
     gpio_set_level(HAL_BUTTON_OUT_1, 0);
 
     gpio_set_level(HAL_BUTTON_OUT_2, 1);
-    res |= gpio_get_level(HAL_BUTTON_IN_1)<<4;
-    res |= gpio_get_level(HAL_BUTTON_IN_2)<<5;
-    res |= gpio_get_level(HAL_BUTTON_IN_3)<<6;
-    res |= gpio_get_level(HAL_BUTTON_IN_4)<<7;
+    res |= gpio_get_level(HAL_BUTTON_IN_1) << 4;
+    res |= gpio_get_level(HAL_BUTTON_IN_2) << 5;
+    res |= gpio_get_level(HAL_BUTTON_IN_3) << 6;
+    res |= gpio_get_level(HAL_BUTTON_IN_4) << 7;
     gpio_set_level(HAL_BUTTON_OUT_2, 0);
 
     gpio_set_level(HAL_BUTTON_OUT_3, 1);
-    res |= gpio_get_level(HAL_BUTTON_IN_1)<<8;
-    res |= gpio_get_level(HAL_BUTTON_IN_2)<<9;
-    res |= gpio_get_level(HAL_BUTTON_IN_3)<<10;
-    res |= gpio_get_level(HAL_BUTTON_IN_4)<<11;
+    res |= gpio_get_level(HAL_BUTTON_IN_1) << 8;
+    res |= gpio_get_level(HAL_BUTTON_IN_2) << 9;
+    res |= gpio_get_level(HAL_BUTTON_IN_3) << 10;
+    res |= gpio_get_level(HAL_BUTTON_IN_4) << 11;
     gpio_set_level(HAL_BUTTON_OUT_3, 0);
 
-        gpio_set_level(HAL_BUTTON_OUT_4, 1);
-    res |= gpio_get_level(HAL_BUTTON_IN_1)<<12;
-    res |= gpio_get_level(HAL_BUTTON_IN_2)<<13;
-    res |= gpio_get_level(HAL_BUTTON_IN_3)<<14;
-    res |= gpio_get_level(HAL_BUTTON_IN_4)<<15;
+    gpio_set_level(HAL_BUTTON_OUT_4, 1);
+    res |= gpio_get_level(HAL_BUTTON_IN_1) << 12;
+    res |= gpio_get_level(HAL_BUTTON_IN_2) << 13;
+    res |= gpio_get_level(HAL_BUTTON_IN_3) << 14;
+    res |= gpio_get_level(HAL_BUTTON_IN_4) << 15;
     gpio_set_level(HAL_BUTTON_OUT_4, 0);
 
     return res;

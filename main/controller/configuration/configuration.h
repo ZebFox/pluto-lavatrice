@@ -20,6 +20,9 @@ int  configuration_load_program(model_t *pmodel, size_t num);
 int  configuration_save_parmac(parmac_t *parmac);
 void configuration_remove_program(programma_preview_t *previews, size_t len, size_t num);
 void configuration_delete_all(void);
+int  configuration_clone_program(model_t *pmodel, size_t destination);
+void configuration_save_contrast(model_t *pmodel);
+void configuration_load_contrast(model_t *pmodel);
 
 
 #endif

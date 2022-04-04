@@ -44,7 +44,7 @@ void view_init(model_t *model, void (*flush_cb)(struct _disp_drv_t *, const lv_a
     disp_drv.rounder_cb = rounder_cb;
     lv_disp_drv_register(&disp_drv);
 
-    lv_theme_t *th = lv_theme_mono_init(0, &hsw_8x8_font);
+    lv_theme_t *th = lv_theme_mono_init(0, &hsw_8x8_bold_font);
     lv_theme_set_current(th);
 
     reset_input = rinput;
@@ -130,6 +130,13 @@ int view_process_msg(view_page_command_t vmsg, model_t *model) {
             view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
             break;
 
+        case VIEW_PAGE_COMMAND_CODE_RESET_PAGE:
+            event_queue_init(&q);
+            reset_input();
+            pman_swap_page(&pman, model, pman.current_page);
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
+            break;
+
         case VIEW_PAGE_COMMAND_CODE_NOTHING:
             break;
     }
@@ -154,11 +161,38 @@ void view_destroy_all(void *arg, void *extra) {
 }
 
 
-lv_task_t *view_register_periodic_task(size_t period, lv_task_prio_t prio, int id) {
-    return lv_task_create(periodic_task, period, prio, (void *)(uintptr_t)id);
+lv_task_t *view_register_periodic_task(size_t period, lv_task_prio_t prio, uint32_t id) {
+    return lv_task_create(periodic_task, period, prio, (void *)(uint32_t)id);
+}
+
+
+const pman_page_t *view_main_page(model_t *pmodel) {
+    if (pmodel->prog.parmac.visualizzazione_stop) {
+        return &page_main_lab;
+    } else {
+        return &page_main;
+    }
+}
+
+
+const pman_page_t *view_choice_page(model_t *pmodel) {
+    if (pmodel->prog.parmac.visualizzazione_stop) {
+        return &page_choice_lab;
+    } else {
+        return &page_choice;
+    }
+}
+
+
+const pman_page_t *view_work_page(model_t *pmodel) {
+    if (pmodel->prog.parmac.visualizzazione_start) {
+        return &page_work_lab;
+    } else {
+        return &page_work;
+    }
 }
 
 
 static void periodic_task(lv_task_t *task) {
-    view_event((view_event_t){.code = VIEW_EVENT_CODE_TIMER, .timer_id = (uintptr_t)task->user_data});
+    view_event((view_event_t){.code = VIEW_EVENT_CODE_TIMER, .timer_id = (uint32_t)task->user_data});
 }

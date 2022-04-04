@@ -50,7 +50,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                 switch (event.key_event.code) {
                     case BUTTON_STOP:
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_REBASE;
-                        msg.vmsg.page = &page_main;
+                        msg.vmsg.page = view_main_page(pmodel);
                         break;
 
                     case BUTTON_LINGUA:

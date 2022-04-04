@@ -46,6 +46,7 @@ static void *create_page(model_t *pmodel, void *extra) {
     pdata->index            = 0;
     pdata->start            = 0;
     pdata->operation        = OP_NONE;
+    pdata->step_code        = 0;
     return pdata;
 }
 
@@ -67,7 +68,7 @@ static void open_page(model_t *pmodel, void *args) {
     for (size_t i = 0; i < NUM_LINES; i++) {
         lv_obj_t *lbl = lv_label_create(lv_scr_act(), NULL);
         lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 28 + 8 * i);
-        lv_label_set_body_draw(lbl, 1);
+        lv_obj_set_style(lbl, &style_label_6x8);
         pdata->lines[i] = lbl;
     }
 
@@ -77,6 +78,9 @@ static void open_page(model_t *pmodel, void *args) {
     lv_obj_set_auto_realign(lbl, 1);
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
     pdata->lbl_addition = lbl;
+
+    line = view_common_horizontal_line();
+    lv_obj_align(line, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -7);
 
     update_page(pmodel, pdata);
 }
@@ -153,7 +157,6 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         } else if (pdata->operation == OP_NONE) {
                             if (model_get_program(pmodel)->num_steps < MAX_STEPS) {
                                 pdata->operation = OP_ADD;
-                                pdata->step_code = 0;
                                 update_page(pmodel, pdata);
                             }
                         }
@@ -165,7 +168,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
 
                     case BUTTON_LINGUA:
                         if (pdata->operation == OP_ADD) {
-                            program_insert_step(model_get_program(pmodel), pdata->step_code + 1, pdata->index + 1);
+                            program_insert_step(model_get_program(pmodel), pdata->step_code + 1, pdata->index);
                             pdata->index     = (pdata->index + 1) % (model_get_program(pmodel)->num_steps + 1);
                             pdata->operation = OP_NONE;
                             update_page(pmodel, pdata);
@@ -210,9 +213,8 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
 
     if (num_steps == 0) {
         lv_label_set_text(pdata->lbl_index, view_intl_get_string(pmodel, STRINGS_PROGRAMMA_VUOTO));
-        lv_obj_set_style(pdata->lines[0], &style_label_6x8_reverse);
         lv_obj_set_hidden(pdata->lines[0], 0);
-        lv_label_set_text(pdata->lines[0], view_intl_get_string(pmodel, STRINGS_INIZIO_PROGRAMMA));
+        lv_label_set_text_fmt(pdata->lines[0], ">00 %s", view_intl_get_string(pmodel, STRINGS_INIZIO_PROGRAMMA));
         for (size_t i = 1; i < NUM_LINES; i++) {
             lv_obj_set_hidden(pdata->lines[i], 1);
         }
@@ -221,17 +223,14 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
                               pdata->index, num_steps);
         for (size_t i = 0; i < NUM_LINES; i++) {
             size_t position = pdata->start + i;
-            if (position == pdata->index) {
-                lv_obj_set_style(pdata->lines[i], &style_label_6x8_reverse);
-            } else {
-                lv_obj_set_style(pdata->lines[i], &style_label_6x8);
-            }
             if (position == 0) {
-                lv_label_set_text(pdata->lines[i], view_intl_get_string(pmodel, STRINGS_INIZIO_PROGRAMMA));
+                lv_label_set_text_fmt(pdata->lines[i], "%c00 %s", VIEW_COMMON_CURSOR(pdata->index, position),
+                                      view_intl_get_string(pmodel, STRINGS_INIZIO_PROGRAMMA));
             } else {
                 parametri_step_t *step = model_get_program_step(pmodel, position - 1);
                 if (step != NULL) {
-                    lv_label_set_text(pdata->lines[i], view_common_step2str(pmodel, step->tipo));
+                    lv_label_set_text_fmt(pdata->lines[i], "%c%02i %s", VIEW_COMMON_CURSOR(pdata->index, position),
+                                          position, view_common_step2str(pmodel, step->tipo));
                     lv_obj_set_hidden(pdata->lines[i], 0);
                 } else {
                     lv_obj_set_hidden(pdata->lines[i], 1);

@@ -11,6 +11,7 @@
 #include "peripherals/pwoff.h"
 #include "i2c_devices/rtc/M41T81/m41t81.h"
 #include "peripherals/i2c_devices.h"
+#include "peripherals/display/NT7534.h"
 #include "peripherals/buzzer.h"
 #include "configuration/configuration.h"
 
@@ -26,8 +27,11 @@ void controller_init(model_t *pmodel) {
     machine_init();
     configuration_init();
     configuration_load_all_data(pmodel);
+    nt7534_set_contrast(pmodel->prog.contrast);
 
     view_change_page(pmodel, &page_splash);
+    view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
+
     power_off_init();
     power_off_register_callback(pwoff_callback, pmodel);
     m41t81_init(rtc_driver);
@@ -53,7 +57,19 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
         case VIEW_CONTROLLER_COMMAND_CODE_REMOVE_PROGRAM:
             configuration_remove_program(pmodel->prog.preview_programmi, pmodel->prog.num_programmi, msg->num);
             pmodel->prog.num_programmi--;
-            view_event((view_event_t){.code = VIEW_EVENT_CODE_PROGRAM_REMOVED});
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_PROGRAM_CHANGE_DONE});
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_AGGIORNA_ORA_DATA:
+            machine_send_time();
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_SAVE_CONTRAST:
+            configuration_save_contrast(pmodel);
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_UPDATE_CONTRAST:
+            nt7534_set_contrast(pmodel->prog.contrast);
             break;
 
         case VIEW_CONTROLLER_COMMAND_CODE_RESET_RAM:
@@ -69,6 +85,24 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
 
         case VIEW_CONTROLLER_COMMAND_CODE_FORCE_DRAIN:
             machine_forza_scarico();
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_AZZERA_LITRI:
+            ESP_LOGI(TAG, "Zeroing liters");
+            machine_azzera_litri();
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_OFFSET_PRESSIONE:
+            ESP_LOGI(TAG, "Resetting pressure offset");
+            machine_offset_pressione();
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_COLPO_SAPONE:
+            machine_activate_detergent(msg->output);
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_CONTROLLO_SAPONE:
+            machine_control_detergent(msg->output, msg->value);
             break;
 
         case VIEW_CONTROLLER_COMMAND_CODE_START_PROGRAM:
@@ -90,7 +124,6 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
                 if (model_macchina_in_pausa(pmodel) &&
                     (int)pmodel->run.macchina.numero_step != pmodel->run.num_step_corrente) {
                     machine_esegui_step(model_get_current_step(pmodel), model_get_current_step_number(pmodel));
-                    model_avanza_step(pmodel);
                 } else {     // Altrimenti l'ho cominciato e devo mandare i parametri macchina
                     machine_invia_parmac(&pmodel->prog.parmac);
                 }
@@ -98,17 +131,44 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
             break;
 
         case VIEW_CONTROLLER_COMMAND_CODE_PAUSE:
-            if (!pending_state_change) {
-                pending_state_change = 1;
-                machine_pause();
-            }
+            ESP_LOGI(TAG, "Pausing");
+            pending_state_change = 1;
+            machine_pause();
             break;
 
         case VIEW_CONTROLLER_COMMAND_CODE_STOP:
-            if (!pending_state_change) {
-                pending_state_change = 1;
-                machine_stop();
+            ESP_LOGI(TAG, "Stopping");
+            pending_state_change = 1;
+            machine_stop();
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_APRI_OBLO:
+            machine_apri_oblo(0);
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_CHIUDI_OBLO:
+            machine_chiudi_oblo();
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_FORZA_APERTURA_OBLO:
+            machine_apri_oblo(1);
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_RELOAD_PREVIEWS:
+            pmodel->prog.num_programmi = configuration_load_programs_preview(
+                pmodel->prog.preview_programmi, MAX_PROGRAMMI, model_get_temporary_language(pmodel));
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_PREVIEWS_LOADED});
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_CLONE_PROGRAM:
+            if (configuration_load_program(pmodel, msg->source)) {
+                break;
             }
+
+            configuration_clone_program(pmodel, msg->destination);
+            pmodel->prog.num_programmi = configuration_load_programs_preview(pmodel->prog.preview_programmi,
+                                                                             MAX_PROGRAMMI, model_get_language(pmodel));
+            view_event((view_event_t){.code = VIEW_EVENT_CODE_PROGRAM_CHANGE_DONE});
             break;
 
         case VIEW_CONTROLLER_COMMAND_CODE_CREATE_PROGRAM:
@@ -120,10 +180,16 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
             break;
 
         case VIEW_CONTROLLER_COMMAND_CODE_RETRY_COMMUNICATION:
+            ESP_LOGI(TAG, "Requesting com retry");
             machine_riavvia_comunicazione();
+            machine_invia_parmac(&pmodel->prog.parmac);
             pmodel->system.errore_comunicazione = 0;
             view_event((view_event_t){.code = VIEW_EVENT_CODE_MODEL_UPDATE});
+            break;
 
+        case VIEW_CONTROLLER_COMMAND_CODE_MODIFICA_PARAMETRI_IN_LAVAGGIO:
+            machine_modify_cycle_parameters(model_get_current_step_number(pmodel), msg->duration, msg->speed,
+                                            msg->temperature, msg->level);
             break;
 
         case VIEW_CONTROLLER_COMMAND_CODE_CHANGE_AB_COMMUNICATION:
@@ -167,6 +233,10 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
             machine_imposta_uscita_singola(msg->output, msg->value);
             break;
 
+        case VIEW_CONTROLLER_COMMAND_CODE_SEND_DEBUG_CODE:
+            machine_send_debug_code(msg->value);
+            break;
+
         default:
             break;
     }
@@ -178,7 +248,7 @@ void controller_manage(model_t *pmodel) {
     static unsigned long stato_ts            = 0;
     machine_response_t   risposta;
 
-    if (is_expired(stato_ts, get_millis(), 250)) {
+    if (is_expired(stato_ts, get_millis(), 400)) {
         machine_richiedi_stato();
         stato_ts = get_millis();
     }
@@ -224,8 +294,10 @@ void controller_manage(model_t *pmodel) {
 
                     if (lavaggio < model_get_num_programs(pmodel)) {
                         configuration_load_program(pmodel, lavaggio);
+                        ESP_LOGI(TAG, "Macchina spenta in azione: lavaggio %i e step %i", lavaggio + 1, step + 1);
                         if (model_select_program_step(pmodel, lavaggio, step) >= 0) {
-                            ESP_LOGI(TAG, "Macchina spenta in azione: lavaggio %i e step %i", lavaggio + 1, step + 1);
+                            ESP_LOGI(TAG, "Caricato lavaggio %i e step %i", model_get_program_num(pmodel) + 1,
+                                     pmodel->run.num_step_corrente + 1);
                             if (pmodel->prog.parmac.autoavvio) {
                                 pending_state_change = 1;
                                 machine_start(lavaggio);
@@ -260,14 +332,9 @@ void controller_manage(model_t *pmodel) {
                 // utils_dump_state(&pmodel->run.macchina);
 
                 if (model_get_livello_centimetri(pmodel) > 0 && !initial_level_check) {
-                    // pmodel->run.f_richiedi_scarico = 1;
+                    pmodel->run.f_richiedi_scarico = 1;
                 }
                 initial_level_check = 1;
-
-                if (pmodel->run.macchina.richiesto_aggiornamento_tempo) {
-                    // TODO: controller_send_time(request_pipe);
-                    pmodel->run.macchina.richiesto_aggiornamento_tempo = 0;
-                }
 
                 view_event((view_event_t){.code = VIEW_EVENT_CODE_MODEL_UPDATE});
 
@@ -280,6 +347,7 @@ void controller_manage(model_t *pmodel) {
                 if (model_macchina_in_marcia(pmodel) && model_step_finito(pmodel)) {
                     if (model_lavaggio_finito(pmodel)) {
                         pending_state_change = 1;
+                        ESP_LOGI(TAG, "Program done");
                         machine_stop();
                     } else {
                         model_avanza_step(pmodel);
@@ -290,6 +358,11 @@ void controller_manage(model_t *pmodel) {
 
                 if (model_macchina_in_scarico_forzato(pmodel)) {
                     pmodel->run.f_richiedi_scarico = 0;
+                }
+
+                if (model_requested_time(pmodel)) {
+                    machine_send_time();
+                    pmodel->run.macchina.richiesto_aggiornamento_tempo = 0;
                 }
                 break;
             }

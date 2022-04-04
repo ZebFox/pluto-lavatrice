@@ -14,6 +14,7 @@ void model_init(model_t *pmodel) {
     pmodel->system.comunicazione_abilitata = 1;
     pmodel->run.maybe_programma            = 0;
     pmodel->run.f_richiedi_scarico         = 0;
+    pmodel->prog.contrast                  = 0x1A;
 }
 
 
@@ -30,6 +31,36 @@ parametri_step_t *model_get_program_step(model_t *pmodel, size_t num) {
     } else {
         return NULL;
     }
+}
+
+
+uint16_t model_program_remaining(model_t *pmodel) {
+    assert(pmodel != NULL);
+
+    programma_lavatrice_t *p      = model_get_program(pmodel);
+    unsigned int           totale = 0;
+
+    for (size_t i = model_get_current_step_number(pmodel); i < p->num_steps; i++) {
+        const parametri_step_t *s = &p->steps[i];
+        totale += s->durata;
+
+        if (s->tipo == STEP_CENTRIFUGA) {
+            unsigned int rampe[3]  = {s->tempo_rampa_1, s->tempo_rampa_2, s->tempo_rampa_3};
+            unsigned int attese[3] = {s->tempo_attesa_centrifuga_1, s->tempo_attesa_centrifuga_2, 0};
+
+            totale += s->tempo_frenata;
+            for (size_t j = 0; j < s->numero_rampe; j++)
+                totale += rampe[j] + attese[j];
+
+            totale += s->tempo_preparazione;
+            for (size_t j = 0; j < pmodel->prog.parmac.abilitazione_preparazione_rotazione; j++) {
+                totale += pmodel->prog.parmac.tempo_marcia_preparazione_rotazione * 2 +
+                          pmodel->prog.parmac.tempo_sosta_preparazione_rotazione * 2;
+            }
+        }
+    }
+
+    return totale + pmodel->run.macchina.rimanente;
 }
 
 
@@ -51,9 +82,50 @@ uint16_t model_get_program_num(model_t *pmodel) {
 }
 
 
-size_t model_get_language(model_t *pmodel) {
+uint16_t model_get_language(model_t *pmodel) {
     assert(pmodel != NULL);
     return pmodel->prog.parmac.lingua;
+}
+
+
+int model_oblo_chiuso(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return pmodel->run.macchina.oblo_aperto_chiuso == 1;
+}
+
+
+int model_oblo_libero(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return pmodel->run.macchina.chiavistello_chiuso == 0 && pmodel->run.macchina.chiavistello_aperto == 1;
+}
+
+
+int model_oblo_serrato(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return model_oblo_chiuso(pmodel) && pmodel->run.macchina.chiavistello_chiuso == 1 &&
+           pmodel->run.macchina.chiavistello_aperto == 0;
+}
+
+
+void model_reset_temporary_language(model_t *pmodel) {
+    assert(pmodel != NULL);
+    pmodel->run.lingua = pmodel->prog.parmac.lingua;
+}
+
+
+uint16_t model_get_temporary_language(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return pmodel->run.lingua;
+}
+
+
+size_t model_get_num_user_programs(model_t *pmodel) {
+    assert(pmodel != NULL);
+    if (pmodel->prog.num_programmi > pmodel->prog.parmac.numero_massimo_programmi_utente) {
+        return pmodel->prog.parmac.numero_massimo_programmi_utente;
+    } else {
+        return pmodel->prog.num_programmi;
+    }
 }
 
 
@@ -80,6 +152,22 @@ void model_avanza_step(model_t *model) {
         model->run.model_lavaggio_finito = 1;
     }
     model->run.num_step_successivo = (model->run.num_step_successivo + 1) % p->num_steps;
+}
+
+
+void model_arretra_step(model_t *model) {
+    const programma_lavatrice_t *prog = model_get_program(model);
+    int                          cur  = model->run.num_step_corrente;
+
+    if (prog && model->prog.num_programmi > 0 && prog->num_steps > 0) {
+        if (cur > 0) {
+            cur--;
+        } else {
+            cur = prog->num_steps - 1;
+        }
+        model->run.num_step_corrente   = cur;
+        model->run.num_step_successivo = cur;
+    }
 }
 
 
@@ -133,7 +221,19 @@ int model_lavaggio_finito(model_t *model) {
 
 
 uint16_t model_get_livello_centimetri(model_t *pmodel) {
+    assert(pmodel != NULL);
     return pmodel->run.macchina.livello;
+}
+
+
+uint16_t model_get_livello(model_t *pmodel) {
+    assert(pmodel != NULL);
+    switch (pmodel->prog.parmac.tipo_livello) {
+        case 0:
+            return pmodel->run.macchina.livello;
+        default:
+            return pmodel->run.macchina.livello_litri;
+    }
 }
 
 
@@ -167,6 +267,12 @@ int model_select_program_step(model_t *pmodel, size_t i, size_t step) {
     } else {
         return -1;
     }
+}
+
+
+uint16_t model_alarm_code(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return pmodel->run.macchina.codice_allarme;
 }
 
 
@@ -319,6 +425,23 @@ int model_is_communication_ok(model_t *pmodel) {
 void model_update_preview(model_t *pmodel) {
     assert(pmodel != NULL);
     pmodel->prog.preview_programmi[pmodel->run.num_programma_caricato].tipo = pmodel->run.programma_caricato.tipo;
+}
+
+
+int model_requested_time(model_t *pmodel) {
+    assert(pmodel != NULL);
+    return pmodel->run.macchina.richiesto_aggiornamento_tempo;
+}
+
+
+int model_is_level_in_cm(parmac_t *parmac) {
+    assert(parmac != NULL);
+    switch (parmac->tipo_livello) {
+        case LIVELLO_CENTIMETRI:
+            return 1;
+        default:
+            return 0;
+    }
 }
 
 

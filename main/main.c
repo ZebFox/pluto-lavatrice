@@ -2,7 +2,7 @@
 #include "freertos/task.h"
 #include "freertos/timers.h"
 #include "esp_log.h"
-
+#include "controller/com/machine.h"
 #include "keypad/keypad.h"
 #include "model/model.h"
 #include "view/view.h"
@@ -27,12 +27,11 @@
 static const char *TAG = "Main";
 static model_t     model;
 
-void invioprova();
-
 
 void app_main(void) {
     keypad_update_t event;
-    unsigned long   t = 0;
+    unsigned long   t               = 0;
+    unsigned long   machine_time_ts = 0;
 
     vTaskDelay(pdMS_TO_TICKS(1000));
 
@@ -65,6 +64,11 @@ void app_main(void) {
         if (is_expired(t, get_millis(), 5000)) {
             // invioprova();
             t = get_millis();
+        }
+
+        if (is_expired(machine_time_ts, get_millis(), 60UL * 60UL * 1000UL)) {
+            machine_send_time();
+            machine_time_ts = get_millis();
         }
 
         vTaskDelay(pdMS_TO_TICKS(4));

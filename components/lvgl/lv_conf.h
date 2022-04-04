@@ -335,12 +335,13 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  * #define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(my_font_1) \
  *                                LV_FONT_DECLARE(my_font_2)
  */
-#define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(hsw_8x8_font) \
+#define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(hsw_8x8_bold_font) \
+                                LV_FONT_DECLARE(hsw_8x8_font) \
                                 LV_FONT_DECLARE(hsw_8x16_font) \
                                 LV_FONT_DECLARE(hsw_6x8_font)
 
 /*Always set a default font from the built-in fonts*/
-#define LV_FONT_DEFAULT        &hsw_8x8_font
+#define LV_FONT_DEFAULT        &hsw_8x8_bold_font
 
 /* Enable it if you have fonts with a lot of characters.
  * The limit depends on the font size, font face and bpp

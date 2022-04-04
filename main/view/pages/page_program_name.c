@@ -111,10 +111,11 @@ static void open_page(model_t *pmodel, void *args) {
 
     for (size_t i = 0; i < 4; i++) {
         for (size_t j = 1; j < 10; j++) {
+            const int spacing = i == 3 ? 6 : 3;
             if (labels[i][j] == NULL) {
                 continue;
             }
-            lv_obj_align(data->labels[i][j], data->labels[i][j - 1], LV_ALIGN_OUT_RIGHT_MID, 3, 0);
+            lv_obj_align(data->labels[i][j], data->labels[i][j - 1], LV_ALIGN_OUT_RIGHT_MID, spacing, 0);
             lv_label_set_body_draw(labels[i][j], 1);
         }
     }
@@ -149,33 +150,16 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                     case BUTTON_DESTRA: {
                         switch (data->rindex) {
                             case (0):
-                                if (data->cindex < 9) {
-                                    data->cindex++;
-                                } else if (data->cindex == 9) {
-                                    data->cindex = 0;
-                                    data->rindex++;
-                                }
+                                data->cindex = (data->cindex + 1) % 10;
                                 break;
                             case (1):
-                                if (data->cindex < 8) {
-                                    data->cindex++;
-                                } else if (data->cindex == 8) {
-                                    data->cindex = 0;
-                                    data->rindex++;
-                                }
+                                data->cindex = (data->cindex + 1) % 9;
                                 break;
                             case (2):
-                                if (data->cindex < 6) {
-                                    data->cindex++;
-                                } else if (data->cindex == 6) {
-                                    data->cindex = 0;
-                                    data->rindex++;
-                                }
+                                data->cindex = (data->cindex + 1) % 7;
                                 break;
                             case (3):
-                                if (data->cindex < 3) {
-                                    data->cindex++;
-                                }
+                                data->cindex = (data->cindex + 1) % 4;
                                 break;
                         }
                         update_page(pmodel, data);
@@ -187,30 +171,29 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                             case (0):
                                 if (data->cindex > 0) {
                                     data->cindex--;
+                                } else {
+                                    data->cindex = 9;
                                 }
                                 break;
                             case (1):
                                 if (data->cindex > 0) {
                                     data->cindex--;
                                 } else if (data->cindex == 0) {
-                                    data->cindex = 9;
-                                    data->rindex--;
+                                    data->cindex = 8;
                                 }
                                 break;
                             case (2):
                                 if (data->cindex > 0) {
                                     data->cindex--;
                                 } else if (data->cindex == 0) {
-                                    data->cindex = 8;
-                                    data->rindex--;
+                                    data->cindex = 6;
                                 }
                                 break;
                             case (3):
                                 if (data->cindex > 0) {
                                     data->cindex--;
                                 } else if (data->cindex == 0) {
-                                    data->cindex = 6;
-                                    data->rindex--;
+                                    data->cindex = 3;
                                 }
                                 break;
 
@@ -221,7 +204,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         break;
                     }
 
-                    case BUTTON_MENO: {
+                    case BUTTON_PIU: {
                         if (data->rindex < 3) {
                             data->rindex++;
                             if (data->labels[data->rindex][data->cindex] == NULL) {
@@ -229,12 +212,14 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                                     data->cindex--;
                                 } while (data->labels[data->rindex][data->cindex] == NULL);
                             }
+                        } else {
+                            data->rindex = 0;
                         }
                         update_page(pmodel, data);
                         break;
                     }
 
-                    case BUTTON_PIU: {
+                    case BUTTON_MENO: {
                         if (data->rindex > 0) {
                             data->rindex--;
                             if (data->labels[data->rindex][data->cindex] == NULL) {
@@ -242,6 +227,8 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                                     data->cindex--;
                                 } while (data->labels[data->rindex][data->cindex] == NULL);
                             }
+                        } else {
+                            data->rindex = 3;
                         }
                         update_page(pmodel, data);
                         break;

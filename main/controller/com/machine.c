@@ -19,19 +19,23 @@
 
 typedef enum {
     MACHINE_REQUEST_CODE_PRESENTAZIONI,
-    MACHINE_REQUEST_CODE_TEST,
     MACHINE_REQUEST_CODE_TEST_DATA,
     MACHINE_REQUEST_CODE_STATO,
     MACHINE_REQUEST_CODE_STATS,
     MACHINE_REQUEST_CODE_RIAVVIA_COMUNICAZIONE,
     MACHINE_REQUEST_CODE_IMPOSTA_USCITA,
     MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA,
-    MACHINE_REQUEST_CODE_AZZERA_ALLARMI,
     MACHINE_REQUEST_CODE_START,
     MACHINE_REQUEST_CODE_PAUSA,
     MACHINE_REQUEST_CODE_STOP,
+    MACHINE_REQUEST_CODE_APRI_OBLO,
     MACHINE_REQUEST_CODE_ESEGUI_STEP,
-    MACHINE_REQUEST_CODE_FORZA_SCARICO,
+    MACHINE_REQUEST_CODE_INVIA_DATA,
+    MACHINE_REQUEST_CODE_CAMBIA_PARAMETRI_IN_LAVAGGIO,
+    MACHINE_REQUEST_CODE_COMANDO_SEMPLICE,
+    MACHINE_REQUEST_CODE_SEND_DEBUG_CODE,
+    MACHINE_REQUEST_CODE_DETERGENT_ACTIVATION,
+    MACHINE_REQUEST_CODE_DETERGENT_CONTROL,
 } machine_request_code_t;
 
 
@@ -43,6 +47,7 @@ typedef struct {
             size_t uscita;
             int    valore;
         };
+        uint16_t  comando;
         int       test;
         parmac_t *parmac;
         uint8_t   num;
@@ -50,6 +55,19 @@ typedef struct {
             parametri_step_t pars;
             uint8_t          num;
         } step;
+        int     force;
+        uint8_t debug_code;
+        struct {
+            uint8_t  step_num;
+            uint16_t duration;
+            uint16_t speed;
+            uint16_t temperature;
+            uint16_t level;
+        };
+        struct {
+            uint8_t num;
+            uint8_t value;
+        } detergent;
     };
 } machine_request_t;
 
@@ -62,12 +80,13 @@ static int  task_gestisci_richiesta(machine_request_t request);
 static void free_packet(packet_t *packet);
 
 
-static const char       *TAG       = "Machine";
-static QueueHandle_t     requestq  = NULL;
-static QueueHandle_t     responseq = NULL;
-static SemaphoreHandle_t sem       = NULL;
-static stato_macchina_t  stato     = {0};
-static int               communication_ab;
+static const char       *TAG              = "Machine";
+static QueueHandle_t     requestq         = NULL;
+static QueueHandle_t     responseq        = NULL;
+static SemaphoreHandle_t sem              = NULL;
+static stato_macchina_t  stato            = {0};
+static int               communication_ab = 0;
+
 
 void machine_init(void) {
     static StaticQueue_t static_requestq_queue;
@@ -99,6 +118,43 @@ int machine_read_state(model_t *pmodel) {
 }
 
 
+void machine_activate_detergent(uint8_t detergent) {
+    machine_request_t richiesta = {
+        .code      = MACHINE_REQUEST_CODE_DETERGENT_ACTIVATION,
+        .detergent = {.num = detergent},
+    };
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_control_detergent(uint8_t detergent, uint8_t value) {
+    machine_request_t richiesta = {
+        .code      = MACHINE_REQUEST_CODE_DETERGENT_CONTROL,
+        .detergent = {.num = detergent, .value = value},
+    };
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_send_time(void) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_INVIA_DATA};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_modify_cycle_parameters(uint8_t step, uint16_t duration, uint16_t speed, uint16_t temperature,
+                                     uint16_t level) {
+    machine_request_t richiesta = {
+        .code        = MACHINE_REQUEST_CODE_CAMBIA_PARAMETRI_IN_LAVAGGIO,
+        .step_num    = step,
+        .duration    = duration,
+        .speed       = speed,
+        .temperature = temperature,
+    };
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
 void machine_read_stats(model_t *pmodel) {
     machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_STATS};
     xQueueSend(requestq, &richiesta, portMAX_DELAY);
@@ -119,14 +175,32 @@ void machine_esegui_step(parametri_step_t *step, uint8_t num) {
 }
 
 
+void machine_send_debug_code(uint8_t debug_code) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_SEND_DEBUG_CODE, .debug_code = debug_code};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_apri_oblo(int forza) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_APRI_OBLO, .force = forza};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_chiudi_oblo(void) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_COMANDO_SEMPLICE, .comando = COMANDO_CHIUDI_OBLO};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
 void machine_forza_scarico(void) {
-    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_FORZA_SCARICO};
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_COMANDO_SEMPLICE, .comando = COMANDO_FORZA_SCARICO};
     xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
 
 
 void machine_azzera_allarmi(void) {
-    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_AZZERA_ALLARMI};
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_COMANDO_SEMPLICE, .comando = COMANDO_AZZERA_ALLARMI};
     xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
 
@@ -167,7 +241,8 @@ void machine_richiedi_stato(void) {
 
 
 void machine_test(int test) {
-    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_TEST, .test = test};
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_COMANDO_SEMPLICE,
+                                   .test = test ? ENTRA_IN_TEST : ESCI_DAL_TEST};
     xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
 
@@ -187,6 +262,18 @@ void machine_invia_presentazioni(void) {
 void machine_imposta_uscita_singola(size_t uscita, int valore) {
     machine_request_t richiesta = {
         .code = MACHINE_REQUEST_CODE_IMPOSTA_USCITA, .uscita = uscita, .singola = 1, .valore = valore};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_azzera_litri(void) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_COMANDO_SEMPLICE, .comando = COMANDO_AZZERA_LITRI};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_offset_pressione(void) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_COMANDO_SEMPLICE, .comando = OFFSET_PRESSIONE};
     xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
 
@@ -242,9 +329,37 @@ static int task_gestisci_richiesta(machine_request_t request) {
     machine_response_t risposta_task      = {0};
 
     switch (request.code) {
-        case MACHINE_REQUEST_CODE_FORZA_SCARICO:
-            res = invia_pacchetto_semplice(COMANDO_FORZA_SCARICO, &risposta_pacchetto, -1);
+        case MACHINE_REQUEST_CODE_COMANDO_SEMPLICE:
+            ESP_LOGI(TAG, "Simple command 0x%02X", request.comando);
+            res = invia_pacchetto_semplice(request.comando, &risposta_pacchetto, -1);
             break;
+
+        case MACHINE_REQUEST_CODE_SEND_DEBUG_CODE: {
+            uint8_t debug_code = request.debug_code;
+            res                = invia_pacchetto(COMANDO_DEBUG, &debug_code, 1, &risposta_pacchetto, -1);
+            break;
+        }
+
+        case MACHINE_REQUEST_CODE_CAMBIA_PARAMETRI_IN_LAVAGGIO: {
+            uint8_t buffer[9] = {0};
+            size_t  i         = 0;
+            i += serialize_uint16_be(&buffer[i], request.duration);
+            i += serialize_uint16_be(&buffer[i], request.level);
+            i += serialize_uint16_be(&buffer[i], request.temperature);
+            i += serialize_uint16_be(&buffer[i], request.speed);
+            i += serialize_uint8(&buffer[i], request.step_num);
+            assert(sizeof(buffer) == i);
+
+            res = invia_pacchetto(COMANDO_MODIFICA_PARAMETRI, buffer, sizeof(buffer), &risposta_pacchetto, -1);
+            break;
+        }
+
+
+        case MACHINE_REQUEST_CODE_APRI_OBLO: {
+            uint8_t force = request.force;
+            res           = invia_pacchetto(COMANDO_APRI_OBLO, &force, 1, &risposta_pacchetto, -1);
+            break;
+        }
 
         case MACHINE_REQUEST_CODE_PRESENTAZIONI: {
             res = invia_pacchetto_semplice(COMANDO_PRESENTAZIONI, &risposta_pacchetto, 38);
@@ -309,10 +424,6 @@ static int task_gestisci_richiesta(machine_request_t request) {
             break;
         }
 
-        case MACHINE_REQUEST_CODE_AZZERA_ALLARMI:
-            res = invia_pacchetto_semplice(COMANDO_AZZERA_ALLARMI, &risposta_pacchetto, -1);
-            break;
-
         case MACHINE_REQUEST_CODE_START:
             res = invia_pacchetto(START_LAVAGGIO, &request.num, 1, &risposta_pacchetto, -1);
             if (res) {
@@ -357,8 +468,29 @@ static int task_gestisci_richiesta(machine_request_t request) {
             }
             break;
 
+        case MACHINE_REQUEST_CODE_DETERGENT_ACTIVATION: {
+            uint8_t num = request.detergent.num;
+            res         = invia_pacchetto(COLPO_SAPONE, &num, 1, &risposta_pacchetto, 1);
+            break;
+        }
+
+        case MACHINE_REQUEST_CODE_DETERGENT_CONTROL: {
+            uint8_t buffer[2] = {request.detergent.num, request.detergent.value};
+            res               = invia_pacchetto(CONTROLLO_SAPONE, buffer, sizeof(buffer), &risposta_pacchetto, 1);
+            break;
+        }
+
+        case MACHINE_REQUEST_CODE_INVIA_DATA: {
+            time_t  now;
+            uint8_t stime[8];
+            time(&now);
+            serialize_uint64_be(stime, (uint64_t)now);
+            invia_pacchetto(COMANDO_IMPOSTA_ORA, stime, sizeof(stime), &risposta_pacchetto, 1);
+            break;
+        }
+
         case MACHINE_REQUEST_CODE_STATS:
-            res = invia_pacchetto_semplice(COMANDO_LEGGI_STATISTICHE, &risposta_pacchetto, -1);
+            res = invia_pacchetto_semplice(COMANDO_LEGGI_STATISTICHE, &risposta_pacchetto, 93);
             if (res) {
                 break;
             }
@@ -370,12 +502,8 @@ static int task_gestisci_richiesta(machine_request_t request) {
             xQueueSend(responseq, &risposta_task, portMAX_DELAY);
             break;
 
-        case MACHINE_REQUEST_CODE_TEST:
-            res = invia_pacchetto_semplice(request.test ? ENTRA_IN_TEST : ESCI_DAL_TEST, &risposta_pacchetto, 1);
-            break;
-
         case MACHINE_REQUEST_CODE_TEST_DATA:
-            res = invia_pacchetto_semplice(COMANDO_LEGGI_TEST, &risposta_pacchetto, -1);
+            res = invia_pacchetto_semplice(COMANDO_LEGGI_TEST, &risposta_pacchetto, 50);
             if (res) {
                 break;
             }
@@ -418,6 +546,7 @@ static int invia_pacchetto(int comando, uint8_t *dati, uint16_t lunghezza_dati, 
     assert(write_len == PACKET_SIZE(lunghezza_dati));
 
     do {
+        machine_serial_flush();
         machine_serial_write(write_buffer, write_len);
 
         int len = machine_serial_read(read_buffer, lunghezza_prevista);
@@ -433,7 +562,7 @@ static int invia_pacchetto(int comando, uint8_t *dati, uint16_t lunghezza_dati, 
     free(write_buffer);
     free(read_buffer);
 
-    if (risposta->command != COMANDO_ACK) {
+    if (err == 0 && risposta->command != COMANDO_ACK) {
         if (risposta->command == COMANDO_NACK) {
             ESP_LOGW(TAG, "Nack: 0x%02X code 0x%02X", risposta->command, risposta->data[1]);
             return err;
@@ -443,7 +572,7 @@ static int invia_pacchetto(int comando, uint8_t *dati, uint16_t lunghezza_dati, 
         }
     }
 
-    if (risposta->data[0] != comando) {
+    if (risposta->data_length > 0 && risposta->data != NULL && risposta->data[0] != comando) {
         ESP_LOGW(TAG, "Risposta a comando diverso: mi aspettavo %i, ho ricevuto %i", comando, risposta->data[0]);
         return -1;
     }

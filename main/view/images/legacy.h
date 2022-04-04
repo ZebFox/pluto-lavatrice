@@ -53,6 +53,8 @@ extern const GSYMBOL legacy_img_level;
 extern const GSYMBOL legacy_img_time;
 extern const GSYMBOL legacy_img_temperature;
 extern const GSYMBOL legacy_img_speed;
+extern const GSYMBOL legacy_img_alt;
+extern const GSYMBOL legacy_img_rpm;
 
 extern const GSYMBOL legacy_img_molto_sporchi;
 extern const GSYMBOL legacy_img_sporchi;

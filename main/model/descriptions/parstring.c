@@ -32,3 +32,40 @@ void formatta_opt(char *string, uint16_t language, const void *arg) {
     char *(*values)[NUM_LINGUE]       = (char *(*)[NUM_LINGUE])udata.valori;
     strcpy(string, values[value][language]);
 }
+
+
+void formatta_ms(char *string, uint16_t language, const void *arg) {
+    (void)language;
+    const parameter_handle_t *par = arg;
+
+    switch (par->type) {
+        case PARAMETER_TYPE_UINT16: {
+            uint16_t value = *(uint16_t *)par->pointer;
+            sprintf(string, "%02im:%02is", value / 60, value % 60);
+            break;
+        }
+
+        default:
+            sprintf(string, "Errore!");
+            break;
+    }
+}
+
+
+void formatta_decimi_secondo(char *string, uint16_t language, const void *arg) {
+    (void)language;
+    const parameter_handle_t *par = arg;
+
+    switch (par->type) {
+        case PARAMETER_TYPE_UINT16: {
+            uint16_t value    = *(uint16_t *)par->pointer;
+            float    dotvalue = ((float)value) / 10;
+            sprintf(string, "%.02f", dotvalue);
+            break;
+        }
+
+        default:
+            sprintf(string, "Errore!");
+            break;
+    }
+}

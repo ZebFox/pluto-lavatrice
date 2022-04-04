@@ -5,10 +5,18 @@
  *  Macro riguardanti la configurazione dell'applicazione
  */
 
-#define APP_CONFIG_FIRMWARE_VERSION "0.0.1"
+#define FIRMWARE_VERSION_MAJOR 0
+#define FIRMWARE_VERSION_MINOR 'A'
+#define FIRMWARE_VERSION_PATCH 1
 
 #define VER_DATI 3
 
 #define BASE_TASK_STACK_SIZE 512
+
+#define LANGUAGE_TIMEOUT 20UL * 1000UL
+#define ALARM_TIMEOUT    10UL * 1000UL
+#define PAGE_TIMEOUT     60UL * 1000UL
+
+#define LONG_PRESS_INCREASE 4000
 
 #endif

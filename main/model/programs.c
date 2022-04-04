@@ -581,6 +581,7 @@ void program_deserialize_preview(programma_preview_t *p, uint8_t *buffer, uint16
         }
     }
 
+    p->num_steps   = num_steps;
     p->lavaggi     = num_washes;
     p->temperatura = max_temp;
     p->livello     = max_level;

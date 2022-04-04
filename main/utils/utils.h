@@ -11,9 +11,11 @@
 
 #define get_millis() (xTaskGetTickCount() * portTICK_PERIOD_MS)
 
-void utils_get_sys_time(struct tm *systm);
-void utils_set_system_time(struct tm systm);
-void utils_set_rtc_time(struct tm systm);
-void utils_dump_state(stato_macchina_t *stato);
+void        utils_get_sys_time(struct tm *systm);
+void        utils_set_system_time(struct tm systm);
+void        utils_set_rtc_time(struct tm systm);
+void        utils_dump_state(stato_macchina_t *stato);
+const char *utils_get_build_date(void);
+size_t      utils_circular_decrease(size_t num, size_t max);
 
 #endif

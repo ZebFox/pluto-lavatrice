@@ -5,6 +5,7 @@
 lv_style_t style_label_8x16;
 lv_style_t style_label_8x16_reverse;
 lv_style_t style_label_6x8;
+lv_style_t style_label_8x8;
 lv_style_t style_label_6x8_reverse;
 lv_style_t style_label_normal;
 lv_style_t style_label_reverse;
@@ -38,6 +39,8 @@ void styles_init(void) {
     lv_style_copy(&style_label_6x8, &lv_style_scr);
     style_label_6x8.text.font = &hsw_6x8_font;
 
+    lv_style_copy(&style_label_8x8, &lv_style_scr);
+    style_label_8x8.text.font = &hsw_8x8_font;
 
     lv_style_copy(&style_label_reverse, &lv_style_scr);
     style_label_reverse.body.main_color     = LV_COLOR_BLACK;
@@ -48,8 +51,9 @@ void styles_init(void) {
     style_label_reverse.body.padding.inner  = 0;
 
     lv_style_copy(&style_container_bordered, &lv_style_plain);
-    style_container_bordered.body.border.color = LV_COLOR_BLACK;
-    style_container_bordered.body.border.opa   = LV_OPA_100;
-    style_container_bordered.body.border.width = 1;
-    style_container_bordered.body.border.part  = LV_BORDER_TOP | LV_BORDER_BOTTOM | LV_BORDER_RIGHT | LV_BORDER_LEFT;
+    style_container_bordered.body.padding.inner = 0;
+    style_container_bordered.body.border.color  = LV_COLOR_BLACK;
+    style_container_bordered.body.border.opa    = LV_OPA_100;
+    style_container_bordered.body.border.width  = 1;
+    style_container_bordered.body.border.part   = LV_BORDER_TOP | LV_BORDER_BOTTOM | LV_BORDER_RIGHT | LV_BORDER_LEFT;
 }

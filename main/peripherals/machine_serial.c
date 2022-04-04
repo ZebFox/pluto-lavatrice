@@ -31,6 +31,11 @@ void machine_serial_init(void) {
 }
 
 
+void machine_serial_flush(void) {
+    uart_flush(UART_PORTNUM);
+}
+
+
 int machine_serial_read(uint8_t *buffer, size_t len) {
     return uart_read_bytes(UART_PORTNUM, buffer, len, pdMS_TO_TICKS(TIMEOUT_MS));
 }

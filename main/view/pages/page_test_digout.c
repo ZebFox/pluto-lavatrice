@@ -7,7 +7,12 @@
 #include "view/fonts/legacy_fonts.h"
 #include "view/common.h"
 
+
+#define NUM_OUTPUTS 20
+
+
 static char *string_status(uint8_t status);
+
 
 static struct {
     lv_obj_t  *lbl_out;
@@ -69,27 +74,21 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
         case VIEW_EVENT_CODE_KEYPAD: {
             if (event.key_event.event == KEY_CLICK) {
                 switch (event.key_event.code) {
-                    case BUTTON_PIU: {
+                    case BUTTON_DESTRA: {
                         msg.vmsg.code          = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
-                        msg.vmsg.page          = &page_main;
+                        msg.vmsg.page          = &page_test_level;
                         page_data.digout_state = 0;
-
-                        msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_TEST;
-                        msg.cmsg.test = 0;
                         break;
                     }
                     case BUTTON_SINISTRA: {
-                        /*msg.vmsg.code          = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
+                        msg.vmsg.code          = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
                         page_data.digout_state = 0;
-                        msg.vmsg.page          = &page_splash;
-
-                        msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_TEST;
-                        msg.cmsg.test = 0;*/
+                        msg.vmsg.page          = &page_test_temperature;
                         break;
                     }
                     case BUTTON_MENO: {
                         page_data.digout_state = 0;
-                        if (page_data.digout_index < 20)
+                        if (page_data.digout_index < NUM_OUTPUTS)
                             page_data.digout_index++;
                         else {
                             page_data.digout_index = 1;
@@ -102,13 +101,13 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
                         msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;
                         break;
                     }
-                    case BUTTON_DESTRA: {
+                    case BUTTON_PIU: {
                         page_data.digout_state = 0;
                         if (page_data.digout_index > 1) {
                             page_data.digout_index--;
 
                         } else {
-                            page_data.digout_index = 20;
+                            page_data.digout_index = NUM_OUTPUTS;
                         }
                         lv_task_set_prio(page_data.task, LV_TASK_PRIO_OFF);
                         lv_task_reset(page_data.task);

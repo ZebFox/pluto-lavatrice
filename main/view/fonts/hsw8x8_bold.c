@@ -9,7 +9,7 @@ static const struct {
     uint8_t data[8];
 
 } hsw_8x8fnt[128] = {
-#include "hsw8x8.fnt"
+#include "hsw8x8_bold.fnt"
 };
 
 /* Get the bitmap of `unicode_letter` from `font`. */
@@ -17,7 +17,7 @@ static const uint8_t *my_get_glyph_bitmap_cb(const lv_font_t *font, uint32_t uni
     return unicode_letter < 128 ? (const uint8_t *)&(hsw_8x8fnt[unicode_letter].data) : NULL;
 }
 
-lv_font_t hsw_8x8_font = {
+lv_font_t hsw_8x8_bold_font = {
     .get_glyph_dsc    = get_glyph_dsc_ramtex,   /*Set a callback to get info about gylphs*/
     .get_glyph_bitmap = my_get_glyph_bitmap_cb, /*Set a callback to get bitmap of a glyp*/
     .line_height      = 8,                      /*The real line height where any text fits*/

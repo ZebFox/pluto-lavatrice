@@ -63,17 +63,17 @@ TIPO_INVERTER, Tipo inverter, Inverter type
 VELOCITA_SERVIZIO, Velocita' servizio, Service speed
 VELOCITA_MINIMA_LAVAGGIO, Velocita' minima lavaggio, Minimum wash speed
 VELOCITA_MASSIMA_LAVAGGIO, Velocita' massima lavaggio, Maximum wash speed
-PREPARAZIONE_ROTAZIONE, Preparazione rotazione, Rotation preparation
+PREPARAZIONE_ROTAZIONE, Cicli preparazione, Preparation cycles
 TEMPO_MARCIA_PREPARAZIONE_ROTAZIONE, T. marcia prep. rot., Run time rot. prep.
 TEMPO_SOSTA_PREPARAZIONE_ROTAZIONE, T. sosta prep. rot., Pause time rot. prep.
 VELOCITA_MINIMA_PREPARAZIONE, V. minima prep., Minimum prep. speed
 VELOCITA_MASSIMA_PREPARAZIONE, V. massima prep., Max prep. speed
-VELOCITA_MINIMA_CENTRIFUGA_1, V. min. centrifuga 1, Minimum c. 1 speed
-VELOCITA_MASSIMA_CENTRIFUGA_1, V. max centrifuga 1, Maximum c. 1 speed
-VELOCITA_MINIMA_CENTRIFUGA_2, V. min. centrifuga 2, Minimum c. 2 speed
-VELOCITA_MASSIMA_CENTRIFUGA_2, V. max centrifuga 2, Maximum c. 2 speed
-VELOCITA_MINIMA_CENTRIFUGA_3, V. min. centrifuga 3, Minimum c. 3 speed
-VELOCITA_MASSIMA_CENTRIFUGA_3, V. max centrifuga 3, Maximum c. 3 speed
+VELOCITA_MINIMA_CENTRIFUGA_1, V. min. centrifuga 1, Minimum cen. 1 speed
+VELOCITA_MASSIMA_CENTRIFUGA_1, V. max centrifuga 1, Maximum cen. 1 speed
+VELOCITA_MINIMA_CENTRIFUGA_2, V. min. centrifuga 2, Minimum cen. 2 speed
+VELOCITA_MASSIMA_CENTRIFUGA_2, V. max centrifuga 2, Maximum cen. 2 speed
+VELOCITA_MINIMA_CENTRIFUGA_3, V. min. centrifuga 3, Minimum cen. 3 speed
+VELOCITA_MASSIMA_CENTRIFUGA_3, V. max centrifuga 3, Maximum cen. 3 speed
 TEMPO_MINIMO_RAMPA, T. minimo rampa, Minium ramp time
 TEMPO_MASSIMO_RAMPA, T. massimo rampa, Maximum ramp time
 NUMERO_MAX_SBILANCIAMENTI, N. max sbilanciamenti, N. max sbilanciamenti
@@ -85,7 +85,7 @@ LIVELLO, Livello, Level
 RICIRCOLO, Ricircolo, Recycling
 ACQUA_FREDDA, Acqua fredda, Cold water
 ACQUA_CALDA, Acqua calda, Hot water
-ACQUA_DEPURATA, Acqual depurata, Purified water
+ACQUA_DEPURATA, Acqua depurata, Purified water
 SAPONE, Sapone, Detergent
 TEMPO_SAPONE_1, Tempo sapone 1, Detergent time 1
 RITARDO_SAPONE_1, Ritardo sapone 1, Detergent delay 1
@@ -107,16 +107,16 @@ TEMPO_SAPONE_9, Tempo sapone 9, Detergent time 9
 RITARDO_SAPONE_9, Ritardo sapone 9, Detergent delay 9
 TEMPO_SAPONE_10, Tempo sapone 10, Detergent time 10
 RITARDO_SAPONE_10, Ritardo sapone 10, Detergent delay 10
-MOTO_FERMO, Moto fermo, Stopped motion
+MOTO_FERMO, Movimento, Motion
 RECUPERO, Recupero, Recovery
 TEMPO_PREPARAZIONE, Tempo preparazione, Preparation time
 VELOCITA_PREPARAZIONE, Preparation speed, Preparation speed
-TEMPO_SCARICO, Tempo scarico, Drain time
-VELOCITA_CENTRIFUGA_1, Velocita' c. 1, C. speed 1
+TIPO_SCARICO, Tipo scarico, Drain type
+VELOCITA_CENTRIFUGA_1, Velocita' cen. 1, Cen. speed 1
 TEMPO_RAMPA_1, Tempo rampa 1, Ramp time 1
-VELOCITA_CENTRIFUGA_2, Velocita' c. 2, C. speed 2
+VELOCITA_CENTRIFUGA_2, Velocita' cen. 2, Cen. speed 2
 TEMPO_RAMPA_2, Tempo rampa 2, Ramp time 2
-VELOCITA_CENTRIFUGA_3, Velocita' c. 3, C. speed 3
+VELOCITA_CENTRIFUGA_3, Velocita' cen. 3, Cen. speed 3
 TEMPO_RAMPA_3, Tempo rampa 3, Ramp time 3
 TEMPO_FRENATA, Tempo frenata, Stop time
 TEMPO_ATTESA, Tempo attesa, Wait time
@@ -125,6 +125,45 @@ TEMPO_AVVISO_ATTESA_OFF, Tempo avviso attesa off, Tempo avviso attesa off
 NUMERO_RAMPE, Numero rampe, Ramp number
 TEMPO_ATTIVO, Tempo attivo, Active time
 TEMPO_ATTIVO_SAPONE, Tempo attivo sapone, Detergent active time
-TEMPO_ATTESA_CENTRIFUGA_1, T. attesa c. 1, C. 1 wait time
-TEMPO_ATTESA_CENTRIFUGA_2, T. attesa c. 2, C. 2 wait time
+TEMPO_ATTESA_CENTRIFUGA_1, T. attesa cen. 1, Cen. 1 wait time
+TEMPO_ATTESA_CENTRIFUGA_2, T. attesa cen. 2, Cen. 2 wait time
 NUMERO_SAPONI, Numero saponi, Detergent count
+TEMPO_ALLARME_LIVELLO, Ritardo allarme livello, Level alarm delay
+TEMPO_ALLARME_SCARICO, Ritardo allarme scarico, Drain alarm delay
+TEMPO_RITARDO_MICRO_OBLO, Ritardo micro oblo, Door contact delay
+TEMPO_PRECARICA, Tempo precarica, Preload time
+TEMPO_PULIZIA_SAPONI, Tempo pulizia saponi, Soap cleaning time
+TEMPO_CARICO_SAPONI, Tempo carico saponi, Soap load time
+TEMPO_COLPO_SCARICO, Tempo colpo scarico, Drain opening time
+TEMPO_MINIMO_SCARICO, Tempo minimo scarico, Minimum drain time
+TEMPO_MINIMO_FRENATA, Tempo minimo frenata, Minimum stop time
+SCARICO_RECUPERO, Scarico recupero, Drain recovery
+PERCENTUALE_LIVELLO_CARICO_RIDOTTO, Livello carico ridotto, Reduced load level
+PERCENTUALE_SAPONE_CARICO_RIDOTTO, Sapone carico ridotto, Reduced load detergent
+AUTOAVVIO, Autoavvio, Autostart
+ACCELEROMETRO, Accelerometro, Accelerometer
+TEMPO_SCARICO_ACCELEROMETRO, Tempo scarico accelerometro, Accelerometer drain time
+TEMPO_ALLARME_TEMPERATURA, Tempo allarme temperatura, Temperature alarm time
+ESPANSIONE_IO, Espansione IO, IO expansion
+ESCLUSIONE_SAPONE, Esclusione sapone, Detergent exclusion
+MACCHINA_LIBERA, Macchina libera, Machine free
+TIPO_MACCHINA_LIBERA, Tipo macchina libera, Machine free signal
+TIPO_IN_AUX_1, Tipo IN ausiliario 1, Auxiliary IN type 1
+TIPO_OUT_AUX_2, Tipo OUT ausiliario 2, Auxiliary OUT type 2
+TIPO_OUT_AUX_3, Tipo OUT ausiliario 3, Auxiliary OUT type 3
+TIPO_OUT_AUX_4, Tipo OUT ausiliario 4, Auxiliary OUT type 4
+LAVAGGIO_PROGRAMMATO, Lavaggio programmato, Scheduled cycle
+MACCHINA_FERMA, LED da fermo, LED while stopped
+MACCHINA_LAVORO, LED al lavoro, LED while working
+MACCHINA_PAUSA, LED in pausa, LED in pause
+MACCHINA_ATTESA, LED in attesa, LED waiting
+MACCHINA_AVVISO, LED con avviso, LED with notification
+MACCHINA_ALLARME, LED con allarme, LED with alarmti
+INTERFACCIA_START, Interf. al lavoro, Work interf.
+INTERFACCIA_STOP, Interf. da fermo, Stopped interf.
+INTERFACCIA_MENU, Interf. menu', Menu interface
+VELOCITA, Velocita', Speed
+MAX_PROGRAMMI_UTENTE, Max programmi utente, Max user programs
+RIPETIZIONE_CICLO, Ripetizione ciclo, Cycle repetition
+INTERFACCIA_SAPONI, Interf. saponi, Detergent interf.
+TEMPO_SCARICO, Tempo scarico servizio, Service drain time

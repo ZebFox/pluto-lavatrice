@@ -8,6 +8,8 @@
 #include "intl/intl.h"
 #include "images/legacy.h"
 #include "widgets/custom_lv_img.h"
+#include "utils/utils.h"
+#include "config/app_config.h"
 
 
 static void timer_task(lv_task_t *task);
@@ -19,7 +21,7 @@ static const button_t preamble[3] = {BUTTON_STOP, BUTTON_STOP, BUTTON_STOP};
 
 const char *view_common_alarm_description(model_t *pmodel) {
     static char codice_generico[32] = {0};
-    uint16_t    alarm_code          = pmodel->run.macchina.codice_allarme;
+    uint16_t    alarm_code          = model_alarm_code(pmodel);
 
     switch (alarm_code) {
         case 1:
@@ -34,12 +36,87 @@ const char *view_common_alarm_description(model_t *pmodel) {
             return view_intl_get_string(pmodel, STRINGS_ALLARME_OBLO_SBLOCCATO);
         case 6 ... 7:
             return view_intl_get_string(pmodel, STRINGS_ALLARME_EMERGENZA);
+        case 8:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_INVERTER);
+        case 9:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_TEMPERATURA_1);
+        case 10 ... 11:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_SBILANCIAMENTO);
+        case 12:
+        case 14:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_CHIAVISTELLO_BLOCCATO);
+        case 13:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_SERRATURA);
+        case 15:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_APERTO_H2O);
+        case 16:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_SERRATURA_FORZATA);
+        case 17:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_ACCELEROMETRO);
+        case 18:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_ACCELEROMETRO_FUORI_SCALA);
+        case 19:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_VELOCITA);
+        case 20:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_NO_MOTO);
+        case 21:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_NO_FERMO);
+        case 22:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_TEMPERATURA);
+        case 23:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_H2O_IN_VASCA);
+        case 24:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_LIVELLO);
+        case 30:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_RIEMPIMENTO);
+        case 31:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_RISCALDAMENTO);
+        case 32:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_SCARICO);
+        case 50:
+            return view_intl_get_string(pmodel, STRINGS_MACCHINA_ACCESA);
+        case 51:
+            return view_intl_get_string(pmodel, STRINGS_ALLARME_SPEGNIMENTO);
+        case 52:
+            return view_intl_get_string(pmodel, STRINGS_INIZIO_LAVAGGIO);
+        case 53:
+            return view_intl_get_string(pmodel, STRINGS_FINE_LAVAGGIO);
+        case 54:
+            return view_intl_get_string(pmodel, STRINGS_LAVAGGIO_INTERROTTO);
+        case 60:
+            return view_intl_get_string(pmodel, STRINGS_APRIRE_OBLO);
+        case 70:
+            return view_intl_get_string(pmodel, STRINGS_STANDBY_SAPONI);
 
         default:
             snprintf(codice_generico, sizeof(codice_generico), "%s %i", view_intl_get_string(pmodel, STRINGS_ALLARME),
                      alarm_code);
             return codice_generico;
     }
+}
+
+
+void view_common_program_type_name(model_t *pmodel, lv_obj_t *lbl, uint8_t type) {
+    const strings_t labels[] = {
+        STRINGS_MOLTO_SPORCHI_CON_PRELAVAGGIO,
+        STRINGS_SPORCHI_CON_PRELAVAGGIO,
+        STRINGS_MOLTO_SPORCHI,
+        STRINGS_SPORCHI,
+        STRINGS_COLORATI,
+        STRINGS_SINTETICI,
+        STRINGS_PIUMONI,
+        STRINGS_DELICATI,
+        STRINGS_LANA,
+        STRINGS_LINO_E_TENDAGGI,
+        STRINGS_CENTRIFUGA,
+        STRINGS_CENTRIFUGA_PER_DELICATI,
+        STRINGS_SANIFICAZIONE,
+        STRINGS_AMMOLLO,
+        STRINGS_PRELAVAGGIO,
+        STRINGS_RISCIACQUO,
+    };
+
+    lv_label_set_text(lbl, view_intl_get_string(pmodel, labels[type]));
 }
 
 
@@ -124,19 +201,20 @@ lv_obj_t *view_common_title(lv_obj_t *root, const char *str) {
     return title;
 }
 
-lv_obj_t *view_common_popup(lv_obj_t *root, const char *str) {
+
+lv_obj_t *view_common_popup(lv_obj_t *root, lv_obj_t **content) {
     lv_obj_t *cont = lv_cont_create(root, NULL);
-    lv_obj_set_size(cont, 110, 50);
+    lv_obj_set_size(cont, 116, 50);
     lv_obj_align(cont, NULL, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style(cont, &style_container_bordered);
     lv_obj_t *cont_in = lv_cont_create(cont, NULL);
-    lv_obj_set_size(cont_in, 105, 45);
+    lv_obj_set_size(cont_in, 112, 46);
     lv_obj_align(cont_in, cont, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style(cont_in, &style_container_bordered);
 
-    lv_obj_t *label = lv_label_create(cont, NULL);
-    lv_label_set_text(label, str);
-    lv_obj_align(label, cont, LV_ALIGN_CENTER, 0, 0);
+    if (content != NULL) {
+        *content = cont_in;
+    }
 
     return cont;
 }
@@ -186,7 +264,7 @@ int view_common_check_password(view_common_password_t *inserted, button_t *passw
         }
     }
 
-    return 1;
+    return inserted->index == (start + length) % (VIEW_PASSWORD_MAX_SIZE);
 }
 
 
@@ -222,6 +300,85 @@ lv_obj_t *view_common_horizontal_line(void) {
     /*Create an array for the points of the line*/
     static lv_point_t line_points[] = {{0, 0}, {128, 0}};
     return view_common_line(line_points, 2);
+}
+
+
+void view_common_set_hidden(lv_obj_t *obj, int hidden) {
+    if (lv_obj_get_hidden(obj) != hidden) {
+        lv_obj_set_hidden(obj, hidden);
+    }
+}
+
+
+lv_obj_t *view_common_braking_popup(lv_obj_t **label, uint16_t language) {
+    lv_obj_t *cont;
+    lv_obj_t *popup = view_common_popup(lv_scr_act(), &cont);
+
+    lv_obj_t *lbl = lv_label_create(cont, NULL);
+    lv_label_set_text(lbl, view_intl_get_string_from_language(language, STRINGS_IN_FRENATA));
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_MID, 0, -4);
+
+    lbl = lv_label_create(cont, NULL);
+    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, -4);
+    lv_obj_set_auto_realign(lbl, 1);
+    *label = lbl;
+
+    return popup;
+}
+
+
+lv_obj_t *view_common_alarm_popup(lv_obj_t **label, lv_obj_t **code) {
+    lv_obj_t *alarm_cont;
+    lv_obj_t *popup_alarm = view_common_popup(lv_scr_act(), &alarm_cont);
+
+    lv_obj_t *img = custom_lv_img_create(alarm_cont, NULL);
+    custom_lv_img_set_src(img, &legacy_img_alt);
+    lv_obj_align(img, NULL, LV_ALIGN_CENTER, -20, -8);
+
+    img = custom_lv_img_create(alarm_cont, NULL);
+    custom_lv_img_set_src(img, &legacy_img_alt);
+    lv_obj_align(img, NULL, LV_ALIGN_CENTER, 20, -8);
+
+    lv_obj_t *lbl = lv_label_create(alarm_cont, NULL);
+    lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
+    lv_obj_set_auto_realign(lbl, 1);
+    lv_obj_set_style(lbl, &style_label_6x8);
+    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, -10);
+    *code = lbl;
+
+    lbl = lv_label_create(alarm_cont, NULL);
+    lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
+    lv_obj_set_auto_realign(lbl, 1);
+    lv_label_set_long_mode(lbl, LV_LABEL_LONG_BREAK);
+    lv_obj_set_width(lbl, 100);
+    lv_obj_set_style(lbl, &style_label_6x8);
+    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 6);
+    *label = lbl;
+
+    return popup_alarm;
+}
+
+
+int view_common_update_alarm_popup(model_t *pmodel, uint16_t *alarm, unsigned long *timestamp, lv_obj_t *popup,
+                                   lv_obj_t *label, lv_obj_t *lbl_code) {
+    if (model_alarm_code(pmodel) > 0) {
+        if (*alarm != model_alarm_code(pmodel)) {
+            *alarm = model_alarm_code(pmodel);
+            lv_label_set_text(label, view_common_alarm_description(pmodel));
+            lv_label_set_text_fmt(lbl_code, "%02i", model_alarm_code(pmodel));
+            lv_obj_set_hidden(popup, 0);
+            *timestamp = get_millis();
+            return 1;
+        }
+        if (lv_obj_get_hidden(popup) && is_expired(*timestamp, get_millis(), ALARM_TIMEOUT)) {
+            lv_obj_set_hidden(popup, 0);
+            *timestamp = get_millis();
+        }
+    } else {
+        lv_obj_set_hidden(popup, 1);
+    }
+
+    return 0;
 }
 
 

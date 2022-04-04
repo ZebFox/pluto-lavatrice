@@ -10,6 +10,7 @@
 #define STRING_NAME_SIZE    (MAX_NAME_LENGTH + 1)
 #define MAX_STEPS           36
 #define STEP_SIZE           256
+#define MAX_DETERGENTS      10
 #define PROGRAM_SIZE(steps) ((size_t)(338 + STEP_SIZE * steps))
 #define MAX_PROGRAM_SIZE    PROGRAM_SIZE(MAX_STEPS)
 
@@ -114,6 +115,7 @@ typedef struct {
 
 typedef struct {
     uint32_t prezzo;
+    uint16_t num_steps;
     uint16_t lavaggi;
     uint16_t velocita;
     uint16_t temperatura;

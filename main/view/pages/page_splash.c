@@ -76,7 +76,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
 
         case VIEW_EVENT_CODE_TIMER:
             msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
-            msg.vmsg.page = &page_main;
+            msg.vmsg.page = view_main_page(pmodel);
             break;
 
         default:

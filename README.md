@@ -2,4 +2,7 @@
 
  # TODO
     
-    - add an inconsistent state flag to be set whenever the underlying machine signals nonsensical programs and steps (and refuses to stop)
+    - Funzionalita' lavaggio programmato
+    - Pagina eventi
+    - Controllare il calcolo del tempo totale di un ciclo
+    - Durante la frenata far comparire un popup che indichi quanto tempo manca o a che velocita' si e' arrivati

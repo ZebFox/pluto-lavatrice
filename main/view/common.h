@@ -17,6 +17,7 @@
 #define VIEW_PASSWORD_RESET        ((button_t[]){BUTTON_PIU, BUTTON_DESTRA, BUTTON_SINISTRA, BUTTON_MENO})
 #define VIEW_SHORT_PASSWORD_LEN    2
 #define VIEW_LONG_PASSWORD_LEN     4
+#define VIEW_COMMON_CURSOR(i, pos) (i == pos ? '>' : ' ')
 
 typedef struct {
     button_t      password[VIEW_PASSWORD_MAX_SIZE];
@@ -37,8 +38,14 @@ lv_obj_t   *view_common_horizontal_line(void);
 lv_obj_t   *view_common_line(lv_point_t *points, size_t len);
 const char *view_common_step2str(model_t *pmodel, uint16_t step);
 const char *view_common_pedantic_string(model_t *pmodel);
-lv_obj_t   *view_common_popup(lv_obj_t *root, const char *str);
+lv_obj_t   *view_common_popup(lv_obj_t *root, lv_obj_t **content);
 void        view_common_program_type_image(lv_obj_t *img, uint8_t ptype);
 const char *view_common_alarm_description(model_t *pmodel);
+int         view_common_update_alarm_popup(model_t *pmodel, uint16_t *alarm, unsigned long *timestamp, lv_obj_t *popup,
+                                           lv_obj_t *label, lv_obj_t *lbl_code);
+lv_obj_t   *view_common_alarm_popup(lv_obj_t **label, lv_obj_t **code);
+void        view_common_set_hidden(lv_obj_t *obj, int hidden);
+void        view_common_program_type_name(model_t *pmodel, lv_obj_t *lbl, uint8_t type);
+lv_obj_t   *view_common_braking_popup(lv_obj_t **label, uint16_t language);
 
 #endif

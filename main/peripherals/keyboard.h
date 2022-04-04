@@ -17,7 +17,9 @@ typedef enum {
     BUTTON_STOP,
     BUTTON_MENU,
     BUTTON_LINGUA,
-    BUTTON_STOP_MENU,
+    BUTTON_STOP_PIU,
+    BUTTON_STOP_MENO,
+    BUTTON_STOP_START,
 } button_t;
 
 void            keyboard_init(void);

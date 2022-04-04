@@ -7,12 +7,12 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include "peripherals/fs_storage.h"
+#include "peripherals/storage.h"
 #include "configuration.h"
 #include "esp_log.h"
 #include "model/model.h"
 #include "model/parmac.h"
 #include "model/programs.h"
-//#include "model/parametri_macchina.h"
 #include "model/parlav.h"
 #include "utils/utils.h"
 #include "config/app_config.h"
@@ -29,6 +29,8 @@
 #define PATH_FILE_PARMAC       (DATA_PATH "/parametri/parmac.bin")
 #define PATH_FILE_DATA_VERSION (DATA_PATH "/version.txt")
 
+#define CONTRAST_KEY "CONTRAST"
+
 #define DIR_CHECK(x)                                                                                                   \
     {                                                                                                                  \
         int res = x;                                                                                                   \
@@ -36,7 +38,10 @@
             ESP_LOGE(TAG, "Errore nel maneggiare una cartella: %s", strerror(errno));                                  \
     }
 
+
 static int load_parmac(parmac_t *parmac);
+static int update_index(programma_preview_t *previews, size_t len);
+
 
 static const char *TAG = "Configuration";
 
@@ -167,6 +172,47 @@ void configuration_remove_program_file(char *name) {
     if (remove(filename)) {
         ESP_LOGE(TAG, "Non sono riuscito a cancellare il file %s: %s", filename, strerror(errno));
     }
+}
+
+
+void configuration_load_contrast(model_t *pmodel) {
+    storage_load_uint8(&pmodel->prog.contrast, CONTRAST_KEY);
+}
+
+
+void configuration_save_contrast(model_t *pmodel) {
+    storage_save_uint8(&pmodel->prog.contrast, CONTRAST_KEY);
+}
+
+
+int configuration_clone_program(model_t *pmodel, size_t destination) {
+    char   path[128] = {0};
+    name_t filename;
+    int    res = 0;
+
+    snprintf(path, sizeof(path), "%s/%s", PROGRAMS_PATH, model_new_unique_filename(pmodel, filename, get_millis()));
+    ESP_LOGI(TAG, "Cloning new program %s", path);
+
+    uint8_t *buffer = malloc(MAX_PROGRAM_SIZE);
+    assert(buffer != NULL);
+    size_t size = serialize_program(buffer, model_get_program(pmodel));
+    FILE  *fp   = fopen(path, "w");
+    if (fwrite(buffer, 1, size, fp) == 0) {
+        res = 1;
+        ESP_LOGE(TAG, "Non sono riuscito a scrivere il file %s : %s", path, strerror(errno));
+    }
+    fclose(fp);
+    free(buffer);
+
+    for (size_t i = model_get_num_programs(pmodel); i > destination; i--) {
+        pmodel->prog.preview_programmi[i] = pmodel->prog.preview_programmi[i - 1];
+    }
+    pmodel->prog.preview_programmi[destination] = pmodel->prog.preview_programmi[model_get_program_num(pmodel)];
+    strcpy(pmodel->prog.preview_programmi[destination].filename, filename);
+
+    pmodel->prog.num_programmi++;
+    update_index(pmodel->prog.preview_programmi, model_get_num_programs(pmodel));
+    return res;
 }
 
 
@@ -355,7 +401,7 @@ int configuration_load_program(model_t *pmodel, size_t num) {
 
 
 void configuration_delete_all(void) {
-    remove(PARAMS_PATH);
+    remove(PATH_FILE_PARMAC);
     remove(PATH_FILE_INDICE);
     configuration_clear_orphan_programs(NULL, 0);
 }
@@ -368,18 +414,7 @@ void configuration_remove_program(programma_preview_t *previews, size_t len, siz
         previews[i] = previews[i + 1];
     }
 
-    FILE *findex = fopen(PATH_FILE_INDICE, "w");
-    if (findex == NULL) {
-        ESP_LOGE(TAG, "Unable to open index: %s", strerror(errno));
-        return;
-    }
-
-    for (size_t i = 0; i < len - 1; i++) {
-        fwrite(previews[i].filename, 1, strlen(previews[i].filename), findex);
-        fwrite("\n", 1, 1, findex);
-    }
-
-    fclose(findex);
+    update_index(previews, len);
 }
 
 
@@ -496,6 +531,8 @@ int configuration_save_data_version(void) {
 
 
 int configuration_load_all_data(model_t *pmodel) {
+    configuration_load_contrast(pmodel);
+
     int err = load_parmac(&pmodel->prog.parmac);
 
     if (err) {
@@ -530,4 +567,21 @@ int configuration_read_local_data_version(void) {
     } else {
         return -1;
     }
+}
+
+
+static int update_index(programma_preview_t *previews, size_t len) {
+    FILE *findex = fopen(PATH_FILE_INDICE, "w");
+    if (findex == NULL) {
+        ESP_LOGE(TAG, "Unable to open index: %s", strerror(errno));
+        return -1;
+    }
+
+    for (size_t i = 0; i < len; i++) {
+        fwrite(previews[i].filename, 1, strlen(previews[i].filename), findex);
+        fwrite("\n", 1, 1, findex);
+    }
+
+    fclose(findex);
+    return 0;
 }

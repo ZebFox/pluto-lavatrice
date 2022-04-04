@@ -337,7 +337,7 @@ typedef struct {
         parmac_t            parmac;
         size_t              num_programmi;
         programma_preview_t preview_programmi[MAX_PROGRAMMI];
-        int                 ordine_modificato, parmac_modificati;
+        uint8_t             contrast;
     } prog;     // Programmazione (parametri e lavaggi)
 
     struct {
@@ -351,20 +351,14 @@ typedef struct {
         int f_richiedi_scarico;
         int lingua;
 
-        uint16_t credito;
-
+        uint16_t         credito;
         stato_macchina_t macchina;
-        struct {
-            int f_richiesta_in_corso;
-            int stato_richiesto;
-        } rpi;
 
         struct {
             int    attivo;
             size_t lavaggio;
             time_t start;
         } lavaggio_programmato;
-        int fw_update_failed;
 
         size_t  event_log_number;
         size_t  total_event_log_number;
@@ -396,7 +390,8 @@ typedef struct {
 void model_init(model_t *model);
 
 
-size_t                     model_get_language(model_t *pmodel);
+uint16_t                   model_get_language(model_t *pmodel);
+uint16_t                   model_get_temporary_language(model_t *pmodel);
 size_t                     model_deserialize_parmac(parmac_t *p, uint8_t *buffer);
 size_t                     model_serialize_parmac(uint8_t *buffer, parmac_t *p);
 void                       model_unpack_stato_macchina(stato_macchina_t *stato, uint8_t *buffer);
@@ -418,7 +413,6 @@ int                        model_macchina_in_frenata(model_t *model);
 int                        model_macchina_in_scarico_forzato(model_t *model);
 int                        model_macchina_in_stop(model_t *model);
 void                       model_azzera_lavaggio(model_t *pmodel);
-void                       model_avanza_step(model_t *model);
 int                        model_macchina_in_marcia(model_t *model);
 int                        model_step_finito(model_t *model);
 int                        model_lavaggio_finito(model_t *model);
@@ -428,10 +422,21 @@ parametri_step_t          *model_get_program_step(model_t *pmodel, size_t num);
 void                       model_deserialize_statistics(statistics_t *stats, uint8_t *buffer);
 int                        model_is_communication_ok(model_t *pmodel);
 uint8_t                    model_get_bit_accesso(uint8_t al);
-void                       model_avanza_step(model_t *model);
 uint16_t                   model_get_program_num(model_t *pmodel);
 int                        model_can_work(model_t *pmodel);
 void                       model_update_preview(model_t *pmodel);
+void                       model_reset_temporary_language(model_t *pmodel);
+int                        model_oblo_serrato(model_t *pmodel);
+int                        model_oblo_libero(model_t *pmodel);
+int                        model_oblo_chiuso(model_t *pmodel);
+uint16_t                   model_get_livello(model_t *pmodel);
+void                       model_arretra_step(model_t *model);
+void                       model_avanza_step(model_t *model);
+uint16_t                   model_alarm_code(model_t *pmodel);
+int                        model_requested_time(model_t *pmodel);
+uint16_t                   model_program_remaining(model_t *pmodel);
+int                        model_is_level_in_cm(parmac_t *parmac);
+size_t                     model_get_num_user_programs(model_t *pmodel);
 
 
 #endif

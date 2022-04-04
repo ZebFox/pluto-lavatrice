@@ -14,19 +14,28 @@
 #include "utils/utils.h"
 #include "view/intl/intl.h"
 
-static char *get_string(int flag);
+
+#define OPTIONS 3
+
 
 struct page_data {
     lv_obj_t *lerror;
     lv_obj_t *lenable;
-    lv_obj_t *cursore_up;
-    lv_obj_t *cursore_down;
+    lv_obj_t *lbl_debug;
+
+    uint8_t debug_code;
+    size_t  index;
 };
 
+
+static const char *get_string(model_t *pmodel, int flag);
+static view_t      update_page(model_t *pmodel, struct page_data *pdata);
 
 
 static void *create_page(model_t *model, void *extra) {
     struct page_data *data = malloc(sizeof(struct page_data));
+    data->index            = 0;
+    data->debug_code       = 0;
     return data;
 }
 
@@ -37,36 +46,22 @@ static void open_page(model_t *model, void *args) {
     view_common_title(lv_scr_act(), "COMUNICATION");
 
 
-    lv_obj_t *title_error = lv_label_create(lv_scr_act(), NULL);
-    lv_label_set_text(title_error, "ERRORE:");
-    lv_obj_align(title_error, NULL, LV_ALIGN_IN_TOP_LEFT, 10, 20);
-
-    lv_obj_t *title_enable = lv_label_create(lv_scr_act(), NULL);
-    lv_label_set_text(title_enable, "ABILITATA:");
-    lv_obj_align(title_enable, NULL, LV_ALIGN_IN_TOP_LEFT, 10, 30);
-
-    lv_obj_t *cursore = lv_label_create(lv_scr_act(), NULL);
-    lv_label_set_text(cursore, ">");
-    lv_obj_align(cursore, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 20);
-    data->cursore_up = cursore;
-
-    cursore = lv_label_create(lv_scr_act(), NULL);
-    lv_label_set_text(cursore, ">");
-    lv_obj_align(cursore, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 30);
-    lv_obj_set_hidden(cursore, 1);
-    data->cursore_down = cursore;
-
     lv_obj_t *lerror = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_auto_realign(lerror, 1);
-    lv_obj_align(lerror, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 20);
+    lv_obj_align(lerror, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 18);
     data->lerror = lerror;
-    lv_label_set_text(lerror, get_string(model->system.errore_comunicazione));
 
     lv_obj_t *lenable = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_auto_realign(lenable, 1);
-    lv_obj_align(lenable, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 30);
+    lv_obj_align(lenable, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 28);
     data->lenable = lenable;
-    lv_label_set_text(lenable, get_string(model->system.comunicazione_abilitata));
+
+    lv_obj_t *lbl = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_set_auto_realign(lbl, 1);
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 38);
+    data->lbl_debug = lbl;
+
+    update_page(model, data);
 }
 
 
@@ -83,39 +78,71 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
                         break;
                     }
+
                     case BUTTON_SINISTRA: {
-                        if (lv_obj_get_hidden(data->cursore_up)) {
-                            lv_obj_set_hidden(data->cursore_up, 0);
-                            lv_obj_set_hidden(data->cursore_down, 1);
-                        } else if (lv_obj_get_hidden(data->cursore_down)) {
-                            lv_obj_set_hidden(data->cursore_up, 1);
-                            lv_obj_set_hidden(data->cursore_down, 0);
+                        if (data->index > 0) {
+                            data->index--;
+                        } else {
+                            data->index = OPTIONS - 1;
                         }
+                        update_page(model, data);
                         break;
                     }
+
                     case BUTTON_DESTRA: {
-                        if (lv_obj_get_hidden(data->cursore_up)) {
-                            lv_obj_set_hidden(data->cursore_up, 0);
-                            lv_obj_set_hidden(data->cursore_down, 1);
-                        } else if (lv_obj_get_hidden(data->cursore_down)) {
-                            lv_obj_set_hidden(data->cursore_up, 1);
-                            lv_obj_set_hidden(data->cursore_down, 0);
+                        data->index = (data->index + 1) % OPTIONS;
+                        update_page(model, data);
+                        break;
+                    }
+
+                    case BUTTON_LINGUA: {
+                        if (data->index == 0) {
+                            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_RETRY_COMMUNICATION;
+                        } else if (data->index == 1) {
+                            model->system.comunicazione_abilitata = !model->system.comunicazione_abilitata;
+                            msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_CHANGE_AB_COMMUNICATION;
+                            msg.cmsg.value = model->system.comunicazione_abilitata;
+                            update_page(model, data);
+                        } else if (data->index == 2) {
+                            msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_SEND_DEBUG_CODE;
+                            msg.cmsg.value = data->debug_code;
                         }
                         break;
                     }
-                    case BUTTON_LINGUA: {
-                        if (lv_obj_get_hidden(data->cursore_down)) {
-                            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_RETRY_COMMUNICATION;
-                            break;
-                        } else if (lv_obj_get_hidden(data->cursore_up)) {
-                            model->system.comunicazione_abilitata = !model->system.comunicazione_abilitata;
-                            msg.cmsg.code                         = VIEW_CONTROLLER_COMMAND_CODE_CHANGE_AB_COMMUNICATION;
-                            msg.cmsg.value                        = model->system.comunicazione_abilitata;
-                            lv_label_set_text(data->lenable, get_string(model->system.comunicazione_abilitata));
-                            
-                            break;
+
+                    case BUTTON_PIU:
+                        if (data->index == 2) {
+                            data->debug_code++;
+                            update_page(model, data);
                         }
-                    }
+                        break;
+
+                    case BUTTON_MENO:
+                        if (data->index == 2) {
+                            data->debug_code--;
+                            update_page(model, data);
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            } else if (event.key_event.event == KEY_LONGPRESS) {
+                switch (event.key_event.code) {
+                    case BUTTON_PIU:
+                        if (data->index == 2) {
+                            data->debug_code++;
+                            update_page(model, data);
+                        }
+                        break;
+
+                    case BUTTON_MENO:
+                        if (data->index == 2) {
+                            data->debug_code--;
+                            update_page(model, data);
+                        }
+                        break;
+
                     default:
                         break;
                 }
@@ -124,10 +151,8 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
         }
 
         case VIEW_EVENT_CODE_MODEL_UPDATE:
-            lv_label_set_text(data->lerror, get_string(model->system.errore_comunicazione));
-            lv_label_set_text(data->lenable, get_string(model->system.comunicazione_abilitata));
-
-
+            update_page(model, data);
+            break;
 
         default:
             break;
@@ -136,7 +161,16 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
     return msg;
 }
 
-static view_t update_page(model_t *pmodel, void *args) {
+static view_t update_page(model_t *pmodel, struct page_data *pdata) {
+    lv_label_set_text_fmt(pdata->lerror, "%c%-10s: %s", VIEW_COMMON_CURSOR(pdata->index, 0),
+                          view_intl_get_string(pmodel, STRINGS_ERRORE),
+                          get_string(pmodel, pmodel->system.errore_comunicazione));
+    lv_label_set_text_fmt(pdata->lenable, "%c%-10s: %s", VIEW_COMMON_CURSOR(pdata->index, 1),
+                          view_intl_get_string(pmodel, STRINGS_ABILITATA),
+                          get_string(pmodel, pmodel->system.comunicazione_abilitata));
+
+    lv_label_set_text_fmt(pdata->lbl_debug, "%c%-10s: %i", VIEW_COMMON_CURSOR(pdata->index, 2),
+                          view_intl_get_string(pmodel, STRINGS_DEBUG), pdata->debug_code);
     return 0;
 }
 
@@ -147,17 +181,16 @@ static view_t update_page(model_t *pmodel, void *args) {
 const pman_page_t page_communication_settings = {
     .create        = create_page,
     .open          = open_page,
-    .update        = update_page,
     .process_event = process_page_event,
     .close         = view_close_all,
     .destroy       = view_destroy_all,
 };
 
 
-static char *get_string(int flag) {
+static const char *get_string(model_t *pmodel, int flag) {
     if (flag) {
-        return "SI";
+        return view_intl_get_string(pmodel, STRINGS_SI);
     } else {
-        return "NO";
+        return view_intl_get_string(pmodel, STRINGS_NO);
     }
 }

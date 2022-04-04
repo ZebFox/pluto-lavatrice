@@ -51,8 +51,17 @@ void machine_esegui_step(parametri_step_t *step, uint8_t num);
 void machine_stop(void);
 void machine_pause(void);
 void machine_forza_scarico(void);
-
+void machine_offset_pressione(void);
+void machine_azzera_litri(void);
+void machine_apri_oblo(int forza);
 void machine_abilita_comunicazione(size_t en);
 void machine_read_stats(model_t *pmodel);
+void machine_chiudi_oblo(void);
+void machine_send_debug_code(uint8_t debug_code);
+void machine_send_time(void);
+void machine_modify_cycle_parameters(uint8_t step, uint16_t duration, uint16_t speed, uint16_t temperature,
+                                     uint16_t level);
+void machine_control_detergent(uint8_t detergent, uint8_t value);
+void machine_activate_detergent(uint8_t detergent);
 
 #endif

@@ -19,6 +19,7 @@ static const char *TAG = "PageChoice";
 struct page_data {
     lv_task_t *timer;
     lv_obj_t  *lbl_status;
+    lv_obj_t  *lbl_credit;
 
     uint16_t allarme;
     uint16_t number;
@@ -26,21 +27,27 @@ struct page_data {
 
 
 static void update_page(model_t *pmodel, struct page_data *pdata) {
-    if (pmodel->run.macchina.codice_allarme > 0) {
-        if (pdata->allarme != pmodel->run.macchina.codice_allarme) {
-            pdata->allarme = pmodel->run.macchina.codice_allarme;
+    if (model_alarm_code(pmodel) > 0) {
+        if (pdata->allarme != model_alarm_code(pmodel)) {
+            pdata->allarme = model_alarm_code(pmodel);
             lv_label_set_text(pdata->lbl_status, view_common_alarm_description(pmodel));
         }
     } else {
-        lv_label_set_text(pdata->lbl_status, view_intl_get_string(pmodel, STRINGS_SCELTA_PROGRAMMA));
+        lv_label_set_text(pdata->lbl_status, view_intl_get_string_from_language(model_get_temporary_language(pmodel),
+                                                                                STRINGS_SCELTA_PROGRAMMA));
     }
+
+    const programma_preview_t *preview    = model_get_preview(pmodel, pdata->number);
+    char                       string[32] = {0};
+    model_formatta_prezzo(string, pmodel, preview->prezzo);
+    lv_label_set_text(pdata->lbl_credit, string);
 }
 
 
 static void *create_page(model_t *model, void *extra) {
     struct page_data *pdata = malloc(sizeof(struct page_data));
     pdata->timer            = view_register_periodic_task(5000UL, LV_TASK_PRIO_OFF, 0);
-    pdata->number           = (uint16_t)(uintptr_t)extra;
+    pdata->number           = (uint16_t)(uint32_t)extra;
     return pdata;
 }
 
@@ -75,15 +82,14 @@ static void open_page(model_t *pmodel, void *args) {
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_8x16);
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
-    char string[32] = {0};
-    model_formatta_prezzo(string, pmodel, preview->prezzo);
-    lv_label_set_text(lbl, string);
+    lv_obj_set_auto_realign(lbl, 1);
     lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, -10);
+    pdata->lbl_credit = lbl;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_8x16);
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
-    memset(string, 0, sizeof(string));
+    char string[32] = {0};
     model_formatta_prezzo(string, pmodel, model_get_credito(pmodel));
     lv_label_set_text(lbl, string);
     lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 2);
@@ -114,7 +120,9 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
         case VIEW_EVENT_CODE_MODEL_UPDATE:
             if (!model_macchina_in_stop(pmodel) && model_can_work(pmodel)) {
                 msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
-                msg.vmsg.page = (void *)&page_work;
+                msg.vmsg.page = (void *)view_work_page(pmodel);
+            } else if (model_alarm_code(pmodel) > 0) {
+                msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
             } else {
                 update_page(pmodel, pdata);
             }

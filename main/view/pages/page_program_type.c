@@ -133,30 +133,9 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
 
 
 static void update_page(model_t *pmodel, struct page_data *pdata) {
-    const strings_t labels[] = {
-        STRINGS_MOLTO_SPORCHI_CON_PRELAVAGGIO,
-        STRINGS_SPORCHI_CON_PRELAVAGGIO,
-        STRINGS_MOLTO_SPORCHI,
-        STRINGS_SPORCHI,
-        STRINGS_COLORATI,
-        STRINGS_SINTETICI,
-        STRINGS_PIUMONI,
-        STRINGS_DELICATI,
-        STRINGS_LANA,
-        STRINGS_LINO_E_TENDAGGI,
-        STRINGS_CENTRIFUGA,
-        STRINGS_CENTRIFUGA_PER_DELICATI,
-        STRINGS_SANIFICAZIONE,
-        STRINGS_AMMOLLO,
-        STRINGS_PRELAVAGGIO,
-        STRINGS_RISCIACQUO,
-    };
-
     uint8_t type = model_get_program(pmodel)->tipo;
-    printf("%i\n", type);
-
     view_common_program_type_image(pdata->img, type);
-    lv_label_set_text(pdata->lbl, view_intl_get_string(pmodel, labels[type]));
+    view_common_program_type_name(pmodel, pdata->lbl, type);
 }
 
 

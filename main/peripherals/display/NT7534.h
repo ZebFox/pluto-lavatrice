@@ -40,6 +40,7 @@ void nt7534_fill(int32_t x1, int32_t y1, int32_t x2, int32_t y2, lv_color_t colo
 void nt7534_set_px(struct _disp_drv_t *disp_drv, uint8_t *buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                    lv_color_t color, lv_opa_t opa);
 void nt7534_rounder(struct _disp_drv_t *disp_drv, lv_area_t *a);
+void nt7534_set_contrast(uint8_t contrast);
 
 /**********************
  *      MACROS
