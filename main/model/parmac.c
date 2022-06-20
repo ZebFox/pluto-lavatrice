@@ -8,7 +8,7 @@
 #include "parmac.h"
 #include "descriptions/AUTOGEN_FILE_pars.h"
 
-#define NUM_PARAMETERS 105
+#define NUM_PARAMETERS 106
 
 enum {
     LIVELLO_ACCESSO_ESTESI  = 0,
@@ -37,6 +37,7 @@ void parmac_init(model_t *pmodel, int reset) {
     // clang-format off
     ps[i++] = PARAMETER(&p->lingua, 0, NUM_LINGUE - 1, 0, FOPT(PARS_DESCRIPTIONS_LINGUA, pars_lingue), BIT_UTENTE);
     ps[i++] = PARAMETER(&p->logo, 0, 5, 0, FOPT(PARS_DESCRIPTIONS_LOGO, pars_loghi), BIT_UTENTE);
+    ps[i++] = PARAMETER(&p->codice_nodo_macchina, 0, 255, 0, FINT(PARS_DESCRIPTIONS_NODO_MACCHINA), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->livello_accesso, 0, 3, 0, FOPT(PARS_DESCRIPTIONS_LIVELLO_ACCESSO, pars_livello_accesso), BIT_TECNICO);
     ps[i++] = PARAMETER(&p->visualizzazione_stop, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_INTERFACCIA_STOP, pars_visualizzazione), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->visualizzazione_start, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_INTERFACCIA_START, pars_visualizzazione), BIT_COSTRUTTORE);
@@ -57,13 +58,13 @@ void parmac_init(model_t *pmodel, int reset) {
     ps[i++] = PARAMETER(&p->secondi_stop, 0, 10, 3, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_STOP, fmt_sec), BIT_UTENTE);
     ps[i++] = PARAMETER(&p->tempo_allarme_livello, 1, 100, 30, FFINT(PARS_DESCRIPTIONS_TEMPO_ALLARME_LIVELLO, fmt_min), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_allarme_temperatura, 1, 100, 45, FFINT(PARS_DESCRIPTIONS_TEMPO_ALLARME_TEMPERATURA, fmt_min), BIT_COSTRUTTORE);
-    ps[i++] = PARAMETER(&p->tempo_allarme_scarico, 1, 100, 45, FFINT(PARS_DESCRIPTIONS_TEMPO_ALLARME_SCARICO, fmt_min), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_allarme_scarico, 1, 100, 45, FTIME(PARS_DESCRIPTIONS_TEMPO_ALLARME_SCARICO), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_ritardo_micro_oblo, 0, 240, 15, FFINT(PARS_DESCRIPTIONS_TEMPO_RITARDO_MICRO_OBLO, fmt_sec), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_precarica, 0, 240, 10, FTIME(PARS_DESCRIPTIONS_TEMPO_PRECARICA), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_h2o_pulizia_saponi, 0, 240, 10, FTIME(PARS_DESCRIPTIONS_TEMPO_PULIZIA_SAPONI), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_tasto_carico_saponi, 0, 240, 5, FTIME(PARS_DESCRIPTIONS_TEMPO_CARICO_SAPONI), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_scarico_servizio, 1, 240, 15, FTIME(PARS_DESCRIPTIONS_TEMPO_SCARICO), BIT_COSTRUTTORE);
-    ps[i++] = PARAMETER(&p->tempo_colpo_aperto_scarico, 1, 240, 24, FTIME(PARS_DESCRIPTIONS_TEMPO_COLPO_SCARICO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_colpo_aperto_scarico, 1, 240, 24, FINT(PARS_DESCRIPTIONS_TEMPO_COLPO_SCARICO), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_minimo_scarico, 1, 240, 10, FTIME(PARS_DESCRIPTIONS_TEMPO_MINIMO_SCARICO), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_minimo_frenata, 1, 250, 45, FTIME(PARS_DESCRIPTIONS_TEMPO_MINIMO_FRENATA), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->diametro_cesto, 0, 10000, 0, FFINT(PARS_DESCRIPTIONS_DIAMETRO_CESTO, fmt_cm), BIT_DISTRIBUTORE);
@@ -179,6 +180,7 @@ void parmac_init(model_t *pmodel, int reset) {
 void parmac_operation(model_t *pmodel, size_t parameter, int op, uint8_t al) {
     parameter_operator(get_actual_parameter(pmodel, parameter, al), op);
 }
+
 
 const char *parmac_get_description(model_t *pmodel, size_t parameter, uint8_t al) {
     parameter_user_data_t data = parameter_get_user_data(get_actual_parameter(pmodel, parameter, al));

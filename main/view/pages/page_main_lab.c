@@ -99,7 +99,7 @@ static void open_page(model_t *pmodel, void *args) {
     pdata->img_right = img;
 
     lv_obj_t *lbl = lv_label_create(lv_scr_act(), NULL);
-    lv_obj_set_style(lbl, &style_label_6x8);
+    lv_obj_set_style(lbl, &style_label_6x8_shorter);
     lv_label_set_long_mode(lbl, LV_LABEL_LONG_BREAK);
     lv_obj_set_width(lbl, 102);
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 18, 0);
@@ -141,7 +141,7 @@ static void open_page(model_t *pmodel, void *args) {
 
     img = custom_lv_img_create(lv_scr_act(), NULL);
     custom_lv_img_set_src(img, &legacy_img_wash_sm);
-    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_LEFT, 2, 17);
+    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_LEFT, 2, 18);
     pdata->img_washes_sm = img;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
@@ -152,7 +152,7 @@ static void open_page(model_t *pmodel, void *args) {
 
     img = custom_lv_img_create(lv_scr_act(), NULL);
     custom_lv_img_set_src(img, &legacy_img_time);
-    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_MID, 8, 17);
+    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_MID, 8, 18);
     pdata->img_duration = img;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
@@ -162,7 +162,7 @@ static void open_page(model_t *pmodel, void *args) {
     pdata->lbl_duration = lbl;
 
     lv_obj_t *line = view_common_horizontal_line();
-    lv_obj_align(line, NULL, LV_ALIGN_IN_TOP_MID, 0, 16);
+    lv_obj_align(line, NULL, LV_ALIGN_IN_TOP_MID, 0, 17);
 
     static lv_point_t points[2] = {{0, 0}, {0, 16}};
     line                        = view_common_line(points, 2);

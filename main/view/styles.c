@@ -5,6 +5,7 @@
 lv_style_t style_label_8x16;
 lv_style_t style_label_8x16_reverse;
 lv_style_t style_label_6x8;
+lv_style_t style_label_6x8_shorter;
 lv_style_t style_label_8x8;
 lv_style_t style_label_6x8_reverse;
 lv_style_t style_label_normal;
@@ -38,6 +39,9 @@ void styles_init(void) {
 
     lv_style_copy(&style_label_6x8, &lv_style_scr);
     style_label_6x8.text.font = &hsw_6x8_font;
+
+    lv_style_copy(&style_label_6x8_shorter, &lv_style_scr);
+    style_label_6x8_shorter.text.font = &hsw_6x8_font_shorter;
 
     lv_style_copy(&style_label_8x8, &lv_style_scr);
     style_label_8x8.text.font = &hsw_8x8_font;

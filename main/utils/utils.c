@@ -84,3 +84,33 @@ size_t utils_circular_decrease(size_t num, size_t max) {
         return max - 1;
     }
 }
+
+
+void utils_free_string_list(char **strings, size_t len) {
+    for (size_t i = 0; i < len; i++) {
+        free(strings[i]);
+    }
+    free(strings);
+}
+
+
+void windowed_list_next(windowed_list_t *list, size_t max) {
+    list->index = (list->index + 1) % max;
+
+    if (list->index >= list->start + list->window) {
+        list->start = list->index - (list->window - 1);
+    } else if (list->index < list->start) {
+        list->start = list->index;
+    }
+}
+
+
+void windowed_list_prev(windowed_list_t *list, size_t max) {
+    list->index = utils_circular_decrease(list->index, max);
+
+    if (list->index >= list->start + list->window) {
+        list->start = list->index - (list->window - 1);
+    } else if (list->index < list->start) {
+        list->start = list->index;
+    }
+}

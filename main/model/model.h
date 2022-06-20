@@ -52,6 +52,14 @@
 #error "Too many languages!"
 #endif
 
+
+typedef enum {
+    REMOVABLE_DRIVE_STATE_MISSING,
+    REMOVABLE_DRIVE_STATE_MOUNTED,
+    REMOVABLE_DRIVE_STATE_INVALID,
+} removable_drive_state_t;
+
+
 enum {
     PAGAMENTO_NESSUNO = 0,
     PAGAMENTO_1_LINEA_NA,
@@ -324,8 +332,7 @@ typedef struct {
     uint8_t      gettoniera_impulsi_abilitata;
     uint32_t     minp[3], maxp[3];
     uint8_t      accelerometro_ok;
-    int          log_index;
-    unsigned int log_accelerometro[MAX_LOG_ACCELEROMETRO][3];
+    unsigned int log_accelerometro[3];
 } test_data_t;
 
 
@@ -374,8 +381,9 @@ typedef struct {
         int f_connected;
         int f_versioni_diverse;
 
-        int     num_archivi;
+        size_t  num_archivi;
         name_t *archivi;
+        int     removable_drive_state;
 
         int errore_comunicazione;
         int comunicazione_abilitata;
@@ -437,6 +445,9 @@ int                        model_requested_time(model_t *pmodel);
 uint16_t                   model_program_remaining(model_t *pmodel);
 int                        model_is_level_in_cm(parmac_t *parmac);
 size_t                     model_get_num_user_programs(model_t *pmodel);
+void                       model_set_drive_mounted(model_t *pmodel, removable_drive_state_t drive_mounted);
+int                        model_get_minimo_livello_riscaldo(model_t *model);
+int                        model_get_velocita_corretta(model_t *model);
 
 
 #endif

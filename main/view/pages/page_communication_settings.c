@@ -1,7 +1,4 @@
 #include <stdio.h>
-#include "src/lv_core/lv_obj.h"
-#include "src/lv_misc/lv_task.h"
-#include "src/lv_objx/lv_label.h"
 #include "view/view.h"
 #include "gel/pagemanager/page_manager.h"
 #include "model/model.h"

@@ -5,4 +5,6 @@ cmake_minimum_required(VERSION 3.5)
 #add_definitions(-DGEL_PAGEMANAGER_CONFIGURATION_HEADER="view/view_types.h")
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(esp32-template)
+project(pluto-lavatrice)
+
+idf_build_set_property(COMPILE_OPTIONS "-Wno-pointer-to-int-cast" APPEND)

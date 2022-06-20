@@ -98,7 +98,10 @@ static view_message_t process_page_event(model_t *pmodel, void *args, pman_event
                         break;
                     }
 
-                    case BUTTON_LINGUA: {
+                    case BUTTON_MENU: {
+                        pmodel->prog.contrast = 0x1A;
+                        msg.cmsg.code         = VIEW_CONTROLLER_COMMAND_CODE_UPDATE_CONTRAST;
+                        update_page(pmodel, pdata);
                         break;
                     }
 

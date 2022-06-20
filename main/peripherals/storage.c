@@ -7,7 +7,7 @@
 #include "esp_log.h"
 
 #define COMPATIBILITY_KEY     "COMPATIBILITY"
-#define COMPATIBILITY_VERSION 1
+#define COMPATIBILITY_VERSION 3
 
 
 static const char *TAG = "Storage";
@@ -34,7 +34,6 @@ void storage_init(void) {
         if (buf != COMPATIBILITY_VERSION) {
             ESP_LOGI(TAG,
                      "The previously saved configuration is not compatibile with the new firmware version; erasing...");
-            nvs_close(handle);
             ESP_ERROR_CHECK(nvs_erase_all(handle));
             ESP_ERROR_CHECK(nvs_set_u8(handle, COMPATIBILITY_KEY, COMPATIBILITY_VERSION));
             ESP_ERROR_CHECK(nvs_commit(handle));

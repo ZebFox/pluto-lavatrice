@@ -15,6 +15,7 @@
 #define VIEW_PASSWORD_LEFT         ((button_t[]){BUTTON_SINISTRA, BUTTON_SINISTRA})
 #define VIEW_PASSWORD_TIEPIDO      ((button_t[]){BUTTON_PIU, BUTTON_PIU})
 #define VIEW_PASSWORD_RESET        ((button_t[]){BUTTON_PIU, BUTTON_DESTRA, BUTTON_SINISTRA, BUTTON_MENO})
+#define VIEW_PASSWORD_LOCK         ((button_t[]){BUTTON_KEY, BUTTON_KEY})
 #define VIEW_SHORT_PASSWORD_LEN    2
 #define VIEW_LONG_PASSWORD_LEN     4
 #define VIEW_COMMON_CURSOR(i, pos) (i == pos ? '>' : ' ')

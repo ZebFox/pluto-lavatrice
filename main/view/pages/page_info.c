@@ -49,20 +49,25 @@ static void open_page(model_t *pmodel, void *args) {
 
     lv_obj_t *lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_6x8);
+    lv_label_set_text(lbl, pmodel->prog.parmac.nome);
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_MID, 0, 18);
+
+    lbl = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_set_style(lbl, &style_label_6x8);
     lv_label_set_text_fmt(lbl, "V%i.%c.%i - %s", FIRMWARE_VERSION_MAJOR, FIRMWARE_VERSION_MINOR, FIRMWARE_VERSION_PATCH,
                           utils_get_build_date());
-    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 20);
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 32);
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_auto_realign(lbl, 1);
     lv_obj_set_style(lbl, &style_label_6x8);
-    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 32);
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 44);
     pdata->label_mem_free = lbl;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_auto_realign(lbl, 1);
     lv_obj_set_style(lbl, &style_label_6x8);
-    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 40);
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 54);
     pdata->label_low_watermark = lbl;
 
     update_page(pmodel, pdata);

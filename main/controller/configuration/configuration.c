@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <dirent.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -16,6 +17,8 @@
 #include "model/parlav.h"
 #include "utils/utils.h"
 #include "config/app_config.h"
+#include "microtar.h"
+
 
 #define DIR_PROGRAMMI "programmi"
 #define DIR_PARAMETRI "parametri"
@@ -94,27 +97,31 @@ static void create_dir(char *name) {
     DIR_CHECK(mkdir(name, 0766));
 }
 
-static int cp(const char *to, const char *from) {
-    int     fd_to, fd_from;
-    char    buf[4096];
-    ssize_t nread;
 
-    fd_from = open(from, O_RDONLY);
-    if (fd_from < 0) {
-        ESP_LOGE(TAG, "Non sono riuscito ad aprire %s: %s", from, strerror(errno));
-        return -1;
-    }
+int configuration_copy_from_tar(mtar_t *tar, const char *name, size_t total) {
+    assert(tar != NULL);
+    char to[128] = {0};
+    snprintf(to, sizeof(to), "%s/%s", DATA_PATH, name);
 
+    int  fd_to;
+    char buf[1024];
     fd_to = open(to, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (fd_to < 0) {
         ESP_LOGE(TAG, "Non sono riuscito ad aprire %s: %s", to, strerror(errno));
-        close(fd_from);
         return -1;
     }
 
-    while ((nread = read(fd_from, buf, sizeof buf)) > 0) {
+
+    while (total > 0) {
+        size_t nread = total < sizeof(buf) ? total : sizeof(buf);
+        if (mtar_read_data(tar, buf, nread) != MTAR_ESUCCESS) {
+            close(fd_to);
+            return -1;
+        }
         char   *out_ptr = buf;
         ssize_t nwritten;
+
+        total -= nread;
 
         do {
             nwritten = write(fd_to, out_ptr, nread);
@@ -123,7 +130,6 @@ static int cp(const char *to, const char *from) {
                 nread -= nwritten;
                 out_ptr += nwritten;
             } else {
-                close(fd_from);
                 close(fd_to);
                 return -1;
             }
@@ -131,7 +137,6 @@ static int cp(const char *to, const char *from) {
     }
 
     close(fd_to);
-    close(fd_from);
 
     return 0;
 }
@@ -142,7 +147,6 @@ static int cp(const char *to, const char *from) {
  */
 
 void configuration_init(void) {
-    (void)cp;
     (void)is_dir;
     (void)nth_strrchr;
     (void)count_occurrences;
@@ -240,7 +244,6 @@ int configuration_create_empty_program(model_t *pmodel) {
     }
     return res;
 }
-
 
 
 int configuration_update_program(programma_lavatrice_t *p) {

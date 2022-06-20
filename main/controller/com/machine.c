@@ -13,7 +13,7 @@
 #include "model/model.h"
 
 
-#define TENTATIVI_TOTALI 5
+#define TENTATIVI_TOTALI 8
 #define RITARDO_MS       50
 
 
@@ -24,6 +24,8 @@ typedef enum {
     MACHINE_REQUEST_CODE_STATS,
     MACHINE_REQUEST_CODE_RIAVVIA_COMUNICAZIONE,
     MACHINE_REQUEST_CODE_IMPOSTA_USCITA,
+    MACHINE_REQUEST_CODE_IMPOSTA_DAC,
+    MACHINE_REQUEST_CODE_IMPOSTA_LED,
     MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA,
     MACHINE_REQUEST_CODE_START,
     MACHINE_REQUEST_CODE_PAUSA,
@@ -68,6 +70,12 @@ typedef struct {
             uint8_t num;
             uint8_t value;
         } detergent;
+        struct {
+            uint8_t value;
+        } dac;
+        struct {
+            uint8_t value;
+        } led;
     };
 } machine_request_t;
 
@@ -101,7 +109,7 @@ void machine_init(void) {
                                    sizeof(machine_response_t), responseq_queue_buffer, &static_responseq_queue);
 
     static StaticTask_t static_task;
-    static StackType_t  task_stack[BASE_TASK_STACK_SIZE * 8] = {0};
+    static StackType_t  task_stack[APP_CONFIG_BASE_TASK_STACK_SIZE * 8] = {0};
     xTaskCreateStatic(communication_task, TAG, sizeof(task_stack), NULL, 1, task_stack, &static_task);
 
     static StaticSemaphore_t static_semaphore;
@@ -259,9 +267,34 @@ void machine_invia_presentazioni(void) {
 }
 
 
+void machine_imposta_dac(uint8_t dac) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_IMPOSTA_DAC, .dac = {.value = dac}};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_imposta_led(uint8_t led) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_IMPOSTA_LED, .dac = {.value = led}};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
 void machine_imposta_uscita_singola(size_t uscita, int valore) {
     machine_request_t richiesta = {
         .code = MACHINE_REQUEST_CODE_IMPOSTA_USCITA, .uscita = uscita, .singola = 1, .valore = valore};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_imposta_uscita_multipla(size_t uscita, int valore) {
+    machine_request_t richiesta = {
+        .code = MACHINE_REQUEST_CODE_IMPOSTA_USCITA, .uscita = uscita, .singola = 0, .valore = valore};
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_azzera_credito(void) {
+    machine_request_t richiesta = {.code = MACHINE_REQUEST_CODE_COMANDO_SEMPLICE, .comando = COMANDO_AZZERA_CREDITO};
     xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
 
@@ -330,7 +363,7 @@ static int task_gestisci_richiesta(machine_request_t request) {
 
     switch (request.code) {
         case MACHINE_REQUEST_CODE_COMANDO_SEMPLICE:
-            ESP_LOGI(TAG, "Simple command 0x%02X", request.comando);
+            // ESP_LOGI(TAG, "Simple command 0x%02X", request.comando);
             res = invia_pacchetto_semplice(request.comando, &risposta_pacchetto, -1);
             break;
 
@@ -519,6 +552,18 @@ static int task_gestisci_richiesta(machine_request_t request) {
             break;
         }
 
+        case MACHINE_REQUEST_CODE_IMPOSTA_DAC: {
+            uint8_t dati[2] = {0, (uint8_t)request.dac.value};
+            res             = invia_pacchetto(IMPOSTA_DAC, dati, sizeof(dati), &risposta_pacchetto, 1);
+            break;
+        }
+
+        case MACHINE_REQUEST_CODE_IMPOSTA_LED: {
+            uint8_t dati[1] = {(uint8_t)request.led.value};
+            res             = invia_pacchetto(COMANDO_IMPOSTA_LED, dati, sizeof(dati), &risposta_pacchetto, 1);
+            break;
+        }
+
         case MACHINE_REQUEST_CODE_RIAVVIA_COMUNICAZIONE:
             // Gestito sopra
             break;
@@ -554,8 +599,16 @@ static int invia_pacchetto(int comando, uint8_t *dati, uint16_t lunghezza_dati, 
         if (err) {
             ESP_LOGW(TAG, "Risposta non valida al comando 0x%02X: %i (%i)", comando, err, len);
             tentativi++;
-        } else if (lunghezza_dati_prevista == -1) {
-            ESP_LOGI(TAG, "Len cmd 0x%02X %i", comando, len - PREAMBLE_LEN - HEADER_LEN - CRC_SIZE - 1);
+        } else {
+            if (risposta->data_length > 0 && risposta->data != NULL && risposta->data[0] != comando) {
+                ESP_LOGW(TAG, "Risposta a comando diverso: mi aspettavo %i, ho ricevuto %i", comando,
+                         risposta->data[0]);
+                tentativi++;
+                err = 1;
+            }
+            if (lunghezza_dati_prevista == -1) {
+                // ESP_LOGI(TAG, "Len cmd 0x%02X %i", comando, len - PREAMBLE_LEN - HEADER_LEN - CRC_SIZE - 1);
+            }
         }
     } while (tentativi++ < TENTATIVI_TOTALI && err != 0);
 
@@ -572,10 +625,6 @@ static int invia_pacchetto(int comando, uint8_t *dati, uint16_t lunghezza_dati, 
         }
     }
 
-    if (risposta->data_length > 0 && risposta->data != NULL && risposta->data[0] != comando) {
-        ESP_LOGW(TAG, "Risposta a comando diverso: mi aspettavo %i, ho ricevuto %i", comando, risposta->data[0]);
-        return -1;
-    }
 
     return err;
 }

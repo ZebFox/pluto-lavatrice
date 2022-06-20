@@ -12,9 +12,17 @@ static unsigned int get_credito_macchina(model_t *model);
 void model_init(model_t *pmodel) {
     memset(pmodel, 0, sizeof(model_t));
     pmodel->system.comunicazione_abilitata = 1;
+    pmodel->system.removable_drive_state   = REMOVABLE_DRIVE_STATE_MISSING;
+    pmodel->system.num_archivi             = 0;
     pmodel->run.maybe_programma            = 0;
     pmodel->run.f_richiedi_scarico         = 0;
     pmodel->prog.contrast                  = 0x1A;
+}
+
+
+void model_set_drive_mounted(model_t *pmodel, removable_drive_state_t drive_mounted) {
+    assert(pmodel != NULL);
+    pmodel->system.removable_drive_state = drive_mounted;
 }
 
 
@@ -223,6 +231,11 @@ int model_lavaggio_finito(model_t *model) {
 uint16_t model_get_livello_centimetri(model_t *pmodel) {
     assert(pmodel != NULL);
     return pmodel->run.macchina.livello;
+}
+
+
+int model_get_velocita_corretta(model_t *model) {
+    return (model->run.macchina.velocita_rilevata * model->prog.parmac.correzione_contagiri) / 100;
 }
 
 
@@ -708,7 +721,7 @@ size_t model_deserialize_parmac(parmac_t *p, uint8_t *buffer) {
     i += UNPACK_UINT16_BE(p->tipo_frontale, &buffer[i]);
 
     i += UNPACK_UINT16_BE(p->tipo_serratura, &buffer[i]);
-    i += UNPACK_UINT16_BE(p->inibizione_allarmi, &buffer[i]);
+    i += UNPACK_UINT16_BE(p->durata_impulso_serratura, &buffer[i]);
 
     assert(i == PARMAC_SIZE);
     return i;
@@ -1025,7 +1038,9 @@ void model_unpack_test(test_data_t *test, uint8_t *buffer) {
     i += deserialize_uint16_be(&y, &buffer[i]);
     i += deserialize_uint16_be(&z, &buffer[i]);
     i += deserialize_uint8(&test->accelerometro_ok, &buffer[i]);
-    // enqueue_dati_accelerometro(pmodel, x, y, z);
+    test->log_accelerometro[0] = x;
+    test->log_accelerometro[1] = y;
+    test->log_accelerometro[2] = z;
 
     // Proximity
     i += deserialize_uint32_be(&min, &buffer[i]);
@@ -1068,6 +1083,12 @@ char *model_new_unique_filename(model_t *model, char *filename, unsigned long se
     } while (found);
 
     return filename;
+}
+
+
+int model_get_minimo_livello_riscaldo(model_t *model) {
+    return model->prog.parmac.tipo_livello == 0 ? model->prog.parmac.centimetri_minimo_riscaldo
+                                                : model->prog.parmac.litri_minimi_riscaldo;
 }
 
 

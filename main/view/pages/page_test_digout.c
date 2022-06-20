@@ -26,7 +26,7 @@ static struct {
 
 
 static void update_page(model_t *model) {
-    lv_label_set_text_fmt(page_data.lbl_out, "output: %i", page_data.digout_index);
+    lv_label_set_text_fmt(page_data.lbl_out, "output: %i", page_data.digout_index + 1);
     lv_label_set_text_fmt(page_data.lbl_status, "%s", string_status(page_data.digout_state));
     lv_label_set_text_fmt(page_data.auto_off, "T.AUTO-OFF[%isec]", page_data.time);
 }
@@ -41,7 +41,7 @@ static void *create_page(model_t *model, void *extra) {
 static void open_page(model_t *model, void *data) {
     view_common_title(lv_scr_act(), "TEST USCITE");
 
-    page_data.digout_index = 1;
+    page_data.digout_index = 0;
     lv_obj_t *lblout       = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_auto_realign(lblout, 1);
     lv_obj_align(lblout, NULL, LV_ALIGN_IN_TOP_LEFT, 2, 20);
@@ -76,22 +76,24 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
                 switch (event.key_event.code) {
                     case BUTTON_DESTRA: {
                         msg.vmsg.code          = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
-                        msg.vmsg.page          = &page_test_level;
+                        msg.vmsg.page          = &page_test_temperature;
                         page_data.digout_state = 0;
+                        msg.cmsg.code          = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;
                         break;
                     }
                     case BUTTON_SINISTRA: {
                         msg.vmsg.code          = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
                         page_data.digout_state = 0;
-                        msg.vmsg.page          = &page_test_temperature;
+                        msg.vmsg.page          = &page_test_digin;
+                        msg.cmsg.code          = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;
                         break;
                     }
-                    case BUTTON_MENO: {
+                    case BUTTON_PIU: {
                         page_data.digout_state = 0;
                         if (page_data.digout_index < NUM_OUTPUTS)
                             page_data.digout_index++;
                         else {
-                            page_data.digout_index = 1;
+                            page_data.digout_index = 0;
                         }
                         lv_task_set_prio(page_data.task, LV_TASK_PRIO_OFF);
                         lv_task_reset(page_data.task);
@@ -101,13 +103,13 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
                         msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;
                         break;
                     }
-                    case BUTTON_PIU: {
+                    case BUTTON_MENO: {
                         page_data.digout_state = 0;
-                        if (page_data.digout_index > 1) {
+                        if (page_data.digout_index > 0) {
                             page_data.digout_index--;
 
                         } else {
-                            page_data.digout_index = NUM_OUTPUTS;
+                            page_data.digout_index = NUM_OUTPUTS - 1;
                         }
                         lv_task_set_prio(page_data.task, LV_TASK_PRIO_OFF);
                         lv_task_reset(page_data.task);

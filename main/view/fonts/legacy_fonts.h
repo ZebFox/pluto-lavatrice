@@ -11,5 +11,7 @@ bool get_glyph_dsc_ramtex(const lv_font_t *font, lv_font_glyph_dsc_t *dsc_out, u
 
 extern lv_font_t hsw_8x8_bold_font;
 extern lv_font_t hsw_8x16_font;
+extern lv_font_t hsw_6x8_font;
+extern lv_font_t hsw_6x8_font_shorter;
 
 #endif

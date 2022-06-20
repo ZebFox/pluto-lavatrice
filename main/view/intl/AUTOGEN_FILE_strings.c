@@ -1,4 +1,4 @@
-const char *strings[153][2] = {
+const char *strings[166][2] = {
     {"", "", },
     {"Inserire moneta", "Insert coin", },
     {"Inserire gettone", "Insert token", },
@@ -152,5 +152,18 @@ const char *strings[153][2] = {
     {"Copiare in posizione", "Copy in position", },
     {"Sapone", "Detergent", },
     {"TEST TEMPERATURE", "TEMPERATURES TEST", },
+    {"TEST INGRESSI", "INPUT TEST", },
+    {"TEST RISCALDO", "HEATING TEST", },
+    {"S. PROSSIMITA'", "PROXIMITY S.", },
+    {"TEST CONTALITRI", "TEST L. COUNTER", },
+    {"TEST MOTORE AVA", "TEST FORWARD", },
+    {"TEST MOTORE IND", "TEST BACKWARD", },
+    {"TEST 0/10V", "TEST 0/10V", },
+    {"ARCHIVIAZIONE", "STORAGE", },
+    {"Inserire un dispositivo di archiviazione", "Insert a storage device", },
+    {"Dispositivo rimosso; premere menu' per riavviare la macchina", "Device removed; press menu' to reset the machine", },
+    {"Nessuna configurazione trovata", "No configuration found", },
+    {"Configurazione caricata con successo", "Configuration successfully loaded", },
+    {"Errore nel caricamento della configurazione", "Configuration load failed", },
 };
 

@@ -512,7 +512,7 @@ typedef void * lv_obj_user_data_t;
 #endif
 
 /*LED (dependencies: -)*/
-#define LV_USE_LED      0
+#define LV_USE_LED      1
 
 /*Line (dependencies: -*/
 #define LV_USE_LINE     1

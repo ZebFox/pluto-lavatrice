@@ -24,3 +24,12 @@ lv_font_t hsw_6x8_font = {
     .base_line        = 0,                      /*Base line measured from the top of line_height*/
     .user_data        = {.height = 8, .bitmap_width = 8, .char_width = 6},
 };
+
+
+lv_font_t hsw_6x8_font_shorter = {
+    .get_glyph_dsc    = get_glyph_dsc_ramtex,   /*Set a callback to get info about gylphs*/
+    .get_glyph_bitmap = my_get_glyph_bitmap_cb, /*Set a callback to get bitmap of a glyp*/
+    .line_height      = 7,                      /*The real line height where any text fits*/
+    .base_line        = 0,                      /*Base line measured from the top of line_height*/
+    .user_data        = {.height = 7, .bitmap_width = 8, .char_width = 6},
+};

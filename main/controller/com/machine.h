@@ -63,5 +63,9 @@ void machine_modify_cycle_parameters(uint8_t step, uint16_t duration, uint16_t s
                                      uint16_t level);
 void machine_control_detergent(uint8_t detergent, uint8_t value);
 void machine_activate_detergent(uint8_t detergent);
+void machine_imposta_uscita_multipla(size_t uscita, int valore);
+void machine_imposta_dac(uint8_t dac);
+void machine_imposta_led(uint8_t led);
+void machine_azzera_credito(void);
 
 #endif

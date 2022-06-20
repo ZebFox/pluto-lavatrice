@@ -1,3 +1,4 @@
+#include "esp_system.h"
 #include "controller.h"
 #include "model/model.h"
 #include "model/parmac.h"
@@ -14,6 +15,7 @@
 #include "peripherals/display/NT7534.h"
 #include "peripherals/buzzer.h"
 #include "configuration/configuration.h"
+#include "configuration/msc.h"
 
 
 static const char *TAG = "Controller";
@@ -28,6 +30,7 @@ void controller_init(model_t *pmodel) {
     configuration_init();
     configuration_load_all_data(pmodel);
     nt7534_set_contrast(pmodel->prog.contrast);
+    msc_init();
 
     view_change_page(pmodel, &page_splash);
     view_event((view_event_t){.code = VIEW_EVENT_CODE_OPEN});
@@ -75,6 +78,35 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
         case VIEW_CONTROLLER_COMMAND_CODE_RESET_RAM:
             configuration_delete_all();
             configuration_load_all_data(pmodel);
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_RESET:
+            esp_restart();
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_LOAD_ARCHIVE:
+            msc_extract_archive(msg->archive_name);
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_SEND_PARMAC:
+            machine_invia_parmac(&pmodel->prog.parmac);
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_SEND_PARMAC_AND_TURNOFF:
+            machine_invia_parmac(&pmodel->prog.parmac);
+            machine_imposta_uscita_singola(0, 0);
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_TEST_LED_CONTROl:
+            machine_imposta_led(msg->value);
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_TEST_CLEAR_CREDIT:
+            machine_azzera_credito();
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_CLEAR_LITERS:
+            machine_azzera_litri();
             break;
 
         case VIEW_CONTROLLER_COMMAND_CODE_SAVE_PARMAC:
@@ -233,6 +265,15 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
             machine_imposta_uscita_singola(msg->output, msg->value);
             break;
 
+        case VIEW_CONTROLLER_COMMAND_CODE_TEST_DIGOUT_MULTI:
+            machine_imposta_uscita_multipla(msg->output, msg->value);
+            break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_TEST_DAC_CONTROL:
+            machine_imposta_dac(msg->value);
+            break;
+
+
         case VIEW_CONTROLLER_COMMAND_CODE_SEND_DEBUG_CODE:
             machine_send_debug_code(msg->value);
             break;
@@ -246,15 +287,29 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
 void controller_manage(model_t *pmodel) {
     static int           initial_level_check = 0;
     static unsigned long stato_ts            = 0;
-    machine_response_t   risposta;
+    machine_response_t   machine_response;
+    msc_response_t       msc_response;
 
-    if (is_expired(stato_ts, get_millis(), 400)) {
+    if (is_expired(stato_ts, get_millis(), 500)) {
+        model_set_drive_mounted(pmodel, msc_is_device_mounted());
+        msc_read_archives(pmodel);
         machine_richiedi_stato();
+        view_event((view_event_t){.code = VIEW_EVENT_CODE_DEVICE_UPDATE});
         stato_ts = get_millis();
     }
 
-    if (machine_ricevi_risposta(&risposta)) {
-        switch (risposta.code) {
+    if (msc_get_response(&msc_response)) {
+        switch (msc_response.code) {
+            case MSC_RESPONSE_CODE_ARCHIVE_EXTRACTION_COMPLETE:
+                configuration_load_all_data(pmodel);
+                model_set_drive_mounted(pmodel, msc_is_device_mounted());
+                view_event((view_event_t){.code = VIEW_EVENT_CODE_CONFIGURATION_LOADED, .error = msc_response.error});
+                break;
+        }
+    }
+
+    if (machine_ricevi_risposta(&machine_response)) {
+        switch (machine_response.code) {
             case MACHINE_RESPONSE_CODE_DRAIN_REQUIRED:
                 ESP_LOGI(TAG, "E' necessario uno scarico");
                 if (model_lavaggio_finito(pmodel)) {     // Se sono alla fine devo segnalarlo all'utente
@@ -282,14 +337,14 @@ void controller_manage(model_t *pmodel) {
                 machine_invia_parmac(&pmodel->prog.parmac);
 
                 // allarme poweroff; se l'autoavvio e' configurato devo ripartire
-                if (risposta.presentazioni.n_all == 0x02 && pmodel->prog.parmac.autoavvio) {
+                if (machine_response.presentazioni.n_all == 0x02 && pmodel->prog.parmac.autoavvio) {
                     machine_azzera_allarmi();
                 }
 
-                ESP_LOGI(TAG, "Machine initial state %i", risposta.presentazioni.stato);
-                if (risposta.presentazioni.stato != STATO_MACCHINA_STOP) {
-                    uint8_t lavaggio = risposta.presentazioni.nro_programma;
-                    int     step     = risposta.presentazioni.nro_step;
+                ESP_LOGI(TAG, "Machine initial state %i", machine_response.presentazioni.stato);
+                if (machine_response.presentazioni.stato != STATO_MACCHINA_STOP) {
+                    uint8_t lavaggio = machine_response.presentazioni.nro_programma;
+                    int     step     = machine_response.presentazioni.nro_step;
                     ESP_LOGI(TAG, "Machine executing program %i, step %i", lavaggio, step);
 
                     if (lavaggio < model_get_num_programs(pmodel)) {
@@ -313,7 +368,7 @@ void controller_manage(model_t *pmodel) {
             }
 
             case MACHINE_RESPONSE_CODE_TEST:
-                pmodel->test = risposta.test;
+                pmodel->test = machine_response.test;
                 view_event((view_event_t){.code = VIEW_EVENT_CODE_MODEL_UPDATE});
                 break;
 
@@ -329,7 +384,7 @@ void controller_manage(model_t *pmodel) {
                     configuration_load_program(pmodel, pmodel->run.macchina.numero_programma);
                 }
 
-                // utils_dump_state(&pmodel->run.macchina);
+                //utils_dump_state(&pmodel->run.macchina);
 
                 if (model_get_livello_centimetri(pmodel) > 0 && !initial_level_check) {
                     pmodel->run.f_richiedi_scarico = 1;
@@ -368,8 +423,8 @@ void controller_manage(model_t *pmodel) {
             }
 
             case MACHINE_RESPONSE_CODE_STATS:
-                pmodel->stats = *risposta.stats;
-                free(risposta.stats);
+                pmodel->stats = *machine_response.stats;
+                free(machine_response.stats);
                 view_event((view_event_t){.code = VIEW_EVENT_CODE_MODEL_UPDATE});
                 break;
         }

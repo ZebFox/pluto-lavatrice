@@ -259,7 +259,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                 if (view_common_check_password(&pdata->password, VIEW_PASSWORD_MINUS, VIEW_SHORT_PASSWORD_LEN,
                                                get_millis())) {
                     msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
-                    msg.vmsg.page = &page_test_digout;
+                    msg.vmsg.page = &page_test_digin;
                     break;
                 } else if (view_common_check_password(&pdata->password, VIEW_PASSWORD_RIGHT, VIEW_SHORT_PASSWORD_LEN,
                                                       get_millis())) {
@@ -290,6 +290,11 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                                                       get_millis())) {
                     msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                     msg.vmsg.page = &page_communication_settings;
+                    break;
+                } else if (view_common_check_password(&pdata->password, VIEW_PASSWORD_LOCK, VIEW_SHORT_PASSWORD_LEN,
+                                                      get_millis())) {
+                    msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
+                    msg.vmsg.page = &page_removable_drive;
                     break;
                 } else if (view_common_check_password_started(&pdata->password)) {
                     if (event.key_event.code != BUTTON_STOP) {

@@ -276,7 +276,7 @@ static void open_page(model_t *pmodel, void *args) {
 
     img = custom_lv_img_create(lv_scr_act(), NULL);
     custom_lv_img_set_src(img, &legacy_img_speed);
-    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_RIGHT, -42, 30);
+    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_RIGHT, -34, 30);
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_align(lbl, img, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);

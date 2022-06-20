@@ -4,6 +4,7 @@
 
 #include "model/model.h"
 #include "model/programs.h"
+#include "microtar.h"
 
 
 void configuration_init(void);
@@ -23,6 +24,7 @@ void configuration_delete_all(void);
 int  configuration_clone_program(model_t *pmodel, size_t destination);
 void configuration_save_contrast(model_t *pmodel);
 void configuration_load_contrast(model_t *pmodel);
+int  configuration_copy_from_tar(mtar_t *tar, const char *name, size_t total);
 
 
 #endif

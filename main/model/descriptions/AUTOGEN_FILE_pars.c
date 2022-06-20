@@ -130,10 +130,11 @@ const char *pars_richiesta_pagamento[4][2] = {
     {"Pagamento importo", "Pay the required amount", },
 };
 
-const char *pars_descriptions[167][2] = {
+const char *pars_descriptions[168][2] = {
     {"PARAMETRO", "Parameter", },
     {"LINGUA", "LANGUAGE", },
     {"LOGO", "LOGO", },
+    {"Nodo macchina", "Machine node", },
     {"LIVELLO DI ACCESSO", "ACCESS LEVEL", },
     {"TEMPO TASTO PAUSA", "PAUSE BUTTON TIME", },
     {"TEMPO TASTO STOP", "STOP BUTTON TIME", },

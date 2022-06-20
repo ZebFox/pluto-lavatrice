@@ -153,3 +153,16 @@ INIZIO, Inizio, Start
 COPIARE_IN_POSIZIONE, Copiare in posizione, Copy in position
 SAPONE, Sapone, Detergent
 TEST_TEMPERATURE, TEST TEMPERATURE, TEMPERATURES TEST
+TEST_INGRESSI, TEST INGRESSI, INPUT TEST
+TEST_RISCALDO, TEST RISCALDO, HEATING TEST
+TEST_S_PROSSIMITA, S. PROSSIMITA', PROXIMITY S.
+TEST_CONTALITRI, TEST CONTALITRI, TEST L. COUNTER
+TEST_MOTORE_AVA, TEST MOTORE AVA, TEST FORWARD
+TEST_MOTORE_IND, TEST MOTORE IND, TEST BACKWARD
+TEST_010, TEST 0/10V, TEST 0/10V
+ARCHIVIAZIONE, ARCHIVIAZIONE, STORAGE
+INSERIRE_UN_DISPOSITIVO_DI_ARCHIVIAZIONE, Inserire un dispositivo di archiviazione, Insert a storage device
+DISPOSITIVO_RIMOSSO_PREMERE_MENU_PER_RIAVVIARE_LA_MACCHINA, Dispositivo rimosso; premere menu' per riavviare la macchina, Device removed; press menu' to reset the machine
+NESSUNA_CONFIGURAZIONE_TROVATA, Nessuna configurazione trovata, No configuration found
+CONFIGURAZIONE_CARICATA_CON_SUCCESSO, Configurazione caricata con successo, Configuration successfully loaded
+ERRORE_NEL_CARICAMENTO_DELLA_CONFIGURAZIONE, Errore nel caricamento della configurazione, Configuration load failed
