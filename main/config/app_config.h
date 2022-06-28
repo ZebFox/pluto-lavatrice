@@ -5,9 +5,9 @@
  *  Macro riguardanti la configurazione dell'applicazione
  */
 
-#define FIRMWARE_VERSION_MAJOR 0
+#define FIRMWARE_VERSION_MAJOR 1
 #define FIRMWARE_VERSION_MINOR 'A'
-#define FIRMWARE_VERSION_PATCH 1
+#define FIRMWARE_VERSION_PATCH 0
 
 #define VER_DATI 3
 

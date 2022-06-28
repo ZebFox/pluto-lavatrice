@@ -90,7 +90,7 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
                     }
                     case BUTTON_PIU: {
                         page_data.digout_state = 0;
-                        if (page_data.digout_index < NUM_OUTPUTS)
+                        if (page_data.digout_index < NUM_OUTPUTS - 1)
                             page_data.digout_index++;
                         else {
                             page_data.digout_index = 0;

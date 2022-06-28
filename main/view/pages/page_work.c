@@ -178,6 +178,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
     switch (event.code) {
         case VIEW_EVENT_CODE_MODEL_UPDATE:
             if (model_macchina_in_stop(pmodel) || !model_can_work(pmodel)) {
+                pmodel->run.done = 1;
                 msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_REBASE;
                 msg.vmsg.page = (void *)view_main_page(pmodel);
             }

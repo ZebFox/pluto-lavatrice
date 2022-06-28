@@ -20,10 +20,10 @@ struct page_data {
     lv_obj_t *ldesc;
     lv_obj_t *lval;
 
-    size_t parameter;
-    size_t num_parameters;
-    size_t livello_accesso;
-    int    par_to_save;
+    size_t  parameter;
+    size_t  num_parameters;
+    uint8_t livello_accesso;
+    int     par_to_save;
 
     int           longpressing;
     unsigned long timestamp;
@@ -43,8 +43,14 @@ static void *create_page(model_t *model, void *extra) {
     (void)TAG;
     struct page_data *data = malloc(sizeof(struct page_data));
     data->par_to_save      = 0;
-    data->livello_accesso  = 3;
-    data->return_task      = view_register_periodic_task(PAGE_TIMEOUT, LV_TASK_PRIO_OFF, 0);
+    ESP_LOGI(TAG, "%i", model->run.livello_accesso_temporaneo);
+    if (model->run.livello_accesso_temporaneo > 0) {
+        data->livello_accesso                 = model->run.livello_accesso_temporaneo;
+        model->run.livello_accesso_temporaneo = 0;
+    } else {
+        data->livello_accesso = model->prog.parmac.livello_accesso;
+    }
+    data->return_task = view_register_periodic_task(PAGE_TIMEOUT, LV_TASK_PRIO_OFF, 0);
     return data;
 }
 
@@ -164,6 +170,7 @@ static view_t update_page(model_t *pmodel, struct page_data *pdata) {
     char string[64] = {0};
 
     lv_label_set_text_fmt(pdata->lnum, "Param. %2i/%i", pdata->parameter + 1, pdata->num_parameters);
+    ESP_LOGI(TAG, "%zu %i", pdata->parameter, pdata->livello_accesso);
     lv_label_set_text(pdata->ldesc, parmac_get_description(pmodel, pdata->parameter, pdata->livello_accesso));
     parmac_format_value(pmodel, string, pdata->parameter, pdata->livello_accesso);
     lv_label_set_text(pdata->lval, string);

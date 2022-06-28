@@ -185,7 +185,7 @@ void parlav_format_value(model_t *pmodel, char *string, size_t parameter, uint8_
     if (data.format == NULL) {
         strcpy(string, "---");
     } else {
-        data.format(string, model_get_language(pmodel), par);
+        data.format(string, model_get_language(pmodel), pmodel, par);
     }
 }
 

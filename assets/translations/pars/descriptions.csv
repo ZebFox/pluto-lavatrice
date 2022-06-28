@@ -43,8 +43,8 @@ SOGLIA_Z_ACCELEROMETRO, Soglia z acc., Acc. z limit
 SOGLIA_X_ACCELEROMETRO_H, Soglia x acc. (h), Acc. x limit (h)
 SOGLIA_Y_ACCELEROMETRO_H, Soglia y acc. (h), Acc. y limit (h)
 SOGLIA_Z_ACCELEROMETRO_H, Soglia z acc. (h), Acc. z limit (h)
-GIRI_ACCELEROMETRO, Giri accelerometro, Accelerometer rounds
-GIRI_ACCELEROMETRO_2, Giri accelerometro 2, Accelerometer rounds 2
+GIRI_ACCELEROMETRO, Soglia accelerometro, Accelerometer limit
+GIRI_ACCELEROMETRO_2, Soglia accelerometro 2, Accelerometer limit 2
 DELTA_ACCELEROMETRO, Delta accelerometro, Delta accelerometer
 TEMPO_ATTESA_ACCELEROMETRO, Tempo attesa acc., Acc. wait time
 TEMPERATURA_MASSIMA, Temperatura massima, Maximum temperature
@@ -86,7 +86,7 @@ LIVELLO, Livello, Level
 RICIRCOLO, Ricircolo, Recycling
 ACQUA_FREDDA, Acqua fredda, Cold water
 ACQUA_CALDA, Acqua calda, Hot water
-ACQUA_DEPURATA, Acqua depurata, Purified water
+ACQUA_DEPURATA, Acqua depurata/recupero, Purified/recovery water
 SAPONE, Sapone, Detergent
 TEMPO_SAPONE_1, Tempo sapone 1, Detergent time 1
 RITARDO_SAPONE_1, Ritardo sapone 1, Detergent delay 1

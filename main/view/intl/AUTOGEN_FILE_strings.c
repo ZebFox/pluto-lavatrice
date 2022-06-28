@@ -1,4 +1,4 @@
-const char *strings[166][2] = {
+const char *strings[168][2] = {
     {"", "", },
     {"Inserire moneta", "Insert coin", },
     {"Inserire gettone", "Insert token", },
@@ -165,5 +165,7 @@ const char *strings[166][2] = {
     {"Nessuna configurazione trovata", "No configuration found", },
     {"Configurazione caricata con successo", "Configuration successfully loaded", },
     {"Errore nel caricamento della configurazione", "Configuration load failed", },
+    {"Apri e svuota", "Open and empty", },
+    {"Frenata in corso", "Stopping", },
 };
 

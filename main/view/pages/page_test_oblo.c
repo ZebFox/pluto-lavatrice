@@ -105,10 +105,9 @@ static view_message_t process_page_event(model_t *pmodel, void *args, pman_event
             if (event.key_event.event == KEY_CLICK) {
                 switch (event.key_event.code) {
                     case BUTTON_SINISTRA: {
-                        msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_APRI_OBLO;
-                        msg.vmsg.code  = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE_EXTRA;
-                        msg.vmsg.page  = &page_test_rotation;
-                        msg.vmsg.extra = (void *)(uintptr_t)1;
+                        msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_APRI_OBLO;
+                        msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
+                        msg.vmsg.page = &page_test_proximity;
                         break;
                     }
 

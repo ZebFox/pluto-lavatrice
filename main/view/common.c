@@ -333,11 +333,11 @@ lv_obj_t *view_common_alarm_popup(lv_obj_t **label, lv_obj_t **code) {
 
     lv_obj_t *img = custom_lv_img_create(alarm_cont, NULL);
     custom_lv_img_set_src(img, &legacy_img_alt);
-    lv_obj_align(img, NULL, LV_ALIGN_CENTER, -20, -8);
+    lv_obj_align(img, NULL, LV_ALIGN_CENTER, -20, -12);
 
     img = custom_lv_img_create(alarm_cont, NULL);
     custom_lv_img_set_src(img, &legacy_img_alt);
-    lv_obj_align(img, NULL, LV_ALIGN_CENTER, 20, -8);
+    lv_obj_align(img, NULL, LV_ALIGN_CENTER, 20, -12);
 
     lv_obj_t *lbl = lv_label_create(alarm_cont, NULL);
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
@@ -352,7 +352,7 @@ lv_obj_t *view_common_alarm_popup(lv_obj_t **label, lv_obj_t **code) {
     lv_label_set_long_mode(lbl, LV_LABEL_LONG_BREAK);
     lv_obj_set_width(lbl, 100);
     lv_obj_set_style(lbl, &style_label_6x8);
-    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 6);
+    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 10);
     *label = lbl;
 
     return popup_alarm;

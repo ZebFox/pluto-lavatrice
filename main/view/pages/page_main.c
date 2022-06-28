@@ -37,6 +37,7 @@ struct page_data {
     lv_obj_t *lbl_language;
     lv_obj_t *lbl_alarm;
     lv_obj_t *lbl_alarm_code;
+    lv_obj_t *lbl_done;
 
     lv_obj_t *img_left;
     lv_obj_t *img_right;
@@ -55,6 +56,7 @@ struct page_data {
     lv_obj_t *popup_comunication_error;
     lv_obj_t *popup_language;
     lv_obj_t *popup_alarm;
+    lv_obj_t *popup_done;
 
     uint16_t      allarme;
     unsigned long alarm_ts;
@@ -65,6 +67,7 @@ static void update_prog_data(model_t *pmodel, struct page_data *pdata);
 static void update_timer_data(model_t *pmodel, struct page_data *pdata);
 static void update_status(model_t *pmodel, struct page_data *pdata);
 static void update_language_popup(model_t *pmodel, struct page_data *pdata);
+static void update_done_popup(model_t *pmodel, struct page_data *pdata);
 
 
 static const char *TAG = "PageMain";
@@ -175,6 +178,17 @@ static void open_page(model_t *pmodel, void *args) {
     line                            = view_common_line(hor_points, 2);
     lv_obj_align(line, NULL, LV_ALIGN_IN_TOP_MID, 15, 22);
 
+    lv_obj_t *done_cont;
+    pdata->popup_done = view_common_popup(lv_scr_act(), &done_cont);
+
+    lbl = lv_label_create(done_cont, NULL);
+    lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
+    lv_label_set_long_mode(lbl, LV_LABEL_LONG_BREAK);
+    lv_obj_set_style(lbl, &style_label_6x8);
+    lv_obj_set_width(lbl, 95);
+    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 0);
+    pdata->lbl_done = lbl;
+
     lv_obj_t *lang_cont;
     pdata->popup_language = view_common_popup(lv_scr_act(), &lang_cont);
 
@@ -210,6 +224,7 @@ static void open_page(model_t *pmodel, void *args) {
 
     update_prog_data(pmodel, pdata);
     update_timer_data(pmodel, pdata);
+    update_done_popup(pmodel, pdata);
 }
 
 
@@ -248,6 +263,11 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                 msg.vmsg.page = (void *)view_work_page(pmodel);
             } else {
                 update_status(pmodel, pdata);
+            }
+
+            if (!model_oblo_chiuso(pmodel) && pmodel->run.done) {
+                pmodel->run.done = 0;
+                update_done_popup(pmodel, pdata);
             }
             break;
 
@@ -341,6 +361,8 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                             msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_RESET_PAGE;
                             msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_RELOAD_PREVIEWS;
                         }
+                        pmodel->run.done = 0;
+                        update_done_popup(pmodel, pdata);
                         break;
                     }
 
@@ -531,6 +553,13 @@ static void update_language_popup(model_t *pmodel, struct page_data *pdata) {
     const strings_t languages[] = {STRINGS_ITALIANO, STRINGS_INGLESE};
     uint16_t        language    = model_get_temporary_language(pmodel);
     lv_label_set_text(pdata->lbl_language, view_intl_get_string_from_language(language, languages[language]));
+}
+
+
+static void update_done_popup(model_t *pmodel, struct page_data *pdata) {
+    lv_label_set_text(pdata->lbl_done,
+                      view_intl_get_string_from_language(model_get_temporary_language(pmodel), STRINGS_APRI_E_SVUOTA));
+    lv_obj_set_hidden(pdata->popup_done, !pmodel->run.done);
 }
 
 

@@ -7,7 +7,7 @@
 
 typedef struct __attribute__((__packed__)) {
     const char **descrizione;
-    void (*format)(char *string, uint16_t, const void *);
+    void (*format)(char *string, uint16_t, const void *, const void *);
     const char   *fmt;
     const char ***valori;
 } parameter_user_data_t;

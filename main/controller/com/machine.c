@@ -158,6 +158,7 @@ void machine_modify_cycle_parameters(uint8_t step, uint16_t duration, uint16_t s
         .duration    = duration,
         .speed       = speed,
         .temperature = temperature,
+        .level       = level,
     };
     xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
@@ -401,7 +402,7 @@ static int task_gestisci_richiesta(machine_request_t request) {
             }
 
             risposta_task.code = MACHINE_RESPONSE_CODE_PRESENTAZIONI;
-            deserialize_uint8(&risposta_task.presentazioni.n_all, &risposta_pacchetto.data[1]);
+            deserialize_uint8(&risposta_task.presentazioni.n_all, &risposta_pacchetto.data[2]);
             deserialize_uint8(&risposta_task.presentazioni.stato, &risposta_pacchetto.data[3]);
             deserialize_uint8(&risposta_task.presentazioni.nro_programma, &risposta_pacchetto.data[4]);
             deserialize_uint8(&risposta_task.presentazioni.nro_step, &risposta_pacchetto.data[5]);

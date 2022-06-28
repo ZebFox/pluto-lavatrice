@@ -370,6 +370,9 @@ typedef struct {
         size_t  event_log_number;
         size_t  total_event_log_number;
         event_t event_log_chunk[EVENT_LOG_CHUNK];
+
+        uint8_t done;
+        int     livello_accesso_temporaneo;
     } run;     // Informazioni relative all'esecuzione attuale (sia della scheda quadro che dell'applicazione)
 
     struct {
@@ -448,6 +451,7 @@ size_t                     model_get_num_user_programs(model_t *pmodel);
 void                       model_set_drive_mounted(model_t *pmodel, removable_drive_state_t drive_mounted);
 int                        model_get_minimo_livello_riscaldo(model_t *model);
 int                        model_get_velocita_corretta(model_t *model);
+void program_deserialize_preview(model_t *pmodel, programma_preview_t *p, uint8_t *buffer, uint16_t lingua);
 
 
 #endif

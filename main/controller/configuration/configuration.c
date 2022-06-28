@@ -383,7 +383,7 @@ int configuration_load_program(model_t *pmodel, size_t num) {
         if (read == 0) {
             ESP_LOGE(TAG, "Non sono riuscito a leggere il file %s: %s", path, strerror(errno));
         } else {
-            program_deserialize_preview(&pmodel->prog.preview_programmi[num], buffer, model_get_language(pmodel));
+            program_deserialize_preview(pmodel, &pmodel->prog.preview_programmi[num], buffer, model_get_language(pmodel));
             deserialize_program(programma, buffer);
 
             // Controllo dei limiti
@@ -421,7 +421,7 @@ void configuration_remove_program(programma_preview_t *previews, size_t len, siz
 }
 
 
-int configuration_load_programs_preview(programma_preview_t *previews, size_t len, uint16_t lingua) {
+int configuration_load_programs_preview(model_t *pmodel, programma_preview_t *previews, size_t len, uint16_t lingua) {
     int  num = list_saved_programs(previews, len);
     char path[PATH_MAX];
     int  count = 0;
@@ -449,7 +449,7 @@ int configuration_load_programs_preview(programma_preview_t *previews, size_t le
             if (read == 0) {
                 ESP_LOGE(TAG, "Non sono riuscito a leggere il file %s: %s", path, strerror(errno));
             } else {
-                program_deserialize_preview(&previews[i], buffer, lingua);
+                program_deserialize_preview(pmodel, &previews[i], buffer, lingua);
                 ESP_LOGI(TAG, "Trovato lavaggio %s (%s)", previews[i].name, path);
                 count++;
             }
@@ -547,7 +547,7 @@ int configuration_load_all_data(model_t *pmodel) {
     }
 
     pmodel->prog.num_programmi =
-        configuration_load_programs_preview(pmodel->prog.preview_programmi, MAX_PROGRAMMI, model_get_language(pmodel));
+        configuration_load_programs_preview(pmodel, pmodel->prog.preview_programmi, MAX_PROGRAMMI, model_get_language(pmodel));
     configuration_clear_orphan_programs(pmodel->prog.preview_programmi, pmodel->prog.num_programmi);
 
     return configuration_read_local_data_version();

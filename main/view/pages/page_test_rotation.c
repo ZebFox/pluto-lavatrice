@@ -199,7 +199,7 @@ static view_message_t process_page_event(model_t *pmodel, void *args, pman_event
                     case BUTTON_SINISTRA: {
                         if (pdata->forward) {
                             msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE;
-                            msg.vmsg.page = &page_test_level;
+                            msg.vmsg.page = &page_test_liter_counter;
                         } else {
                             msg.vmsg.code  = VIEW_PAGE_COMMAND_CODE_SWAP_PAGE_EXTRA;
                             msg.vmsg.page  = &page_test_rotation;

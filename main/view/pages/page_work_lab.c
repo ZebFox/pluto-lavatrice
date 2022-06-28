@@ -18,8 +18,10 @@
 #include "model/descriptions/parstring.h"
 
 
+
 #define ALLARME_CHIAVISTELLO 15
 #define ALLARME_SCARICO      32
+
 
 enum {
     DETERGENT_TIMER_ID,
@@ -53,9 +55,12 @@ struct page_data {
     lv_obj_t *lbl_detergent_num;
     lv_obj_t *lbl_detergent_configured_time;
     lv_obj_t *lbl_detergent_actual_time;
+    lv_obj_t *lbl_brake;
 
     lv_obj_t *img_menu;
+    lv_obj_t *img_rpm;
 
+    lv_obj_t *popup_brake;
     lv_obj_t *popup_alarm;
     lv_obj_t *popup_menu;
     lv_obj_t *popup_detergent;
@@ -67,6 +72,7 @@ struct page_data {
     parameter_handle_t ps[4];
     size_t             menu_index;
 
+    uint16_t          old_step;
     uint16_t          alarm;
     uint16_t          detergent_index;
     unsigned long     alarm_ts;
@@ -113,7 +119,7 @@ static void update_popup_menu(model_t *pmodel, struct page_data *pdata) {
     lv_label_set_text(pdata->lbl_menu_description, data.descrizione[model_get_temporary_language(pmodel)]);
 
     char string[32] = {0};
-    data.format(string, model_get_temporary_language(pmodel), &pdata->ps[pdata->menu_index]);
+    data.format(string, model_get_temporary_language(pmodel), pmodel, &pdata->ps[pdata->menu_index]);
     lv_label_set_text(pdata->lbl_menu_value, string);
 }
 
@@ -131,17 +137,18 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
     rimanente = model_program_remaining(pmodel);
     lv_label_set_text_fmt(pdata->lbl_total_remaining, "%02im%02is", rimanente / 60, rimanente % 60);
 
-    lv_label_set_text_fmt(pdata->lbl_required_temperature, "%02iC", pmodel->run.macchina.temperatura_impostata);
-    lv_label_set_text_fmt(pdata->lbl_temperature, "%02iC", pmodel->run.macchina.temperatura);
+    lv_label_set_text_fmt(pdata->lbl_required_temperature, "%03iC", pmodel->run.macchina.temperatura_impostata);
+    lv_label_set_text_fmt(pdata->lbl_temperature, "%03iC", pmodel->run.macchina.temperatura);
 
     char    *level_unit = model_is_level_in_cm(&pmodel->prog.parmac) ? "cm" : "lt";
     uint16_t level =
         model_is_level_in_cm(&pmodel->prog.parmac) ? pmodel->run.macchina.livello : pmodel->run.macchina.livello_litri;
-    lv_label_set_text_fmt(pdata->lbl_required_level, "%02i%s", pmodel->run.macchina.livello_impostato, level_unit);
-    lv_label_set_text_fmt(pdata->lbl_level, "%02i%s", level, level_unit);
+    lv_label_set_text_fmt(pdata->lbl_required_level, "%03i%s", pmodel->run.macchina.livello_impostato, level_unit);
+    lv_label_set_text_fmt(pdata->lbl_level, "%03i%s", level, level_unit);
 
-    lv_label_set_text_fmt(pdata->lbl_required_speed, "%02i", pmodel->run.macchina.velocita_rpm);
-    lv_label_set_text_fmt(pdata->lbl_speed, "%02i", pmodel->run.macchina.velocita_rpm);
+    lv_label_set_text_fmt(pdata->lbl_required_speed, "%04i", pmodel->run.macchina.velocita_rpm);
+    lv_label_set_text_fmt(pdata->lbl_speed, "%04i", pmodel->run.macchina.velocita_rpm);
+    lv_obj_align(pdata->img_rpm, pdata->lbl_required_speed, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
 
     const programma_lavatrice_t *program = model_get_program(pmodel);
     lv_label_set_text_fmt(pdata->lbl_step_num, "# %s %02i/%02i #",
@@ -163,6 +170,24 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
         lv_label_set_text(pdata->lbl_phase, view_common_pedantic_string(pmodel));
     }
 
+    if (model_macchina_in_frenata(pmodel)) {
+        lv_obj_set_hidden(pdata->popup_brake, 0);
+
+        if (pmodel->prog.parmac.f_proximity) {
+            lv_label_set_text_fmt(pdata->lbl_brake, "%s: %i RPM",
+                                  view_intl_get_string(pmodel, STRINGS_FRENATA_IN_CORSO),
+                                  pmodel->run.macchina.velocita_rpm);
+            lv_obj_align(pdata->lbl_brake, NULL, LV_ALIGN_CENTER, 0, 0);
+        } else {
+            uint16_t rimanente = pmodel->run.macchina.rimanente;
+            lv_label_set_text_fmt(pdata->lbl_brake, "%s: %02im%02is",
+                                  view_intl_get_string(pmodel, STRINGS_FRENATA_IN_CORSO), rimanente / 60,
+                                  rimanente % 60);
+        }
+    } else {
+        lv_obj_set_hidden(pdata->popup_brake, 1);
+    }
+
     view_common_update_alarm_popup(pmodel, &pdata->alarm, &pdata->alarm_ts, pdata->popup_alarm, pdata->lbl_alarm,
                                    pdata->lbl_alarm_code);
 }
@@ -172,6 +197,7 @@ static void *create_page(model_t *model, void *extra) {
     struct page_data *pdata = malloc(sizeof(struct page_data));
     pdata->blink_timer      = view_register_periodic_task(2000UL, LV_TASK_PRIO_OFF, BLINK_TIMER_ID);
     pdata->detergent_timer  = view_register_periodic_task(200UL, LV_TASK_PRIO_OFF, DETERGENT_TIMER_ID);
+    pdata->old_step         = 0;
     return pdata;
 }
 
@@ -246,7 +272,7 @@ static void open_page(model_t *pmodel, void *args) {
 
     img = custom_lv_img_create(lv_scr_act(), NULL);
     custom_lv_img_set_src(img, &legacy_img_temperature);
-    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_RIGHT, -32, 12);
+    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_RIGHT, -42, 12);
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_align(lbl, img, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
@@ -276,7 +302,7 @@ static void open_page(model_t *pmodel, void *args) {
 
     img = custom_lv_img_create(lv_scr_act(), NULL);
     custom_lv_img_set_src(img, &legacy_img_speed);
-    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_RIGHT, -34, 30);
+    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_RIGHT, -48, 30);
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_align(lbl, img, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
@@ -292,7 +318,8 @@ static void open_page(model_t *pmodel, void *args) {
     img = custom_lv_img_create(lv_scr_act(), NULL);
     custom_lv_img_set_src(img, &legacy_img_rpm);
     lv_obj_set_auto_realign(img, 1);
-    lv_obj_align(img, pdata->lbl_required_speed, LV_ALIGN_OUT_RIGHT_TOP, -14, 0);
+    lv_obj_align(img, pdata->lbl_required_speed, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
+    pdata->img_rpm = img;
 
     lv_obj_t *line = view_common_horizontal_line();
     lv_obj_align(line, NULL, LV_ALIGN_IN_TOP_MID, 0, 10);
@@ -350,6 +377,18 @@ static void open_page(model_t *pmodel, void *args) {
 
     pdata->popup_alarm = view_common_alarm_popup(&pdata->lbl_alarm, &pdata->lbl_alarm_code);
 
+    lv_obj_t *brake_cont;
+    pdata->popup_brake = view_common_popup(lv_scr_act(), &brake_cont);
+
+    lbl = lv_label_create(brake_cont, NULL);
+    lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
+    lv_label_set_long_mode(lbl, LV_LABEL_LONG_BREAK);
+    lv_obj_set_style(lbl, &style_label_6x8);
+    lv_obj_set_width(lbl, 95);
+    lv_obj_set_auto_realign(lbl, 1);
+    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 0);
+    pdata->lbl_brake = lbl;
+
     lv_obj_set_hidden(pdata->popup_alarm, 1);
     lv_obj_set_hidden(pdata->popup_menu, 1);
     lv_obj_set_hidden(pdata->popup_detergent, 1);
@@ -366,8 +405,9 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
     switch (event.code) {
         case VIEW_EVENT_CODE_MODEL_UPDATE:
             if (model_macchina_in_stop(pmodel) || !model_can_work(pmodel)) {
-                msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_REBASE;
-                msg.vmsg.page = (void *)view_main_page(pmodel);
+                pmodel->run.done = 1;
+                msg.vmsg.code    = VIEW_PAGE_COMMAND_CODE_REBASE;
+                msg.vmsg.page    = (void *)view_main_page(pmodel);
             }
 
             if (model_alarm_code(pmodel) == ALLARME_SCARICO || model_alarm_code(pmodel) == ALLARME_CHIAVISTELLO) {
@@ -510,8 +550,6 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                                     ESP_LOGI(TAG, "Requesting pause");
                                     msg.cmsg.code    = VIEW_CONTROLLER_COMMAND_CODE_PAUSE;
                                     pdata->timestamp = get_millis();
-                                } else {
-                                    ESP_LOGI(TAG, "State: %i", pmodel->run.macchina.stato);
                                 }
                             }
                         }
@@ -564,6 +602,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                             msg.cmsg.level       = pdata->params[1];
                             msg.cmsg.temperature = pdata->params[2];
                             msg.cmsg.speed       = pdata->params[3];
+                            ESP_LOGI(TAG, "Livello 2 %i", pdata->params[1]);
                         }
                         break;
 
@@ -652,10 +691,11 @@ static void init_ephemeral_parameters(model_t *pmodel, struct page_data *pdata, 
 
 static void toggle_menu_popup(model_t *pmodel, struct page_data *pdata) {
     if (lv_obj_get_hidden(pdata->popup_menu) && pmodel->prog.parmac.visualizzazione_menu) {
-        init_ephemeral_parameters(pmodel, pdata, 0);
+        init_ephemeral_parameters(pmodel, pdata, pmodel->run.macchina.numero_step != pdata->old_step);
         lv_obj_set_hidden(pdata->popup_menu, 0);
         update_popup_menu(pmodel, pdata);
         lv_obj_set_hidden(pdata->popup_detergent, 1);
+        pdata->old_step = pmodel->run.macchina.numero_step;
     } else {
         lv_obj_set_hidden(pdata->popup_menu, 1);
     }

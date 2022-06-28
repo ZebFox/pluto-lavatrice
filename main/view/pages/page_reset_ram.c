@@ -67,9 +67,9 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                     case BUTTON_PIU:
                         data->count2++;
                         if (data->count2 >= 3) {
-                            // pmodel->pmac.abilita_parametri_ridotti = 0;
-                            msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_REBASE;
-                            msg.vmsg.page = &page_splash;
+                            pmodel->run.livello_accesso_temporaneo = CODICE_LVL_COSTRUTTORE;
+                            msg.vmsg.code                          = VIEW_PAGE_COMMAND_CODE_REBASE;
+                            msg.vmsg.page                          = &page_splash;
                         }
                         break;
                 }

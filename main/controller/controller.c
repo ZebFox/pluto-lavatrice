@@ -188,7 +188,7 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
 
         case VIEW_CONTROLLER_COMMAND_CODE_RELOAD_PREVIEWS:
             pmodel->prog.num_programmi = configuration_load_programs_preview(
-                pmodel->prog.preview_programmi, MAX_PROGRAMMI, model_get_temporary_language(pmodel));
+                pmodel, pmodel->prog.preview_programmi, MAX_PROGRAMMI, model_get_temporary_language(pmodel));
             view_event((view_event_t){.code = VIEW_EVENT_CODE_PREVIEWS_LOADED});
             break;
 
@@ -198,14 +198,14 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
             }
 
             configuration_clone_program(pmodel, msg->destination);
-            pmodel->prog.num_programmi = configuration_load_programs_preview(pmodel->prog.preview_programmi,
+            pmodel->prog.num_programmi = configuration_load_programs_preview(pmodel, pmodel->prog.preview_programmi,
                                                                              MAX_PROGRAMMI, model_get_language(pmodel));
             view_event((view_event_t){.code = VIEW_EVENT_CODE_PROGRAM_CHANGE_DONE});
             break;
 
         case VIEW_CONTROLLER_COMMAND_CODE_CREATE_PROGRAM:
             configuration_create_empty_program(pmodel);
-            pmodel->prog.num_programmi = configuration_load_programs_preview(pmodel->prog.preview_programmi,
+            pmodel->prog.num_programmi = configuration_load_programs_preview(pmodel, pmodel->prog.preview_programmi,
                                                                              MAX_PROGRAMMI, model_get_language(pmodel));
             configuration_clear_orphan_programs(pmodel->prog.preview_programmi, pmodel->prog.num_programmi);
             view_event((view_event_t){.code = VIEW_EVENT_CODE_DATA_REFRESH});
@@ -341,27 +341,37 @@ void controller_manage(model_t *pmodel) {
                     machine_azzera_allarmi();
                 }
 
-                ESP_LOGI(TAG, "Machine initial state %i", machine_response.presentazioni.stato);
-                if (machine_response.presentazioni.stato != STATO_MACCHINA_STOP) {
-                    uint8_t lavaggio = machine_response.presentazioni.nro_programma;
-                    int     step     = machine_response.presentazioni.nro_step;
-                    ESP_LOGI(TAG, "Machine executing program %i, step %i", lavaggio, step);
+                uint8_t allarme = machine_response.presentazioni.n_all;
+                uint8_t stato   = machine_response.presentazioni.stato;
 
-                    if (lavaggio < model_get_num_programs(pmodel)) {
-                        configuration_load_program(pmodel, lavaggio);
-                        ESP_LOGI(TAG, "Macchina spenta in azione: lavaggio %i e step %i", lavaggio + 1, step + 1);
-                        if (model_select_program_step(pmodel, lavaggio, step) >= 0) {
-                            ESP_LOGI(TAG, "Caricato lavaggio %i e step %i", model_get_program_num(pmodel) + 1,
-                                     pmodel->run.num_step_corrente + 1);
-                            if (pmodel->prog.parmac.autoavvio) {
-                                pending_state_change = 1;
-                                machine_start(lavaggio);
+                ESP_LOGI(TAG, "Machine initial state %i (alarm %i)", machine_response.presentazioni.stato, allarme);
+                if (allarme == 0 || allarme == 2) {
+                    // allarme poweroff; se l'autoavvio e' configurato devo ripartire
+                    if (allarme == 0x02 && pmodel->prog.parmac.autoavvio) {
+                        machine_azzera_allarmi();
+                    }
+
+                    if (stato != STATO_MACCHINA_STOP) {
+                        uint8_t lavaggio = machine_response.presentazioni.nro_programma;
+                        int     step     = machine_response.presentazioni.nro_step;
+                        ESP_LOGI(TAG, "Machine executing program %i, step %i", lavaggio, step);
+
+                        if (lavaggio < model_get_num_programs(pmodel)) {
+                            configuration_load_program(pmodel, lavaggio);
+                            ESP_LOGI(TAG, "Macchina spenta in azione: lavaggio %i e step %i", lavaggio + 1, step + 1);
+                            if (model_select_program_step(pmodel, lavaggio, step) >= 0) {
+                                ESP_LOGI(TAG, "Caricato lavaggio %i e step %i", model_get_program_num(pmodel) + 1,
+                                         pmodel->run.num_step_corrente + 1);
+                                if (pmodel->prog.parmac.autoavvio) {
+                                    pending_state_change = 1;
+                                    machine_start(lavaggio);
+                                }
                             }
+                        } else {
+                            ESP_LOGI(TAG, "Inconsistent state");
+                            pending_state_change = 1;
+                            machine_stop();
                         }
-                    } else {
-                        ESP_LOGI(TAG, "Inconsistent state");
-                        pending_state_change = 1;
-                        machine_stop();
                     }
                 }
                 break;
@@ -384,7 +394,7 @@ void controller_manage(model_t *pmodel) {
                     configuration_load_program(pmodel, pmodel->run.macchina.numero_programma);
                 }
 
-                //utils_dump_state(&pmodel->run.macchina);
+                // utils_dump_state(&pmodel->run.macchina);
 
                 if (model_get_livello_centimetri(pmodel) > 0 && !initial_level_check) {
                     pmodel->run.f_richiedi_scarico = 1;

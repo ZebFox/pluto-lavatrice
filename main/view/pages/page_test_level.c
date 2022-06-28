@@ -223,13 +223,13 @@ static view_message_t process_page_event(model_t *pmodel, void *args, pman_event
                         break;
                     }
 
-                    case BUTTON_MENO: {
+                    case BUTTON_PIU: {
                         pdata->index = (pdata->index + 1) % 4;
                         update_page(pmodel, pdata);
                         break;
                     }
 
-                    case BUTTON_PIU: {
+                    case BUTTON_MENO: {
                         if (pdata->index > 0) {
                             pdata->index--;
                         } else {

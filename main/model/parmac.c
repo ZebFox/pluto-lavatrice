@@ -46,8 +46,8 @@ void parmac_init(model_t *pmodel, int reset) {
     ps[i++] = PARAMETER(&p->visualizzazione_menu_saponi, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_INTERFACCIA_SAPONI, pars_abilitazione), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->abilitazione_lavaggio_programmato, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_LAVAGGIO_PROGRAMMATO, pars_abilitazione), BIT_UTENTE);
     ps[i++] = PARAMETER(&p->tipo_gettoniera, 0, 8, 0, FOPT(PARS_DESCRIPTIONS_TIPO_GETTONIERA, pars_gettoniera), BIT_UTENTE);
-    ps[i++] = PARAMETER(&p->valore_impulso, 1, 0xFFFF, 100, FINT(PARS_DESCRIPTIONS_VALORE_IMPULSO), BIT_UTENTE);
-    ps[i++] = PARAMETER(&p->valore_prezzo_unico, 1, 0xFFFF, 500, FINT(PARS_DESCRIPTIONS_VALORE_PREZZO_UNICO), BIT_TECNICO);
+    ps[i++] = PARAMETER(&p->valore_impulso, 1, 0xFFFF, 100, FPRICE(PARS_DESCRIPTIONS_VALORE_IMPULSO), BIT_UTENTE);
+    ps[i++] = PARAMETER(&p->valore_prezzo_unico, 1, 0xFFFF, 500, FPRICE(PARS_DESCRIPTIONS_VALORE_PREZZO_UNICO), BIT_TECNICO);
     ps[i++] = PARAMETER(&p->prezzo_unico, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_PREZZO_UNICO, pars_abilitazione), BIT_UTENTE);
     ps[i++] = PARAMETER(&p->cifre_prezzo, 1, 6, 4, FINT(PARS_DESCRIPTIONS_CIFRE_PREZZO), BIT_TECNICO);
     ps[i++] = PARAMETER_DLIMITS(&p->cifre_decimali_prezzo, NULL, &p->cifre_prezzo, 0, 6, 2, FINT(PARS_DESCRIPTIONS_CIFRE_DECIMALI_PREZZO), BIT_TECNICO);
@@ -64,7 +64,7 @@ void parmac_init(model_t *pmodel, int reset) {
     ps[i++] = PARAMETER(&p->tempo_h2o_pulizia_saponi, 0, 240, 10, FTIME(PARS_DESCRIPTIONS_TEMPO_PULIZIA_SAPONI), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_tasto_carico_saponi, 0, 240, 5, FTIME(PARS_DESCRIPTIONS_TEMPO_CARICO_SAPONI), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_scarico_servizio, 1, 240, 15, FTIME(PARS_DESCRIPTIONS_TEMPO_SCARICO), BIT_COSTRUTTORE);
-    ps[i++] = PARAMETER(&p->tempo_colpo_aperto_scarico, 1, 240, 24, FINT(PARS_DESCRIPTIONS_TEMPO_COLPO_SCARICO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_colpo_aperto_scarico, 1, 240, 24, FFINT(PARS_DESCRIPTIONS_TEMPO_COLPO_SCARICO, fmt_sec), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_minimo_scarico, 1, 240, 10, FTIME(PARS_DESCRIPTIONS_TEMPO_MINIMO_SCARICO), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_minimo_frenata, 1, 250, 45, FTIME(PARS_DESCRIPTIONS_TEMPO_MINIMO_FRENATA), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->diametro_cesto, 0, 10000, 0, FFINT(PARS_DESCRIPTIONS_DIAMETRO_CESTO, fmt_cm), BIT_DISTRIBUTORE);
@@ -192,7 +192,7 @@ void parmac_format_value(model_t *pmodel, char *string, size_t parameter, uint8_
     parameter_handle_t   *par  = get_actual_parameter(pmodel, parameter, al);
     parameter_user_data_t data = parameter_get_user_data(par);
 
-    data.format(string, model_get_language(pmodel), par);
+    data.format(string, model_get_language(pmodel), pmodel, par);
 }
 
 size_t parmac_get_tot_parameters(uint8_t al) {

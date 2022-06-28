@@ -443,7 +443,7 @@ static int serialize_step(uint8_t *buffer, parametri_step_t *s) {
 }
 
 
-static int deserialize_step(parametri_step_t *s, uint8_t *buffer) {
+int deserialize_step(parametri_step_t *s, uint8_t *buffer) {
     int i = 0;
 
     i += UNPACK_UINT16_BE(s->tipo, &buffer[i]);
@@ -509,84 +509,6 @@ static int deserialize_step(parametri_step_t *s, uint8_t *buffer) {
 
     assert(i <= STEP_SIZE);
     return STEP_SIZE;     // Allow for some margin
-}
-
-
-void program_deserialize_preview(programma_preview_t *p, uint8_t *buffer, uint16_t lingua) {
-    size_t i = lingua * STRING_NAME_SIZE;
-    memcpy(p->name, &buffer[i], STRING_NAME_SIZE);
-
-    i = MAX_LINGUE * STRING_NAME_SIZE;
-    uint32_t prezzo;
-    i += deserialize_uint32_be(&prezzo, &buffer[i]);
-    p->prezzo = prezzo;
-    i += UNPACK_UINT16_BE(p->tipo, &buffer[i]);
-
-    uint16_t num_steps;
-    i += deserialize_uint16_be(&num_steps, &buffer[i]);
-
-    uint16_t num_washes           = 0;
-    uint16_t max_temp             = 0;
-    uint16_t max_level            = 0;
-    uint16_t max_speed_centrifuge = 0;
-    uint16_t max_speed_wash       = 0;
-    uint16_t duration             = 0;
-
-    parametri_step_t step = {0};
-    for (size_t j = 0; j < num_steps; j++) {
-        i += deserialize_step(&step, &buffer[i]);
-
-        duration += step.durata;
-
-        if (step.tipo == STEP_LAVAGGIO || step.tipo == STEP_AMMOLLO || step.tipo == STEP_PRELAVAGGIO ||
-            step.tipo == STEP_RISCIACQUO) {
-            num_washes++;
-            if (step.livello > max_level) {
-                max_level = step.livello;
-            }
-            if (step.velocita_riempimento > max_speed_wash) {
-                max_speed_wash = step.velocita_riempimento;
-            }
-        }
-        if (step.tipo == STEP_LAVAGGIO || step.tipo == STEP_AMMOLLO || step.tipo == STEP_PRELAVAGGIO ||
-            step.tipo == STEP_RISCIACQUO || step.tipo == STEP_SCARICO || step.tipo == STEP_SROTOLAMENTO) {
-            if (step.velocita_lavaggio > max_speed_wash) {
-                max_speed_wash = step.velocita_lavaggio;
-            }
-        }
-        if (step.tipo == STEP_LAVAGGIO || step.tipo == STEP_AMMOLLO || step.tipo == STEP_PRELAVAGGIO ||
-            step.tipo == STEP_ATTESA) {
-            if (step.temperatura > max_temp) {
-                max_temp = step.temperatura;
-            }
-        }
-        if (step.tipo == STEP_CENTRIFUGA) {
-            duration += step.tempo_frenata;
-            duration += step.tempo_rampa_1;
-            duration += step.tempo_attesa_centrifuga_1;
-            duration += step.tempo_rampa_2;
-            duration += step.tempo_attesa_centrifuga_2;
-            duration += step.tempo_rampa_3;
-            duration += step.tempo_preparazione;
-
-            if (step.velocita_centrifuga_1 > max_speed_centrifuge) {
-                max_speed_centrifuge = step.velocita_centrifuga_1;
-            }
-            if (step.velocita_centrifuga_2 > max_speed_centrifuge) {
-                max_speed_centrifuge = step.velocita_centrifuga_2;
-            }
-            if (step.velocita_centrifuga_3 > max_speed_centrifuge) {
-                max_speed_centrifuge = step.velocita_centrifuga_3;
-            }
-        }
-    }
-
-    p->num_steps   = num_steps;
-    p->lavaggi     = num_washes;
-    p->temperatura = max_temp;
-    p->livello     = max_level;
-    p->velocita    = max_speed_centrifuge > 0 ? max_speed_centrifuge : max_speed_wash;
-    p->durata      = duration;
 }
 
 

@@ -68,7 +68,7 @@ uint16_t model_program_remaining(model_t *pmodel) {
         }
     }
 
-    return totale + pmodel->run.macchina.rimanente;
+    return totale;
 }
 
 
@@ -193,7 +193,7 @@ int model_macchina_in_pausa(model_t *model) {
 
 
 int model_macchina_in_frenata(model_t *model) {
-    return model->run.macchina.stato == STATO_MACCHINA_FRENATA;
+    return model->run.macchina.stato == STATO_MACCHINA_FRENATA || model->run.macchina.vis_popup_frenata;
 }
 
 
@@ -1117,4 +1117,80 @@ static unsigned int get_credito_macchina(model_t *model) {
     }
 
     return 0;
+}
+
+int deserialize_step(parametri_step_t *s, uint8_t *buffer);
+
+void program_deserialize_preview(model_t *pmodel, programma_preview_t *p, uint8_t *buffer, uint16_t lingua) {
+    size_t i = lingua * STRING_NAME_SIZE;
+    memcpy(p->name, &buffer[i], STRING_NAME_SIZE);
+
+    i = MAX_LINGUE * STRING_NAME_SIZE;
+    uint32_t prezzo;
+    i += deserialize_uint32_be(&prezzo, &buffer[i]);
+    p->prezzo = prezzo;
+    i += UNPACK_UINT16_BE(p->tipo, &buffer[i]);
+
+    uint16_t num_steps;
+    i += deserialize_uint16_be(&num_steps, &buffer[i]);
+
+    uint16_t num_washes           = 0;
+    uint16_t max_temp             = 0;
+    uint16_t max_level            = 0;
+    uint16_t max_speed_centrifuge = 0;
+    uint16_t max_speed_wash       = 0;
+    uint16_t duration             = 0;
+
+    parametri_step_t step = {0};
+    for (size_t j = 0; j < num_steps; j++) {
+        i += deserialize_step(&step, &buffer[i]);
+
+        duration += step.durata;
+
+        if (step.tipo == STEP_LAVAGGIO || step.tipo == STEP_AMMOLLO || step.tipo == STEP_PRELAVAGGIO ||
+            step.tipo == STEP_RISCIACQUO) {
+            num_washes++;
+            if (step.livello > max_level) {
+                max_level = step.livello;
+            }
+            if (step.velocita_riempimento > max_speed_wash) {
+                max_speed_wash = step.velocita_riempimento;
+            }
+        }
+        if (step.tipo == STEP_LAVAGGIO || step.tipo == STEP_AMMOLLO || step.tipo == STEP_PRELAVAGGIO ||
+            step.tipo == STEP_RISCIACQUO || step.tipo == STEP_SCARICO || step.tipo == STEP_SROTOLAMENTO) {
+            if (step.velocita_lavaggio > max_speed_wash) {
+                max_speed_wash = step.velocita_lavaggio;
+            }
+        }
+        if (step.tipo == STEP_LAVAGGIO || step.tipo == STEP_AMMOLLO || step.tipo == STEP_PRELAVAGGIO ||
+            step.tipo == STEP_ATTESA) {
+            if (step.temperatura > max_temp) {
+                max_temp = step.temperatura;
+            }
+        }
+
+        if (step.tipo == STEP_CENTRIFUGA) {
+            unsigned int rampe[3]  = {step.tempo_rampa_1, step.tempo_rampa_2, step.tempo_rampa_3};
+            unsigned int attese[3] = {step.tempo_attesa_centrifuga_1, step.tempo_attesa_centrifuga_2, 0};
+
+            duration += step.tempo_frenata;
+            for (size_t j = 0; j < step.numero_rampe; j++) {
+                duration += rampe[j] + attese[j];
+            }
+
+            duration += step.tempo_preparazione;
+            for (size_t j = 0; j < pmodel->prog.parmac.abilitazione_preparazione_rotazione; j++) {
+                duration += pmodel->prog.parmac.tempo_marcia_preparazione_rotazione * 2 +
+                            pmodel->prog.parmac.tempo_sosta_preparazione_rotazione * 2;
+            }
+        }
+    }
+
+    p->num_steps   = num_steps;
+    p->lavaggi     = num_washes;
+    p->temperatura = max_temp;
+    p->livello     = max_level;
+    p->velocita    = max_speed_centrifuge > 0 ? max_speed_centrifuge : max_speed_wash;
+    p->durata      = duration;
 }
