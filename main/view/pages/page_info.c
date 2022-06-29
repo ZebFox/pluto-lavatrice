@@ -14,9 +14,6 @@
 
 
 struct page_data {
-    lv_obj_t *label_mem_free;
-    lv_obj_t *label_low_watermark;
-
     lv_task_t *timer;
 };
 
@@ -25,8 +22,8 @@ static const char *TAG = "PageInfo";
 
 
 static void update_page(model_t *pmodel, struct page_data *pdata) {
-    lv_label_set_text_fmt(pdata->label_mem_free, "Free  : %i", xPortGetFreeHeapSize());
-    lv_label_set_text_fmt(pdata->label_low_watermark, "Low WM: %i", xPortGetMinimumEverFreeHeapSize());
+    // lv_label_set_text_fmt(pdata->label_mem_free, "Free  : %i", xPortGetFreeHeapSize());
+    // lv_label_set_text_fmt(pdata->label_low_watermark, "Low WM: %i", xPortGetMinimumEverFreeHeapSize());
 }
 
 
@@ -59,6 +56,11 @@ static void open_page(model_t *pmodel, void *args) {
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 32);
 
     lbl = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_set_style(lbl, &style_label_6x8);
+    lv_label_set_text_fmt(lbl, "V%s - %s", pmodel->system.machine_fw_version, pmodel->system.machine_fw_date);
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 42);
+
+    /*lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_auto_realign(lbl, 1);
     lv_obj_set_style(lbl, &style_label_6x8);
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 44);
@@ -68,7 +70,7 @@ static void open_page(model_t *pmodel, void *args) {
     lv_obj_set_auto_realign(lbl, 1);
     lv_obj_set_style(lbl, &style_label_6x8);
     lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 54);
-    pdata->label_low_watermark = lbl;
+    pdata->label_low_watermark = lbl;*/
 
     update_page(pmodel, pdata);
 }

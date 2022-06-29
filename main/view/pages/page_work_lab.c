@@ -83,6 +83,7 @@ struct page_data {
     int               scarico_fallito;
     uint16_t          counter;
     int               flag;
+    uint8_t           wait_for_release;
 };
 
 
@@ -147,7 +148,7 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
     lv_label_set_text_fmt(pdata->lbl_level, "%03i%s", level, level_unit);
 
     lv_label_set_text_fmt(pdata->lbl_required_speed, "%04i", pmodel->run.macchina.velocita_rpm);
-    lv_label_set_text_fmt(pdata->lbl_speed, "%04i", pmodel->run.macchina.velocita_rpm);
+    lv_label_set_text_fmt(pdata->lbl_speed, "%04i", pmodel->run.macchina.frenata);
     lv_obj_align(pdata->img_rpm, pdata->lbl_required_speed, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
 
     const programma_lavatrice_t *program = model_get_program(pmodel);
@@ -179,7 +180,7 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
                                   pmodel->run.macchina.velocita_rpm);
             lv_obj_align(pdata->lbl_brake, NULL, LV_ALIGN_CENTER, 0, 0);
         } else {
-            uint16_t rimanente = pmodel->run.macchina.rimanente;
+            uint16_t rimanente = pmodel->run.macchina.tempo_moto_cesto;
             lv_label_set_text_fmt(pdata->lbl_brake, "%s: %02im%02is",
                                   view_intl_get_string(pmodel, STRINGS_FRENATA_IN_CORSO), rimanente / 60,
                                   rimanente % 60);
@@ -204,6 +205,7 @@ static void *create_page(model_t *model, void *extra) {
 
 static void open_page(model_t *pmodel, void *args) {
     struct page_data *pdata = args;
+    pdata->wait_for_release = 0;
 
     for (size_t i = 0; i < MAX_DETERGENTS; i++) {
         pdata->detergent_time[i]  = 0;
@@ -537,6 +539,10 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
             } else if ((event.key_event.event == KEY_PRESSING || event.key_event.event == KEY_LONGPRESS)) {
                 switch (event.key_event.code) {
                     case BUTTON_STOP:
+                        if (pdata->wait_for_release) {
+                            break;
+                        }
+
                         if (model_macchina_in_pausa(pmodel)) {
                             if (is_expired(pdata->timestamp, get_millis(), pmodel->prog.parmac.secondi_stop * 1000UL)) {
                                 ESP_LOGI(TAG, "Requesting stop");
@@ -548,8 +554,9 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                                            pmodel->prog.parmac.secondi_pausa * 1000UL)) {
                                 if (model_macchina_in_marcia(pmodel)) {
                                     ESP_LOGI(TAG, "Requesting pause");
-                                    msg.cmsg.code    = VIEW_CONTROLLER_COMMAND_CODE_PAUSE;
-                                    pdata->timestamp = get_millis();
+                                    msg.cmsg.code           = VIEW_CONTROLLER_COMMAND_CODE_PAUSE;
+                                    pdata->timestamp        = get_millis();
+                                    pdata->wait_for_release = 1;
                                 }
                             }
                         }
@@ -594,6 +601,10 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                 }
             } else if (event.key_event.event == KEY_RELEASE) {
                 switch (event.key_event.code) {
+                    case BUTTON_STOP:
+                        pdata->wait_for_release = 0;
+                        break;
+
                     case BUTTON_PIU:
                     case BUTTON_MENO:
                         if (!lv_obj_get_hidden(pdata->popup_menu)) {

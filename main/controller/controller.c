@@ -341,6 +341,11 @@ void controller_manage(model_t *pmodel) {
                     machine_azzera_allarmi();
                 }
 
+                memcpy(pmodel->system.machine_fw_version, machine_response.presentazioni.machine_fw_version,
+                       sizeof(pmodel->system.machine_fw_version));
+                memcpy(pmodel->system.machine_fw_date, machine_response.presentazioni.machine_fw_date,
+                       sizeof(pmodel->system.machine_fw_date));
+
                 uint8_t allarme = machine_response.presentazioni.n_all;
                 uint8_t stato   = machine_response.presentazioni.stato;
 

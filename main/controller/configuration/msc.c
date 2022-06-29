@@ -23,9 +23,6 @@
 #include "msc.h"
 
 
-static void file_operations(void);
-
-
 #define EVENT_DRIVE_DETECTED         0x01
 #define EVENT_REAEDY_TO_UNINSTALL    0x02
 #define EVENT_USB_HOST_LIB_INSTALLED 0x04
@@ -49,10 +46,8 @@ typedef struct {
 
 
 static void msc_event_cb(const msc_host_event_t *event, void *arg);
-static void print_device_info(msc_host_device_info_t *info);
 static void msc_task(void *args);
 static void msc_host_lib_task(void *args);
-static int  msc_is_device_detected(void);
 static void msc_install_host_lib(void);
 static void msc_install_device(uint8_t device_address);
 static void msc_uninstall(msc_host_device_handle_t handle);
@@ -175,7 +170,6 @@ static void msc_install_device(uint8_t device_address) {
 
     msc_host_device_info_t info;
     ESP_ERROR_CHECK(msc_host_get_device_info(msc_device, &info));
-    // print_device_info(&info);
 
     const esp_vfs_fat_mount_config_t mount_config = {
         .format_if_mount_failed = false,
@@ -203,64 +197,6 @@ static void msc_uninstall(msc_host_device_handle_t handle) {
 
 static void msc_event_cb(const msc_host_event_t *event, void *arg) {
     xQueueSend(event_queue, event, 4);
-}
-
-
-static void print_device_info(msc_host_device_info_t *info) {
-    const size_t megabyte = 1024 * 1024;
-    uint64_t     capacity = ((uint64_t)info->sector_size * info->sector_count) / megabyte;
-
-    printf("Device info:\n");
-    printf("\t Capacity: %llu MB\n", capacity);
-    printf("\t Sector size: %u\n", info->sector_size);
-    printf("\t Sector count: %u\n", info->sector_count);
-    printf("\t PID: 0x%4X \n", info->idProduct);
-    printf("\t VID: 0x%4X \n", info->idVendor);
-    wprintf(L"\t iProduct: %S \n", info->iProduct);
-    wprintf(L"\t iManufacturer: %S \n", info->iManufacturer);
-    wprintf(L"\t iSerialNumber: %S \n", info->iSerialNumber);
-}
-
-
-static void file_operations(void) {
-    const char *directory = "/usb/esp";
-    const char *file_path = "/usb/esp/test.txt";
-
-    struct stat s                = {0};
-    bool        directory_exists = stat(directory, &s) == 0;
-    if (!directory_exists) {
-        if (mkdir(directory, 0775) != 0) {
-            ESP_LOGE(TAG, "mkdir failed with errno: %s\n", strerror(errno));
-        }
-    }
-
-    ESP_LOGI(TAG, "Writing file");
-    FILE *f = fopen(file_path, "w");
-    if (f == NULL) {
-        ESP_LOGE(TAG, "Failed to open file for writing");
-        return;
-    }
-    fprintf(f, "Hello World!\n");
-    fclose(f);
-
-    ESP_LOGI(TAG, "Reading file");
-    f = fopen(file_path, "r");
-    if (f == NULL) {
-        ESP_LOGE(TAG, "Failed to open file for reading");
-        return;
-    }
-    char line[64];
-    fgets(line, sizeof(line), f);
-    fclose(f);
-    // strip newline
-    char *pos = strchr(line, '\n');
-    if (pos) {
-        *pos = '\0';
-    }
-    ESP_LOGI(TAG, "Read from file: '%s'", line);
-
-    // archive_management_list_archives("/usb");
-    archive_management_extract_configuration("/usb/webapp.WS2020.tar.gz");
 }
 
 
@@ -295,7 +231,6 @@ static void msc_task(void *args) {
 
                     xEventGroupSetBits(event_group, EVENT_DRIVE_MOUNTED);
 #if 0
-                    file_operations();
                     msc_uninstall(msc_device);
                     ESP_LOGI(TAG, "Done");
                     msc_install_host_lib();
@@ -358,11 +293,4 @@ static void msc_host_lib_task(void *args) {
     }
 
     vTaskDelete(NULL);
-}
-
-
-
-static int msc_is_device_detected(void) {
-    uint32_t res = xEventGroupWaitBits(event_group, EVENT_DRIVE_DETECTED, pdFALSE, pdTRUE, 0);
-    return (res & EVENT_DRIVE_DETECTED) > 0;
 }

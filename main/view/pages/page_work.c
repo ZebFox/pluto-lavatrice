@@ -36,6 +36,7 @@ struct page_data {
     unsigned long alarm_ts;
     unsigned long timestamp;
     int           scarico_fallito;
+    uint8_t       wait_for_release;
 };
 
 
@@ -87,6 +88,7 @@ static void *create_page(model_t *model, void *extra) {
 
 static void open_page(model_t *pmodel, void *args) {
     struct page_data *pdata = args;
+    pdata->wait_for_release = 0;
 
     pdata->alarm    = 0;
     pdata->alarm_ts = 0;
@@ -179,8 +181,8 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
         case VIEW_EVENT_CODE_MODEL_UPDATE:
             if (model_macchina_in_stop(pmodel) || !model_can_work(pmodel)) {
                 pmodel->run.done = 1;
-                msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_REBASE;
-                msg.vmsg.page = (void *)view_main_page(pmodel);
+                msg.vmsg.code    = VIEW_PAGE_COMMAND_CODE_REBASE;
+                msg.vmsg.page    = (void *)view_main_page(pmodel);
             }
 
             if (model_alarm_code(pmodel) == ALLARME_SCARICO || model_alarm_code(pmodel) == ALLARME_CHIAVISTELLO) {
@@ -241,6 +243,10 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                 }
             } else if ((event.key_event.event == KEY_PRESSING || event.key_event.event == KEY_LONGPRESS) &&
                        event.key_event.code == BUTTON_STOP) {
+                if (pdata->wait_for_release) {
+                    break;
+                }
+
                 if (model_macchina_in_pausa(pmodel)) {
                     if (is_expired(pdata->timestamp, get_millis(), pmodel->prog.parmac.secondi_stop * 1000UL)) {
                         ESP_LOGI(TAG, "Requesting stop");
@@ -251,8 +257,9 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                     if (is_expired(pdata->timestamp, get_millis(), pmodel->prog.parmac.secondi_pausa * 1000UL)) {
                         if (model_macchina_in_marcia(pmodel)) {
                             ESP_LOGI(TAG, "Requesting pause");
-                            msg.cmsg.code    = VIEW_CONTROLLER_COMMAND_CODE_PAUSE;
-                            pdata->timestamp = get_millis();
+                            msg.cmsg.code           = VIEW_CONTROLLER_COMMAND_CODE_PAUSE;
+                            pdata->timestamp        = get_millis();
+                            pdata->wait_for_release = 1;
                         } else {
                             ESP_LOGI(TAG, "State: %i", pmodel->run.macchina.stato);
                         }
@@ -274,6 +281,8 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         }
                         break;
                 }
+            } else if (event.key_event.event == KEY_RELEASE && event.key_event.code == BUTTON_STOP) {
+                pdata->wait_for_release = 0;
             }
             break;
         }

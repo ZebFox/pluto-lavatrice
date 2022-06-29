@@ -174,7 +174,7 @@ void model_arretra_step(model_t *model) {
             cur = prog->num_steps - 1;
         }
         model->run.num_step_corrente   = cur;
-        model->run.num_step_successivo = cur;
+        model->run.num_step_successivo = cur + 1;
     }
 }
 
