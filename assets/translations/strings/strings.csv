@@ -83,7 +83,7 @@ SROTOLAMENTO, Srotolamento, Unrolling
 ATTESA_OPERATORE, Attesa operatore, Waiting
 FASE, FASE, PHASE
 PRECARICA_IN_CORSO, Precarica in corso, Preloading
-ATTESA_LIVELLO_E_TEMPERATURA, Attesa livel.e temper., Wait for temper/level
+ATTESA_LIVELLO_E_TEMPERATURA, Attesa livel. e temp., Wait for temper/level
 ATTESA_LIVELLO, Attesa livello, Waiting for the water level
 ATTESA_TEMPERATURA, Attesa temperatura, Waiting for temperature
 RIEMPIMENTO, Riempimento, Filling up
