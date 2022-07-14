@@ -91,7 +91,7 @@ ATTESA_TERMODEGRADAZIONE, Att.termodegradazione, Wait for thermal down
 ATTESA_LIVELLO_SCARICO, Attesa livel. scarico, Wait for drain level
 PRESCARICO, Prescarico, Pre-draining
 PREPARAZIONE, Preparazione, Preparing
-RAGGIUNGIMENTO_VELOCITA, Attesa velocità, Warning speed
+RAGGIUNGIMENTO_VELOCITA, Attesa velocita', Warning speed
 IN_FRENATA, In frenata, Stopping due to lurching
 ATTESA_FRENATA, Attesa frenata, Waiting for full stop
 SCARICO_FORZATO, Scarico forzato, Forced drain
