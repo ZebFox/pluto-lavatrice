@@ -58,7 +58,7 @@ void parmac_init(model_t *pmodel, int reset) {
     ps[i++] = PARAMETER(&p->secondi_stop, 0, 10, 3, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_STOP, fmt_sec), BIT_UTENTE);
     ps[i++] = PARAMETER(&p->tempo_allarme_livello, 1, 100, 30, FFINT(PARS_DESCRIPTIONS_TEMPO_ALLARME_LIVELLO, fmt_min), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_allarme_temperatura, 1, 100, 45, FFINT(PARS_DESCRIPTIONS_TEMPO_ALLARME_TEMPERATURA, fmt_min), BIT_COSTRUTTORE);
-    ps[i++] = PARAMETER(&p->tempo_allarme_scarico, 1, 100, 45, FTIME(PARS_DESCRIPTIONS_TEMPO_ALLARME_SCARICO), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_allarme_scarico, 1, 100, 45, FFINT(PARS_DESCRIPTIONS_TEMPO_ALLARME_SCARICO, fmt_min), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_ritardo_micro_oblo, 0, 240, 15, FFINT(PARS_DESCRIPTIONS_TEMPO_RITARDO_MICRO_OBLO, fmt_sec), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_precarica, 0, 240, 10, FTIME(PARS_DESCRIPTIONS_TEMPO_PRECARICA), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_h2o_pulizia_saponi, 0, 240, 10, FTIME(PARS_DESCRIPTIONS_TEMPO_PULIZIA_SAPONI), BIT_COSTRUTTORE);

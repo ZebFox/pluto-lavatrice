@@ -77,6 +77,7 @@ struct page_data {
     uint16_t          detergent_index;
     unsigned long     alarm_ts;
     unsigned long     timestamp;
+    unsigned long     force_ts;
     unsigned long     detergent_time[MAX_DETERGENTS];
     detergent_state_t detergent_state[MAX_DETERGENTS];
     unsigned long     detergent_ts;
@@ -87,9 +88,11 @@ struct page_data {
 };
 
 
-static void init_ephemeral_parameters(model_t *pmodel, struct page_data *pdata, int reset);
-static void toggle_menu_popup(model_t *pmodel, struct page_data *pdata);
-static void toggle_detergent_popup(model_t *pmodel, struct page_data *pdata);
+static void    init_ephemeral_parameters(model_t *pmodel, struct page_data *pdata, int reset);
+static void    toggle_menu_popup(model_t *pmodel, struct page_data *pdata);
+static void    toggle_detergent_popup(model_t *pmodel, struct page_data *pdata);
+static uint8_t centrifuga_o_scarico(model_t *pmodel);
+static uint8_t centrifuga_scarico_o_srotolamento(model_t *pmodel);
 
 
 static const char *TAG = "PageWorkLab";
@@ -177,7 +180,7 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
         if (pmodel->prog.parmac.f_proximity) {
             lv_label_set_text_fmt(pdata->lbl_brake, "%s: %i RPM",
                                   view_intl_get_string(pmodel, STRINGS_FRENATA_IN_CORSO),
-                                  pmodel->run.macchina.velocita_rpm);
+                                  model_get_velocita_corretta(pmodel));
             lv_obj_align(pdata->lbl_brake, NULL, LV_ALIGN_CENTER, 0, 0);
         } else {
             uint16_t rimanente = pmodel->run.macchina.tempo_moto_cesto;
@@ -412,6 +415,19 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                 msg.vmsg.page    = (void *)view_main_page(pmodel);
             }
 
+            if (centrifuga_o_scarico(pmodel)) {
+                view_common_set_hidden(pdata->popup_detergent, 1);
+            }
+
+            if (centrifuga_scarico_o_srotolamento(pmodel)) {
+                if (!lv_obj_get_hidden(pdata->popup_menu)) {
+                    if (pdata->menu_index == 0) {
+                        pdata->menu_index++;
+                        update_popup_menu(pmodel, pdata);
+                    }
+                }
+            }
+
             if (model_alarm_code(pmodel) == ALLARME_SCARICO || model_alarm_code(pmodel) == ALLARME_CHIAVISTELLO) {
                 if (pdata->scarico_fallito == 0) {
                     ESP_LOGI(TAG, "Scarico fallito");
@@ -475,7 +491,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                     case BUTTON_MENO:
                         if (!lv_obj_get_hidden(pdata->popup_menu)) {
                             parameter_operator(&pdata->ps[pdata->menu_index], -1);
-                            if (pdata->menu_index == 0) {
+                            if (centrifuga_scarico_o_srotolamento(pmodel) && pdata->menu_index == 0) {
                                 pdata->params[0] = (pdata->params[0] / 10) * 10;
                             }
                             update_popup_menu(pmodel, pdata);
@@ -488,6 +504,9 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                     case BUTTON_SINISTRA:
                         if (!lv_obj_get_hidden(pdata->popup_menu)) {
                             pdata->menu_index = utils_circular_decrease(pdata->menu_index, 4);
+                            if (centrifuga_scarico_o_srotolamento(pmodel) && pdata->menu_index == 0) {
+                                pdata->menu_index = 3;
+                            }
                             update_popup_menu(pmodel, pdata);
                         } else if (!lv_obj_get_hidden(pdata->popup_detergent)) {
                             pdata->detergent_index = utils_circular_decrease(
@@ -499,6 +518,9 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                     case BUTTON_DESTRA:
                         if (!lv_obj_get_hidden(pdata->popup_menu)) {
                             pdata->menu_index = (pdata->menu_index + 1) % 4;
+                            if (centrifuga_scarico_o_srotolamento(pmodel) && pdata->menu_index == 0) {
+                                pdata->menu_index++;
+                            }
                             update_popup_menu(pmodel, pdata);
                         } else if (!lv_obj_get_hidden(pdata->popup_detergent)) {
                             pdata->detergent_index =
@@ -531,6 +553,10 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         if (!lv_obj_get_hidden(pdata->popup_menu)) {
                             toggle_detergent_popup(pmodel, pdata);
                         }
+                        break;
+
+                    case BUTTON_STOP_KEY:
+                        pdata->force_ts = get_millis();
                         break;
 
                     default:
@@ -579,6 +605,17 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                                 pdata->params[0] = (pdata->params[0] / 10) * 10;
                             }
                             update_popup_menu(pmodel, pdata);
+                        }
+                        break;
+
+                    case BUTTON_STOP_KEY:
+                        if (model_macchina_in_pausa(pmodel) && pdata->scarico_fallito) {
+                            if (is_expired(pdata->force_ts, get_millis(), 10000UL)) {
+                                msg.cmsg.code   = VIEW_CONTROLLER_COMMAND_CODE_FORZA_APERTURA_OBLO;
+                                pdata->force_ts = get_millis();
+                            }
+                        } else {
+                            pdata->force_ts = get_millis();
                         }
                         break;
                 }
@@ -704,6 +741,9 @@ static void toggle_menu_popup(model_t *pmodel, struct page_data *pdata) {
     if (lv_obj_get_hidden(pdata->popup_menu) && pmodel->prog.parmac.visualizzazione_menu) {
         init_ephemeral_parameters(pmodel, pdata, pmodel->run.macchina.numero_step != pdata->old_step);
         lv_obj_set_hidden(pdata->popup_menu, 0);
+        if (centrifuga_scarico_o_srotolamento(pmodel) && pdata->menu_index == 0) {
+            pdata->menu_index++;
+        }
         update_popup_menu(pmodel, pdata);
         lv_obj_set_hidden(pdata->popup_detergent, 1);
         pdata->old_step = pmodel->run.macchina.numero_step;
@@ -714,14 +754,30 @@ static void toggle_menu_popup(model_t *pmodel, struct page_data *pdata) {
 
 
 static void toggle_detergent_popup(model_t *pmodel, struct page_data *pdata) {
-    if (lv_obj_get_hidden(pdata->popup_detergent) && pmodel->prog.parmac.visualizzazione_menu_saponi &&
-        pmodel->prog.parmac.numero_saponi_utilizzabili > 0) {
+    if (centrifuga_o_scarico(pmodel)) {
+        lv_obj_set_hidden(pdata->popup_detergent, 1);
+        lv_obj_set_hidden(pdata->popup_menu, 1);
+    } else if (lv_obj_get_hidden(pdata->popup_detergent) && pmodel->prog.parmac.visualizzazione_menu_saponi &&
+               pmodel->prog.parmac.numero_saponi_utilizzabili > 0) {
         lv_obj_set_hidden(pdata->popup_detergent, 0);
         lv_obj_set_hidden(pdata->popup_menu, 1);
         update_popup_detergent(pmodel, pdata);
     } else {
         lv_obj_set_hidden(pdata->popup_detergent, 1);
     }
+}
+
+
+static uint8_t centrifuga_o_scarico(model_t *pmodel) {
+    return model_get_current_step(pmodel)->tipo == STEP_CENTRIFUGA ||
+           model_get_current_step(pmodel)->tipo == STEP_SCARICO;
+}
+
+
+static uint8_t centrifuga_scarico_o_srotolamento(model_t *pmodel) {
+    return model_get_current_step(pmodel)->tipo == STEP_CENTRIFUGA ||
+           model_get_current_step(pmodel)->tipo == STEP_SCARICO ||
+           model_get_current_step(pmodel)->tipo == STEP_SROTOLAMENTO;
 }
 
 

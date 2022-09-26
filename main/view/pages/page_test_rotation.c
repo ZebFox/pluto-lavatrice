@@ -228,17 +228,29 @@ static view_message_t process_page_event(model_t *pmodel, void *args, pman_event
                         } else {
                             pdata->da_value = 100;
                         }
+
+                        if (pdata->da_value == 0) {
+                            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;
+                            pdata->run    = 0;
+                        } else {
+                            msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_TEST_DAC_CONTROL;
+                            msg.cmsg.value = pdata->da_value;
+                        }
                         update_page(pmodel, pdata);
-                        msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_TEST_DAC_CONTROL;
-                        msg.cmsg.value = pdata->da_value;
                         break;
                     }
 
                     case BUTTON_PIU: {
                         pdata->da_value = (pdata->da_value + 1) % 101;
+
+                        if (pdata->da_value == 0) {
+                            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;
+                            pdata->run    = 0;
+                        } else {
+                            msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_TEST_DAC_CONTROL;
+                            msg.cmsg.value = pdata->da_value;
+                        }
                         update_page(pmodel, pdata);
-                        msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_TEST_DAC_CONTROL;
-                        msg.cmsg.value = pdata->da_value;
                         break;
                     }
 
@@ -259,9 +271,15 @@ static view_message_t process_page_event(model_t *pmodel, void *args, pman_event
                         } else {
                             pdata->da_value = 0;
                         }
+
+                        if (pdata->da_value == 0) {
+                            pdata->run    = 0;
+                            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;
+                        } else {
+                            msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_TEST_DAC_CONTROL;
+                            msg.cmsg.value = pdata->da_value;
+                        }
                         update_page(pmodel, pdata);
-                        msg.cmsg.code  = VIEW_CONTROLLER_COMMAND_CODE_TEST_DAC_CONTROL;
-                        msg.cmsg.value = pdata->da_value;
                         break;
                     }
 

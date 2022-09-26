@@ -35,6 +35,7 @@ struct page_data {
     uint16_t      alarm;
     unsigned long alarm_ts;
     unsigned long timestamp;
+    unsigned long force_ts;
     int           scarico_fallito;
     uint8_t       wait_for_release;
 };
@@ -238,6 +239,10 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         }
                         break;
 
+                    case BUTTON_STOP_KEY:
+                        pdata->force_ts = get_millis();
+                        break;
+
                     default:
                         break;
                 }
@@ -265,6 +270,15 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         }
                     }
                 }
+            } else if (event.key_event.event == KEY_LONGPRESS && event.key_event.code == BUTTON_STOP_KEY) {
+                if (model_macchina_in_pausa(pmodel) && pdata->scarico_fallito) {
+                    if (is_expired(pdata->force_ts, get_millis(), 10000UL)) {
+                        msg.cmsg.code   = VIEW_CONTROLLER_COMMAND_CODE_FORZA_APERTURA_OBLO;
+                        pdata->force_ts = get_millis();
+                    }
+                } else {
+                    pdata->force_ts = get_millis();
+                }
             } else if (event.key_event.event == KEY_LONGCLICK) {
                 switch (event.key_event.code) {
                     case BUTTON_STOP:
@@ -276,9 +290,6 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         break;
 
                     case BUTTON_START:
-                        if (model_macchina_in_pausa(pmodel) && pdata->scarico_fallito) {
-                            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_FORZA_APERTURA_OBLO;
-                        }
                         break;
                 }
             } else if (event.key_event.event == KEY_RELEASE && event.key_event.code == BUTTON_STOP) {

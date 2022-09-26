@@ -230,21 +230,25 @@ static view_message_t process_page_event(model_t *pmodel, void *args, pman_event
                     }
 
                     case BUTTON_START: {
-                        if ((!test_scarico_chiuso(pmodel, pdata) || !model_oblo_chiuso(pmodel)) && pdata->index != 0) {
+                        if (!model_oblo_chiuso(pmodel) && pdata->index != 0) {
                             break;
                         }
 
-                        msg.cmsg.code   = VIEW_CONTROLLER_COMMAND_CODE_TEST_DIGOUT_MULTI;
                         msg.cmsg.output = transform[pdata->index];
-                        msg.cmsg.value  = (pdata->outputs & (1 << transform[pdata->index])) > 0;
+                        msg.cmsg.value  = !((pdata->outputs & (1 << transform[pdata->index])) > 0);
+
+                        if (msg.cmsg.value && !test_scarico_chiuso(pmodel, pdata) && msg.cmsg.output != OUT_SCARICO) {
+                            break;
+                        }
+
                         if (msg.cmsg.value) {
-                            msg.cmsg.value = 0;
-                            pdata->outputs &= ~(1 << transform[pdata->index]);
-                        } else {
-                            msg.cmsg.value = 1;
                             pdata->outputs |= (1 << transform[pdata->index]);
+                        } else {
+                            pdata->outputs &= ~(1 << transform[pdata->index]);
                         }
                         update_page(pmodel, pdata);
+
+                        msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_TEST_DIGOUT_MULTI;
                         break;
                     }
 

@@ -20,6 +20,7 @@ typedef enum {
     BUTTON_STOP_PIU,
     BUTTON_STOP_MENO,
     BUTTON_STOP_START,
+    BUTTON_STOP_KEY,
 } button_t;
 
 void            keyboard_init(void);

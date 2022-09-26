@@ -155,9 +155,16 @@ const programma_preview_t *model_get_preview(model_t *pmodel, size_t i) {
 void model_avanza_step(model_t *model) {
     const programma_lavatrice_t *p = model_get_program(model);
 
-    model->run.num_step_corrente = model->run.num_step_successivo;
+    if (p && model->run.num_step_successivo >= (int)p->num_steps) {
+        model->run.num_step_corrente = 0;
+    } else {
+        model->run.num_step_corrente = model->run.num_step_successivo;
+    }
+
     if (p && model->run.num_step_successivo + 1 >= (int)p->num_steps) {
         model->run.model_lavaggio_finito = 1;
+    } else {
+        model->run.model_lavaggio_finito = 0;
     }
     model->run.num_step_successivo = (model->run.num_step_successivo + 1) % p->num_steps;
 }
@@ -175,6 +182,12 @@ void model_arretra_step(model_t *model) {
         }
         model->run.num_step_corrente   = cur;
         model->run.num_step_successivo = cur + 1;
+
+        if (model->run.num_step_successivo + 1 > (int)prog->num_steps) {
+            model->run.model_lavaggio_finito = 1;
+        } else {
+            model->run.model_lavaggio_finito = 0;
+        }
     }
 }
 

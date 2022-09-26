@@ -154,6 +154,11 @@ static view_message_t process_page_event(model_t *model, void *arg, pman_event_t
             break;
 
         case VIEW_EVENT_CODE_TIMER: {
+            // Timeout solo sull'uscita del riscaldamento
+            if (page_data.digout_index != 15) {
+                break;
+            }
+
             page_data.time--;
             if (page_data.time == 0) {
                 msg.cmsg.code          = VIEW_CONTROLLER_COMMAND_CODE_DIGOUT_TURNOFF;

@@ -59,7 +59,8 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
         }
     }
 
-    lv_label_set_text_fmt(pdata->lbl_level, "%icm", model_get_livello_centimetri(pmodel));
+    lv_label_set_text_fmt(pdata->lbl_level, "%3icm (>%i)", model_get_livello_centimetri(pmodel),
+                          pmodel->prog.parmac.centimetri_minimo_riscaldo);
     lv_label_set_text_fmt(pdata->lbl_temperature, "%iC", pmodel->run.macchina.temperatura);
     if (model_oblo_chiuso(pmodel)) {
         lv_label_set_text(pdata->lbl_oblo, "OBLO CLOSED");
@@ -105,7 +106,7 @@ static void open_page(model_t *pmodel, void *args) {
     lv_obj_t *lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_6x8);
     lv_obj_set_auto_realign(lbl, 1);
-    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 4, 18);
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 18);
     pdata->lbl_level = lbl;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
@@ -117,7 +118,7 @@ static void open_page(model_t *pmodel, void *args) {
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_6x8);
     lv_obj_set_auto_realign(lbl, 1);
-    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_MID, 4, 18);
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_TOP_MID, 16, 18);
     pdata->lbl_res_ok = lbl;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
@@ -251,25 +252,30 @@ static view_message_t process_page_event(model_t *pmodel, void *args, pman_event
                     }
 
                     case BUTTON_START: {
-                        if ((!test_scarico_chiuso(pmodel, pdata) || !model_oblo_chiuso(pmodel)) && pdata->index != 0) {
+                        if (!model_oblo_chiuso(pmodel) && pdata->index != 0) {
                             break;
                         }
 
-                        if (pdata->index == 3 && !test_resistenze_in_sicurezza(pmodel, pdata)) {
-                            break;
-                        }
-
-                        msg.cmsg.code   = VIEW_CONTROLLER_COMMAND_CODE_TEST_DIGOUT_MULTI;
                         msg.cmsg.output = transform[pdata->index];
-                        msg.cmsg.value  = (pdata->outputs & (1 << transform[pdata->index])) > 0;
+                        msg.cmsg.value  = !((pdata->outputs & (1 << transform[pdata->index])) > 0);
+
+                        if (msg.cmsg.value && !test_scarico_chiuso(pmodel, pdata) && msg.cmsg.output != OUT_SCARICO) {
+                            break;
+                        }
+
+                        if (msg.cmsg.value && !test_resistenze_in_sicurezza(pmodel, pdata) &&
+                            msg.cmsg.output == OUT_RESISTENZE) {
+                            break;
+                        }
+
                         if (msg.cmsg.value) {
-                            msg.cmsg.value = 0;
-                            pdata->outputs &= ~(1 << transform[pdata->index]);
-                        } else {
-                            msg.cmsg.value = 1;
                             pdata->outputs |= (1 << transform[pdata->index]);
+                        } else {
+                            pdata->outputs &= ~(1 << transform[pdata->index]);
                         }
                         update_page(pmodel, pdata);
+
+                        msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_TEST_DIGOUT_MULTI;
                         break;
                     }
 
