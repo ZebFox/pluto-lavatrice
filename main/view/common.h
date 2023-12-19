@@ -48,5 +48,7 @@ lv_obj_t   *view_common_alarm_popup(lv_obj_t **label, lv_obj_t **code);
 void        view_common_set_hidden(lv_obj_t *obj, int hidden);
 void        view_common_program_type_name(model_t *pmodel, lv_obj_t *lbl, uint8_t type);
 lv_obj_t   *view_common_braking_popup(lv_obj_t **label, uint16_t language);
+const char *view_require_payment_string(model_t *pmodel, int language);
+void        view_common_set_label_text(lv_obj_t *lbl, const char *text);
 
 #endif

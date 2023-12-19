@@ -1,8 +1,10 @@
-const char *strings[168][2] = {
+const char *strings[175][2] = {
     {"", "", },
     {"Inserire moneta", "Insert coin", },
     {"Inserire gettone", "Insert token", },
     {"Pagare cassa", "Pay at desk", },
+    {"Pagare gettone", "Insert token ", },
+    {"Pagare moneta", "Insert coin ", },
     {"Scelta programma", "Choose program", },
     {"e premere start", "and press start", },
     {"al  lavoro", "al  lavoro", },
@@ -163,8 +165,13 @@ const char *strings[168][2] = {
     {"Inserire un dispositivo di archiviazione", "Insert a storage device", },
     {"Dispositivo rimosso; premere menu' per riavviare la macchina", "Device removed; press menu' to reset the machine", },
     {"Nessuna configurazione trovata", "No configuration found", },
+    {"Chiave per esportare", "Key to export", },
+    {"Chiave per esportare - Bandiera per importare", "Key to export - Flag to import", },
+    {"Configurazione esportata", "Configuration saved", },
+    {"Operazione in corso", "Processing", },
     {"Configurazione caricata con successo", "Configuration successfully loaded", },
     {"Errore nel caricamento della configurazione", "Configuration load failed", },
+    {"Errore nel salvataggio della configurazione", "Configuration save failed", },
     {"Aprire oblo' e svuotare cesto", "Open and empty ", },
     {"Frenata in corso", "Stopping", },
 };

@@ -20,9 +20,14 @@ void utils_get_sys_time(struct tm *systm) {
 
 void utils_set_system_time(struct tm systm) {
     struct timeval timeval;
+    ESP_LOGI(TAG, "Setting time to %02i:%02i:%02i %i/%i/%i", systm.tm_hour, systm.tm_min, systm.tm_sec, systm.tm_mday, systm.tm_mon, systm.tm_year);
     timeval.tv_sec  = mktime(&systm);
     timeval.tv_usec = 0;
     settimeofday(&timeval, NULL);
+
+    time_t time_now = time(NULL);
+    systm = *localtime(&time_now);
+    ESP_LOGI(TAG, "Time set to time to %02i:%02i:%02i %i/%i/%i", systm.tm_hour, systm.tm_min, systm.tm_sec, systm.tm_mday, systm.tm_mon, systm.tm_year);
 }
 
 

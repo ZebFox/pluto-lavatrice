@@ -33,6 +33,8 @@ void app_main(void) {
     unsigned long   t               = 0;
     unsigned long   machine_time_ts = 0;
 
+    ESP_LOGI(TAG, "Main");
+
     vTaskDelay(pdMS_TO_TICKS(1000));
 
     system_i2c_init();

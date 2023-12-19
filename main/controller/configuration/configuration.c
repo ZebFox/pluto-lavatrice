@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include "peripherals/fs_storage.h"
 #include "peripherals/storage.h"
 #include "configuration.h"
 #include "esp_log.h"
@@ -24,13 +23,6 @@
 #define DIR_PARAMETRI "parametri"
 #define BASENAME(x)   (strrchr(x, '/') + 1)
 
-#define BASE_PATH              LITTLEFS_PARTITION_PATH
-#define DATA_PATH              BASE_PATH "/data"
-#define PROGRAMS_PATH          (DATA_PATH "/programmi")
-#define PARAMS_PATH            (DATA_PATH "/parametri")
-#define PATH_FILE_INDICE       (DATA_PATH "/programmi/index.txt")
-#define PATH_FILE_PARMAC       (DATA_PATH "/parametri/parmac.bin")
-#define PATH_FILE_DATA_VERSION (DATA_PATH "/version.txt")
 
 #define CONTRAST_KEY "CONTRAST"
 
@@ -539,7 +531,8 @@ int configuration_load_all_data(model_t *pmodel) {
     int err = load_parmac(&pmodel->prog.parmac);
 
     if (err) {
-        // change_machine_name(model, NOME_MACCHINA_NUOVA);
+        strcpy(pmodel->prog.parmac.nome, "");
+
         parmac_init(pmodel, 1);
         configuration_save_parmac(&pmodel->prog.parmac);
     } else {

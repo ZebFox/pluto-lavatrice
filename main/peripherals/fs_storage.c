@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "cJSON.h"
 #include "esp_system.h"
-#include "esp_spi_flash.h"
+//#include "esp_spi_flash.h"
 #include "nvs_flash.h"
 #include "esp_err.h"
 #include "esp_log.h"
@@ -19,8 +19,6 @@ static const char *TAG = "FS Storage";
 
 void fs_storage_mount_littlefs(void) {
     /* Print chip information */
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
     ESP_LOGI(TAG, "Initializing LittleFS");
 
     esp_vfs_littlefs_conf_t conf = {

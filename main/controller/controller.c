@@ -48,7 +48,7 @@ void controller_init(model_t *pmodel) {
     tm.tm_hour   = rtc_time.hour;
     tm.tm_mday   = rtc_time.day;
     tm.tm_mon    = rtc_time.month;
-    tm.tm_year   = rtc_time.year;
+    tm.tm_year   = (rtc_time.year % 100) + 100;
     utils_set_system_time(tm);
 
     machine_invia_presentazioni();
@@ -87,6 +87,11 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
         case VIEW_CONTROLLER_COMMAND_CODE_LOAD_ARCHIVE:
             msc_extract_archive(msg->archive_name);
             break;
+
+        case VIEW_CONTROLLER_COMMAND_CODE_SAVE_ARCHIVE: {
+            msc_save_archive(pmodel->prog.parmac.nome);
+            break;
+        }
 
         case VIEW_CONTROLLER_COMMAND_CODE_SEND_PARMAC:
             machine_invia_parmac(&pmodel->prog.parmac);
@@ -304,6 +309,12 @@ void controller_manage(model_t *pmodel) {
                 configuration_load_all_data(pmodel);
                 model_set_drive_mounted(pmodel, msc_is_device_mounted());
                 view_event((view_event_t){.code = VIEW_EVENT_CODE_CONFIGURATION_LOADED, .error = msc_response.error});
+                break;
+
+            case MSC_RESPONSE_CODE_ARCHIVE_SAVING_COMPLETE:
+                ESP_LOGI(TAG, "Configuration saved!");
+                model_set_drive_mounted(pmodel, msc_is_device_mounted());
+                view_event((view_event_t){.code = VIEW_EVENT_CODE_CONFIGURATION_SAVED, .error = msc_response.error});
                 break;
         }
     }

@@ -19,6 +19,13 @@ static int  find_password_start(view_common_password_t *password);
 static const button_t preamble[3] = {BUTTON_STOP, BUTTON_STOP, BUTTON_STOP};
 
 
+void view_common_set_label_text(lv_obj_t *lbl, const char *text) {
+    if (strcmp(text, lv_label_get_text(lbl))) {
+        lv_label_set_text(lbl, text);
+    }
+}
+
+
 const char *view_common_alarm_description(model_t *pmodel) {
     static char codice_generico[32] = {0};
     uint16_t    alarm_code          = model_alarm_code(pmodel);
@@ -379,6 +386,28 @@ int view_common_update_alarm_popup(model_t *pmodel, uint16_t *alarm, unsigned lo
     }
 
     return 0;
+}
+
+
+const char *view_require_payment_string(model_t *pmodel, int language) {
+    switch (pmodel->prog.parmac.tipo_gettoniera) {
+        case PAGAMENTO_1_LINEA_NA:
+        case PAGAMENTO_1_LINEA_NC:
+        case PAGAMENTO_2_LINEA_NA:
+        case PAGAMENTO_2_LINEA_NC:
+            return view_intl_get_string_from_language(language, STRINGS_PAGARE_GETTONE);
+
+        case PAGAMENTO_DIGITALE:
+        case PAGAMENTO_DIGITALE_LINEA_SINGOLA:
+            return view_intl_get_string_from_language(language, STRINGS_PAGARE_MONETA);
+
+        case PAGAMENTO_CASSA_NA:
+        case PAGAMENTO_CASSA_NC:
+            return view_intl_get_string_from_language(language, STRINGS_PAGARE_CASSA);
+
+        default:
+            return "";
+    }
 }
 
 

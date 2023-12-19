@@ -43,7 +43,6 @@ static void *create_page(model_t *model, void *extra) {
     (void)TAG;
     struct page_data *data = malloc(sizeof(struct page_data));
     data->par_to_save      = 0;
-    ESP_LOGI(TAG, "%i", model->run.livello_accesso_temporaneo);
     if (model->run.livello_accesso_temporaneo > 0) {
         data->livello_accesso                 = model->run.livello_accesso_temporaneo;
         model->run.livello_accesso_temporaneo = 0;
@@ -151,6 +150,11 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                         msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_SAVE_PARMAC;
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
                         break;
+
+                    case BUTTON_MENU:
+                        msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
+                        msg.vmsg.page = &page_machine_name;
+                        break;
                 }
             } else if (event.key_event.event == KEY_RELEASE) {
                 data->longpressing = 0;
@@ -170,7 +174,6 @@ static view_t update_page(model_t *pmodel, struct page_data *pdata) {
     char string[64] = {0};
 
     lv_label_set_text_fmt(pdata->lnum, "Param. %2i/%i", pdata->parameter + 1, pdata->num_parameters);
-    ESP_LOGI(TAG, "%zu %i", pdata->parameter, pdata->livello_accesso);
     lv_label_set_text(pdata->ldesc, parmac_get_description(pmodel, pdata->parameter, pdata->livello_accesso));
     parmac_format_value(pmodel, string, pdata->parameter, pdata->livello_accesso);
     lv_label_set_text(pdata->lval, string);

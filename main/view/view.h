@@ -33,6 +33,6 @@ extern const pman_page_t page_main, page_main_lab, page_test_digout, page_test_l
     page_program_type, page_program_steps, page_parlav, page_choice, page_choice_lab, page_work, page_work_lab,
     page_communication_settings, page_info, page_test_temperature, page_contrast, page_removable_drive, page_test_digin,
     page_test_heating, page_test_rotation, page_test_proximity, page_test_coin, page_test_led, page_test_oblo,
-    page_test_mems, page_test_liter_counter;
+    page_test_mems, page_test_liter_counter, page_machine_name;
 
 #endif

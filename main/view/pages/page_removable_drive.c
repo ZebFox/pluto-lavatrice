@@ -13,11 +13,12 @@
 #include "view/styles.h"
 
 
-#define NUM_LINES 5
+#define NUM_LINES 4
 
 
 typedef enum {
     ARCHIVE_OPERATION_NONE,
+    ARCHIVE_OPERATION_IN_PROGRESS,
     ARCHIVE_OPERATION_SUCCESS,
     ARCHIVE_OPERATION_FAILURE,
 } archive_operation_t;
@@ -26,8 +27,9 @@ typedef enum {
 struct page_data {
     windowed_list_t     list;
     lv_obj_t           *lines[NUM_LINES];
-    lv_obj_t           *lbl_message;
-    archive_operation_t operation;
+    lv_obj_t           *lbl_info;
+    archive_operation_t import_operation;
+    archive_operation_t export_operation;
 };
 
 
@@ -43,7 +45,8 @@ static void *create_page(model_t *model, void *extra) {
 static void open_page(model_t *pmodel, void *args) {
     struct page_data *pdata = args;
     pdata->list             = WINDOWED_LIST(NUM_LINES);
-    pdata->operation        = ARCHIVE_OPERATION_NONE;
+    pdata->import_operation = ARCHIVE_OPERATION_NONE;
+    pdata->export_operation = ARCHIVE_OPERATION_NONE;
 
     view_common_title(lv_scr_act(), view_intl_get_string(pmodel, STRINGS_ARCHIVIAZIONE));
 
@@ -56,12 +59,12 @@ static void open_page(model_t *pmodel, void *args) {
 
     lv_obj_t *lbl = lv_label_create(lv_scr_act(), NULL);
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
-    lv_label_set_long_mode(lbl, LV_LABEL_LONG_BREAK);
     lv_obj_set_style(lbl, &style_label_6x8);
-    lv_obj_set_width(lbl, LV_HOR_RES_MAX - 4);
-    lv_obj_set_auto_realign(lbl, 1);
-    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 4);
-    pdata->lbl_message = lbl;
+    lv_label_set_long_mode(lbl, LV_LABEL_LONG_SROLL_CIRC);
+    lv_obj_set_width(lbl, 128);
+    // lv_obj_set_auto_realign(lbl, 1);
+    lv_obj_align(lbl, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
+    pdata->lbl_info = lbl;
 
     update_page(pmodel, pdata);
 }
@@ -77,7 +80,10 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
             if (event.key_event.event == KEY_CLICK) {
                 switch (event.key_event.code) {
                     case BUTTON_STOP: {
-                        msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
+                        if (data->import_operation != ARCHIVE_OPERATION_IN_PROGRESS &&
+                            data->export_operation != ARCHIVE_OPERATION_IN_PROGRESS) {
+                            msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
+                        }
                         break;
                     }
 
@@ -89,10 +95,23 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                         break;
                     }
 
+                    case BUTTON_KEY: {
+                        if (model->system.removable_drive_state == REMOVABLE_DRIVE_STATE_MOUNTED &&
+                            data->export_operation == ARCHIVE_OPERATION_NONE) {
+                            data->export_operation = ARCHIVE_OPERATION_IN_PROGRESS;
+                            msg.cmsg.code          = VIEW_CONTROLLER_COMMAND_CODE_SAVE_ARCHIVE;
+                            update_page(model, data);
+                        }
+                        break;
+                    }
+
                     case BUTTON_LINGUA: {
-                        if (model->system.removable_drive_state == REMOVABLE_DRIVE_STATE_MOUNTED) {
+                        if (model->system.removable_drive_state == REMOVABLE_DRIVE_STATE_MOUNTED &&
+                            data->import_operation == ARCHIVE_OPERATION_NONE) {
                             strcpy(msg.cmsg.archive_name, model->system.archivi[data->list.index]);
-                            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_LOAD_ARCHIVE;
+                            data->import_operation = ARCHIVE_OPERATION_IN_PROGRESS;
+                            msg.cmsg.code          = VIEW_CONTROLLER_COMMAND_CODE_LOAD_ARCHIVE;
+                            update_page(model, data);
                         }
                         break;
                     }
@@ -123,12 +142,22 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
 
         case VIEW_EVENT_CODE_CONFIGURATION_LOADED:
             if (event.error) {
-                data->operation = ARCHIVE_OPERATION_FAILURE;
+                data->import_operation = ARCHIVE_OPERATION_FAILURE;
             } else {
-                data->operation = ARCHIVE_OPERATION_SUCCESS;
+                data->import_operation = ARCHIVE_OPERATION_SUCCESS;
             }
             update_page(model, data);
             break;
+
+        case VIEW_EVENT_CODE_CONFIGURATION_SAVED:
+            if (event.error) {
+                data->export_operation = ARCHIVE_OPERATION_FAILURE;
+            } else {
+                data->export_operation = ARCHIVE_OPERATION_SUCCESS;
+            }
+            update_page(model, data);
+            break;
+
 
         case VIEW_EVENT_CODE_DEVICE_UPDATE:
             update_page(model, data);
@@ -145,70 +174,109 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
 static view_t update_page(model_t *pmodel, struct page_data *pdata) {
     switch (pmodel->system.removable_drive_state) {
         case REMOVABLE_DRIVE_STATE_MISSING:
-            lv_obj_set_hidden(pdata->lbl_message, 0);
+            lv_obj_set_hidden(pdata->lbl_info, 0);
             for (size_t i = 0; i < NUM_LINES; i++) {
                 lv_obj_set_hidden(pdata->lines[i], 1);
             }
-            lv_label_set_text(pdata->lbl_message,
-                              view_intl_get_string(pmodel, STRINGS_INSERIRE_UN_DISPOSITIVO_DI_ARCHIVIAZIONE));
+            view_common_set_label_text(pdata->lbl_info,
+                                       view_intl_get_string(pmodel, STRINGS_INSERIRE_UN_DISPOSITIVO_DI_ARCHIVIAZIONE));
             break;
 
         case REMOVABLE_DRIVE_STATE_INVALID:
-            lv_obj_set_hidden(pdata->lbl_message, 0);
+            lv_obj_set_hidden(pdata->lbl_info, 0);
             for (size_t i = 0; i < NUM_LINES; i++) {
                 lv_obj_set_hidden(pdata->lines[i], 1);
             }
-            lv_label_set_text(
-                pdata->lbl_message,
+            view_common_set_label_text(
+                pdata->lbl_info,
                 view_intl_get_string(pmodel, STRINGS_DISPOSITIVO_RIMOSSO_PREMERE_MENU_PER_RIAVVIARE_LA_MACCHINA));
             break;
 
         case REMOVABLE_DRIVE_STATE_MOUNTED: {
-            switch (pdata->operation) {
-                case ARCHIVE_OPERATION_NONE: {
-                    if (pmodel->system.num_archivi > 0) {
-                        lv_obj_set_hidden(pdata->lbl_message, 1);
-                        for (size_t i = 0; i < NUM_LINES; i++) {
-                            size_t archive_index = pdata->list.start + i;
+            if (pdata->export_operation == ARCHIVE_OPERATION_NONE &&
+                pdata->import_operation == ARCHIVE_OPERATION_NONE) {
+                lv_obj_set_hidden(pdata->lbl_info, 0);
 
-                            if (archive_index >= pmodel->system.num_archivi) {
-                                lv_obj_set_hidden(pdata->lines[i], 1);
-                            } else {
-                                lv_obj_set_hidden(pdata->lines[i], 0);
-                                lv_label_set_text_fmt(pdata->lines[i], "%c %s",
-                                                      archive_index == pdata->list.index ? '>' : ' ',
-                                                      pmodel->system.archivi[archive_index]);
-                            }
-                        }
-                    } else {
-                        lv_obj_set_hidden(pdata->lbl_message, 0);
-                        for (size_t i = 0; i < NUM_LINES; i++) {
+                if (pmodel->system.num_archivi > 0) {
+                    for (size_t i = 0; i < NUM_LINES; i++) {
+                        size_t archive_index = pdata->list.start + i;
+
+                        if (archive_index >= pmodel->system.num_archivi) {
                             lv_obj_set_hidden(pdata->lines[i], 1);
+                        } else {
+                            lv_obj_set_hidden(pdata->lines[i], 0);
+                            lv_label_set_text_fmt(pdata->lines[i], "%c %s",
+                                                  archive_index == pdata->list.index ? '>' : ' ',
+                                                  pmodel->system.archivi[archive_index]);
                         }
-                        lv_label_set_text(pdata->lbl_message,
-                                          view_intl_get_string(pmodel, STRINGS_NESSUNA_CONFIGURAZIONE_TROVATA));
                     }
-                    break;
+
+                    view_common_set_label_text(
+                        pdata->lbl_info,
+                        view_intl_get_string(pmodel, STRINGS_CHIAVE_PER_ESPORTARE_BANDIERA_PER_IMPORTARE));
+                } else {
+                    lv_obj_set_hidden(pdata->lbl_info, 0);
+                    for (size_t i = 0; i < NUM_LINES; i++) {
+                        lv_obj_set_hidden(pdata->lines[i], 1);
+                    }
+                    view_common_set_label_text(pdata->lbl_info,
+                                               view_intl_get_string(pmodel, STRINGS_CHIAVE_PER_ESPORTARE));
+                }
+            } else if (pdata->export_operation == ARCHIVE_OPERATION_NONE) {
+                for (size_t i = 0; i < NUM_LINES; i++) {
+                    lv_obj_set_hidden(pdata->lines[i], 1);
                 }
 
-                case ARCHIVE_OPERATION_SUCCESS:
-                    lv_obj_set_hidden(pdata->lbl_message, 0);
-                    for (size_t i = 0; i < NUM_LINES; i++) {
-                        lv_obj_set_hidden(pdata->lines[i], 1);
-                    }
-                    lv_label_set_text(pdata->lbl_message,
-                                      view_intl_get_string(pmodel, STRINGS_CONFIGURAZIONE_CARICATA_CON_SUCCESSO));
-                    break;
+                switch (pdata->import_operation) {
+                    case ARCHIVE_OPERATION_NONE:
+                        view_common_set_label_text(pdata->lbl_info,
+                                                   view_intl_get_string(pmodel, STRINGS_CHIAVE_PER_ESPORTARE));
+                        break;
 
-                case ARCHIVE_OPERATION_FAILURE:
-                    lv_obj_set_hidden(pdata->lbl_message, 0);
-                    for (size_t i = 0; i < NUM_LINES; i++) {
-                        lv_obj_set_hidden(pdata->lines[i], 1);
-                    }
-                    lv_label_set_text(
-                        pdata->lbl_message,
-                        view_intl_get_string(pmodel, STRINGS_ERRORE_NEL_CARICAMENTO_DELLA_CONFIGURAZIONE));
-                    break;
+                    case ARCHIVE_OPERATION_IN_PROGRESS:
+                        view_common_set_label_text(pdata->lbl_info,
+                                                   view_intl_get_string(pmodel, STRINGS_OPERAZIONE_IN_CORSO));
+                        break;
+
+                    case ARCHIVE_OPERATION_SUCCESS:
+                        view_common_set_label_text(pdata->lbl_info,
+                                                   view_intl_get_string(pmodel, STRINGS_CONFIGURAZIONE_CARICATA_CON_SUCCESSO));
+                        break;
+
+                    case ARCHIVE_OPERATION_FAILURE:
+                        view_common_set_label_text(
+                            pdata->lbl_info,
+                            view_intl_get_string(pmodel, STRINGS_ERRORE_NEL_CARICAMENTO_DELLA_CONFIGURAZIONE));
+                        break;
+                }
+            } else if (pdata->import_operation == ARCHIVE_OPERATION_NONE) {
+                for (size_t i = 0; i < NUM_LINES; i++) {
+                    lv_obj_set_hidden(pdata->lines[i], 1);
+                }
+
+                switch (pdata->export_operation) {
+                    case ARCHIVE_OPERATION_NONE:
+                        view_common_set_label_text(pdata->lbl_info,
+                                                   view_intl_get_string(pmodel, STRINGS_CHIAVE_PER_ESPORTARE));
+                        break;
+
+                    case ARCHIVE_OPERATION_IN_PROGRESS:
+                        view_common_set_label_text(pdata->lbl_info,
+                                                   view_intl_get_string(pmodel, STRINGS_OPERAZIONE_IN_CORSO));
+                        break;
+
+                    case ARCHIVE_OPERATION_SUCCESS:
+                        view_common_set_label_text(
+                            pdata->lbl_info,
+                            view_intl_get_string(pmodel, STRINGS_CONFIGURAZIONE_ESPORTATA));
+                        break;
+
+                    case ARCHIVE_OPERATION_FAILURE:
+                        view_common_set_label_text(
+                            pdata->lbl_info,
+                            view_intl_get_string(pmodel, STRINGS_ERRORE_NEL_SALVATAGGIO_DELLA_CONFIGURAZIONE));
+                        break;
+                }
             }
             break;
         }

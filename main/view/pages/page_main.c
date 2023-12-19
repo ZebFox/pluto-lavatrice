@@ -401,19 +401,23 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, view_event_
                         break;
 
                     case BUTTON_MENO:
-                        if (pmodel->run.lingua > 0) {
-                            pmodel->run.lingua--;
-                        } else {
-                            pmodel->run.lingua = NUM_LINGUE - 1;
+                        if (!lv_obj_get_hidden(pdata->popup_language)) {
+                            if (pmodel->run.lingua > 0) {
+                                pmodel->run.lingua--;
+                            } else {
+                                pmodel->run.lingua = NUM_LINGUE - 1;
+                            }
+                            pdata->popup_language_ts = get_millis();
+                            update_language_popup(pmodel, pdata);
                         }
-                        pdata->popup_language_ts = get_millis();
-                        update_language_popup(pmodel, pdata);
                         break;
 
                     case BUTTON_PIU:
-                        pmodel->run.lingua       = (pmodel->run.lingua + 1) % NUM_LINGUE;
-                        pdata->popup_language_ts = get_millis();
-                        update_language_popup(pmodel, pdata);
+                        if (!lv_obj_get_hidden(pdata->popup_language)) {
+                            pmodel->run.lingua       = (pmodel->run.lingua + 1) % NUM_LINGUE;
+                            pdata->popup_language_ts = get_millis();
+                            update_language_popup(pmodel, pdata);
+                        }
                         break;
 
                     default:
@@ -567,11 +571,13 @@ static void update_status(model_t *pmodel, struct page_data *pdata) {
     if (view_common_update_alarm_popup(pmodel, &pdata->allarme, &pdata->alarm_ts, pdata->popup_alarm, pdata->lbl_alarm,
                                        pdata->lbl_alarm_code)) {
         lv_label_set_text(pdata->lbl_status, view_common_alarm_description(pmodel));
-    } else {
+    } else if (model_lavaggio_pagato(pmodel, pdata->index)) {
         lv_label_set_text(pdata->lbl_status,
                           view_intl_get_string_from_language(model_get_temporary_language(pmodel),
                                                              pdata->flag_status ? STRINGS_SCELTA_PROGRAMMA
                                                                                 : STRINGS_E_PREMERE_START));
+    } else {
+        lv_label_set_text(pdata->lbl_status, view_require_payment_string(pmodel, model_get_temporary_language(pmodel)));
     }
 }
 

@@ -91,7 +91,7 @@ static void open_page(model_t *model, void *args) {
     lv_label_set_text_fmt(data->lora, ":%02i:%02i:%02i", data->datetime.tm_hour, data->datetime.tm_min,
                           data->datetime.tm_sec);
     lv_label_set_text_fmt(data->ldata, ":%02i/%02i/%02i", data->datetime.tm_mday, data->datetime.tm_mon + 1,
-                          data->datetime.tm_year - 100);
+                          data->datetime.tm_year % 100);
     lv_label_set_text(data->lday, get_string_day(model, data));
 }
 
@@ -253,18 +253,20 @@ static void time_op(model_t *pmodel, struct page_data *data, int op) {
         }
         case (10): {
             int newyear = data->datetime.tm_year + op * 10;
-            if (newyear >= 100 && newyear < 200) {
-                data->datetime.tm_year = newyear;
-                mktime(&data->datetime);
+            if (newyear < 100 || newyear >= 200) {
+                newyear = (newyear % 100) + 100;
             }
+            data->datetime.tm_year = newyear;
+            mktime(&data->datetime);
             break;
         }
         case (11): {
             int newyear = data->datetime.tm_year + op;
-            if (newyear >= 100 && newyear < 200) {
-                data->datetime.tm_year = newyear;
-                mktime(&data->datetime);
+            if (newyear < 100 || newyear >= 200) {
+                newyear = (newyear % 100) + 100;
             }
+            data->datetime.tm_year = newyear;
+            mktime(&data->datetime);
             break;
         }
     }
@@ -287,8 +289,8 @@ static void timedata_update(model_t *pmodel, struct page_data *data) {
     timedata[7]  = (data->datetime.tm_mday % 10) + 48;
     timedata[8]  = ((data->datetime.tm_mon + 1) / 10) + 48;
     timedata[9]  = ((data->datetime.tm_mon + 1) % 10) + 48;
-    timedata[10] = ((data->datetime.tm_year - 100) / 10) + 48;
-    timedata[11] = ((data->datetime.tm_year - 100) % 10) + 48;
+    timedata[10] = ((data->datetime.tm_year % 100) / 10) + 48;
+    timedata[11] = ((data->datetime.tm_year % 100) % 10) + 48;
 
     char weekday[STRING_MAX_LEN] = {0};
     memcpy(weekday, get_string_day(pmodel, data), strlen(get_string_day(pmodel, data)));

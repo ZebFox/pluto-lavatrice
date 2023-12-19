@@ -5,6 +5,16 @@
 #include "model/model.h"
 #include "model/programs.h"
 #include "microtar.h"
+#include "peripherals/fs_storage.h"
+
+
+#define BASE_PATH              LITTLEFS_PARTITION_PATH
+#define DATA_PATH              BASE_PATH "/data"
+#define PROGRAMS_PATH          (DATA_PATH "/programmi")
+#define PARAMS_PATH            (DATA_PATH "/parametri")
+#define PATH_FILE_INDICE       (DATA_PATH "/programmi/index.txt")
+#define PATH_FILE_PARMAC       (DATA_PATH "/parametri/parmac.bin")
+#define PATH_FILE_DATA_VERSION (DATA_PATH "/version.txt")
 
 
 void configuration_init(void);

@@ -8,7 +8,7 @@
 #include "parmac.h"
 #include "descriptions/AUTOGEN_FILE_pars.h"
 
-#define NUM_PARAMETERS 106
+#define NUM_PARAMETERS 107
 
 enum {
     LIVELLO_ACCESSO_ESTESI  = 0,
@@ -26,13 +26,14 @@ void parmac_init(model_t *pmodel, int reset) {
     parmac_t           *p  = &pmodel->prog.parmac;
     parameter_handle_t *ps = parameters;
 
-    char *fmt_sec  = "%i s";
-    char *fmt_min  = "%i min";
-    char *fmt_cm   = "%i cm";
-    char *fmt_perc = "%i %%";
-    char *fmt_lt   = "%i lt";
-    char *fmt_C    = "%i C";
-    char *fmt_rpm  = "%i rpm";
+    char *fmt_dec_sec = "%i dsec";
+    char *fmt_sec     = "%i s";
+    char *fmt_min     = "%i min";
+    char *fmt_cm      = "%i cm";
+    char *fmt_perc    = "%i %%";
+    char *fmt_lt      = "%i lt";
+    char *fmt_C       = "%i C";
+    char *fmt_rpm     = "%i rpm";
 
     // clang-format off
     ps[i++] = PARAMETER(&p->lingua, 0, NUM_LINGUE - 1, 0, FOPT(PARS_DESCRIPTIONS_LINGUA, pars_lingue), BIT_UTENTE);
@@ -56,10 +57,11 @@ void parmac_init(model_t *pmodel, int reset) {
     ps[i++] = PARAMETER(&p->abilitazione_sblocco_get, 0, 1, 0, FOPT(PARS_DESCRIPTIONS_SBLOCCO_GETTONIERA, pars_abilitazione), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->secondi_pausa, 0, 10, 1, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_PAUSA, fmt_sec), BIT_UTENTE);
     ps[i++] = PARAMETER(&p->secondi_stop, 0, 10, 3, FFINT(PARS_DESCRIPTIONS_TEMPO_TASTO_STOP, fmt_sec), BIT_UTENTE);
+    ps[i++]= PARAMETER(&p->tempo_out_pagine, 3, 60, 20, FFINT(PARS_DESCRIPTIONS_TEMPO_OUT_PAGINE, fmt_sec), BIT_TECNICO);
     ps[i++] = PARAMETER(&p->tempo_allarme_livello, 1, 100, 30, FFINT(PARS_DESCRIPTIONS_TEMPO_ALLARME_LIVELLO, fmt_min), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_allarme_temperatura, 1, 100, 45, FFINT(PARS_DESCRIPTIONS_TEMPO_ALLARME_TEMPERATURA, fmt_min), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_allarme_scarico, 1, 100, 45, FFINT(PARS_DESCRIPTIONS_TEMPO_ALLARME_SCARICO, fmt_min), BIT_COSTRUTTORE);
-    ps[i++] = PARAMETER(&p->tempo_ritardo_micro_oblo, 0, 240, 15, FFINT(PARS_DESCRIPTIONS_TEMPO_RITARDO_MICRO_OBLO, fmt_sec), BIT_COSTRUTTORE);
+    ps[i++] = PARAMETER(&p->tempo_ritardo_micro_oblo, 0, 240, 15, FFINT(PARS_DESCRIPTIONS_TEMPO_RITARDO_MICRO_OBLO, fmt_dec_sec), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_precarica, 0, 240, 10, FTIME(PARS_DESCRIPTIONS_TEMPO_PRECARICA), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_h2o_pulizia_saponi, 0, 240, 10, FTIME(PARS_DESCRIPTIONS_TEMPO_PULIZIA_SAPONI), BIT_COSTRUTTORE);
     ps[i++] = PARAMETER(&p->tempo_tasto_carico_saponi, 0, 240, 5, FTIME(PARS_DESCRIPTIONS_TEMPO_CARICO_SAPONI), BIT_COSTRUTTORE);
@@ -162,7 +164,6 @@ void parmac_init(model_t *pmodel, int reset) {
         {.t = unsigned_int, .d = {.uint = {0, 1, 0, &parmac->visualizzazione_help_5}}, .display={.string_value=(const char ***)stringhe_abilitazione}, .lvl = BIT_DISTRIBUTORE, .runtime = {.userdata = SWITCH_PARAMETER}},
         {.t = unsigned_int, .d = {.uint = {0, 1, 0, &parmac->visualizzazione_opl}}, .display={.string_value=(const char ***)stringhe_abilitazione}, .lvl = BIT_COSTRUTTORE, .runtime = {.userdata = SWITCH_PARAMETER}},
         {.t = unsigned_int, .d = {.uint = {0, 3, 0, &parmac->visualizzazione_tot_cicli}}, .display = {.string_value = (const char ***)stringhe_totale_cicli}, .lvl = BIT_COSTRUTTORE, .runtime = {.userdata = DROPLIST_PARAMETER}},
-        {.t = unsigned_int, .d = {.uint = {3, 60, 20, &parmac->tempo_out_pagine}}, .display = {.format = (const char **)secondi}, .lvl = BIT_COSTRUTTORE, .runtime = {.userdata = NUMBER_PARAMETER}},
         // Parametri non visualizzati nella lista con gli altri
         {.t = unsigned_int, .d = {.uint = {0, 1, 0, &parmac->visualizzazione_data_ora}}, .lvl = BIT_NESSUNO},
         {.t = unsigned_int, .d = {.uint = {0, 1, 0, &parmac->visualizzazione_pedante}}, .lvl = BIT_NESSUNO},

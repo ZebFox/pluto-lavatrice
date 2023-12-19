@@ -23,6 +23,7 @@ struct page_data {
 
     uint16_t allarme;
     uint16_t number;
+    uint16_t previous_credit;
 };
 
 
@@ -32,22 +33,24 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
             pdata->allarme = model_alarm_code(pmodel);
             lv_label_set_text(pdata->lbl_status, view_common_alarm_description(pmodel));
         }
-    } else {
+    } else if (model_lavaggio_pagato(pmodel, pdata->number)) {
         lv_label_set_text(pdata->lbl_status, view_intl_get_string_from_language(model_get_temporary_language(pmodel),
                                                                                 STRINGS_SCELTA_PROGRAMMA));
+    } else {
+        lv_label_set_text(pdata->lbl_status, view_require_payment_string(pmodel, model_get_temporary_language(pmodel)));
     }
 
-    const programma_preview_t *preview    = model_get_preview(pmodel, pdata->number);
-    char                       string[32] = {0};
-    model_formatta_prezzo(string, pmodel, preview->prezzo);
+    char string[32] = {0};
+    model_formatta_prezzo(string, pmodel, model_get_credito(pmodel));
+    lv_label_set_text(pdata->lbl_credit, string);
     lv_label_set_text(pdata->lbl_credit, string);
 }
 
 
 static void *create_page(model_t *model, void *extra) {
     struct page_data *pdata = malloc(sizeof(struct page_data));
-    pdata->timer            = view_register_periodic_task(5000UL, LV_TASK_PRIO_OFF, 0);
-    pdata->number           = (uint16_t)(uint32_t)extra;
+    pdata->timer  = view_register_periodic_task(model->prog.parmac.tempo_out_pagine * 1000UL, LV_TASK_PRIO_OFF, 0);
+    pdata->number = (uint16_t)(uint32_t)extra;
     return pdata;
 }
 
@@ -55,6 +58,7 @@ static void *create_page(model_t *model, void *extra) {
 static void open_page(model_t *pmodel, void *args) {
     struct page_data *pdata = args;
     pdata->allarme          = 0;
+    pdata->previous_credit  = model_get_credito(pmodel);
     lv_task_set_prio(pdata->timer, LV_TASK_PRIO_MID);
 
     const programma_preview_t *preview = model_get_preview(pmodel, pdata->number);
@@ -83,16 +87,18 @@ static void open_page(model_t *pmodel, void *args) {
     lv_obj_set_style(lbl, &style_label_8x16);
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
     lv_obj_set_auto_realign(lbl, 1);
+    char string[32] = {0};
+    model_formatta_prezzo(string, pmodel, preview->prezzo);
+    lv_label_set_text(lbl, string);
+
     lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, -10);
-    pdata->lbl_credit = lbl;
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_8x16);
     lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
-    char string[32] = {0};
-    model_formatta_prezzo(string, pmodel, model_get_credito(pmodel));
-    lv_label_set_text(lbl, string);
+    lv_obj_set_auto_realign(lbl, 1);
     lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 2);
+    pdata->lbl_credit = lbl;
 
     lv_obj_t *line = view_common_horizontal_line();
     lv_obj_align(line, NULL, LV_ALIGN_IN_TOP_MID, 0, 10);
@@ -118,6 +124,11 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
             break;
 
         case VIEW_EVENT_CODE_MODEL_UPDATE:
+            if (model_get_credito(pmodel) != pdata->previous_credit) {
+                lv_task_reset(pdata->timer);
+                pdata->previous_credit = model_get_credito(pmodel);
+            }
+
             if (!model_macchina_in_stop(pmodel) && model_can_work(pmodel)) {
                 msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                 msg.vmsg.page = (void *)view_work_page(pmodel);
@@ -144,7 +155,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         break;
 
                     case BUTTON_START:
-                        if (model_lavaggio_pagato(pmodel)) {
+                        if (model_lavaggio_pagato(pmodel, pdata->number)) {
                             msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_START_PROGRAM;
                         } else {
                             ESP_LOGI(TAG, "Missing credit!");

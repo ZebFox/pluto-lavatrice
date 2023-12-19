@@ -49,8 +49,7 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
     lv_label_set_text(pdata->lbl_step, view_common_step2str(pmodel, step->tipo));
 
     uint16_t rimanente = pmodel->run.macchina.rimanente;
-    lv_label_set_text_fmt(pdata->lbl_remaining, "%02im%02is [%i %i]", rimanente / 60, rimanente % 60,
-                          pmodel->run.macchina.temperatura, model_get_livello(pmodel));
+    lv_label_set_text_fmt(pdata->lbl_remaining, "%02im%02is", rimanente / 60, rimanente % 60);
 
     rimanente = model_program_remaining(pmodel);
     lv_label_set_text_fmt(pdata->lbl_total_remaining, "%02im%02is", rimanente / 60, rimanente % 60);
@@ -141,8 +140,7 @@ static void open_page(model_t *pmodel, void *args) {
 
     lv_obj_t *img = custom_lv_img_create(lv_scr_act(), NULL);
     custom_lv_img_set_src(img, &legacy_img_time);
-    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_MID, -48, 12);
-    // -16
+    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_MID, -16, 12);
 
     lbl = lv_label_create(lv_scr_act(), NULL);
     lv_obj_set_style(lbl, &style_label_6x8);

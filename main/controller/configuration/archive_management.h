@@ -11,6 +11,7 @@
 int    archive_management_list_archives(const char *path, char ***strings);
 size_t archive_management_copy_archive_names(char **strings, name_t **archives, size_t len);
 int    archive_management_extract_configuration(const char *zipped_archive);
+int    archive_management_save_configuration(const char *path, const char *name);
 
 
 #endif

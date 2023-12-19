@@ -425,6 +425,7 @@ static int task_gestisci_richiesta(machine_request_t request) {
         }
 
         case MACHINE_REQUEST_CODE_SCRIVI_PARAMETRI_MACCHINA: {
+            ESP_LOGI(TAG, "Invio parametri macchina");
             uint8_t buffer[116] = {0};
             int     len         = model_pack_parametri_macchina(buffer, request.parmac);
             assert(len == sizeof(buffer));

@@ -21,10 +21,10 @@ enum {
 
 
 struct page_data {
-    lv_obj_t * lora;
-    lv_obj_t * ldata;
+    lv_obj_t  *lora;
+    lv_obj_t  *ldata;
     lv_task_t *task;
-    lv_obj_t * lday;
+    lv_obj_t  *lday;
 
     struct tm time;
 };
@@ -71,7 +71,7 @@ static void open_page(model_t *model, void *args) {
     utils_get_sys_time(&data->time);
     lv_label_set_text_fmt(data->lora, ":%02i:%02i:%02i", data->time.tm_hour, data->time.tm_min, data->time.tm_sec);
     lv_label_set_text_fmt(data->ldata, ":%02i/%02i/%02i", data->time.tm_mday, data->time.tm_mon + 1,
-                          data->time.tm_year - 100);
+                          data->time.tm_year % 100);
     lv_label_set_text(data->lday, get_string_day(model, &data->time));
 }
 
@@ -98,7 +98,7 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
             lv_label_set_text_fmt(data->lora, ":%02i:%02i:%02i", data->time.tm_hour, data->time.tm_min,
                                   data->time.tm_sec);
             lv_label_set_text_fmt(data->ldata, ":%02i/%02i/%02i", data->time.tm_mday, data->time.tm_mon + 1,
-                                  data->time.tm_year - 100);
+                                  data->time.tm_year % 100);
             lv_label_set_text(data->lday, get_string_day(model, &data->time));
 
         } break;

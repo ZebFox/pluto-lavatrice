@@ -428,7 +428,7 @@ int                        model_macchina_in_marcia(model_t *model);
 int                        model_step_finito(model_t *model);
 int                        model_lavaggio_finito(model_t *model);
 uint16_t                   model_get_livello_centimetri(model_t *pmodel);
-int                        model_lavaggio_pagato(model_t *pmodel);
+int                        model_lavaggio_pagato(model_t *pmodel, size_t num_prog);
 parametri_step_t          *model_get_program_step(model_t *pmodel, size_t num);
 void                       model_deserialize_statistics(statistics_t *stats, uint8_t *buffer);
 int                        model_is_communication_ok(model_t *pmodel);

@@ -34,6 +34,7 @@
 
 typedef enum {
     TASK_MESSAGE_CODE_LOAD_ARCHIVE,
+    TASK_MESSAGE_CODE_SAVE_ARCHIVE,
 } task_message_code_t;
 
 
@@ -93,7 +94,7 @@ void msc_init(void) {
     msc_install_host_lib();
 
     static StaticTask_t static_task;
-    static StackType_t  task_stack[APP_CONFIG_BASE_TASK_STACK_SIZE * 8] = {0};
+    static StackType_t  task_stack[APP_CONFIG_BASE_TASK_STACK_SIZE * 10] = {0};
     xTaskCreateStatic(msc_task, TAG, sizeof(task_stack) / sizeof(task_stack[0]), NULL, 2, task_stack, &static_task);
 
     static StaticTask_t static_host_lib_task;
@@ -138,6 +139,13 @@ void msc_extract_archive(name_t archive) {
 }
 
 
+void msc_save_archive(name_t archive) {
+    task_message_t message = {.code = TASK_MESSAGE_CODE_SAVE_ARCHIVE};
+    strcpy(message.archive_name, archive);
+    xQueueSend(message_queue, &message, portMAX_DELAY);
+}
+
+
 int msc_get_response(msc_response_t *response) {
     return xQueueReceive(response_queue, response, 0) == pdTRUE;
 }
@@ -166,7 +174,7 @@ static void msc_install_host_lib(void) {
 static void msc_install_device(uint8_t device_address) {
     ESP_ERROR_CHECK(msc_host_install_device(device_address, &msc_device));
 
-    msc_host_print_descriptors(msc_device);
+    //msc_host_print_descriptors(msc_device);
 
     msc_host_device_info_t info;
     ESP_ERROR_CHECK(msc_host_get_device_info(msc_device, &info));
@@ -258,6 +266,13 @@ static void msc_task(void *args) {
                     snprintf(string, sizeof(string), "%s/%s%s", MOUNTPOINT, message.archive_name, ARCHIVE_SUFFIX);
                     msc_response_t response = {.code = MSC_RESPONSE_CODE_ARCHIVE_EXTRACTION_COMPLETE};
                     response.error          = archive_management_extract_configuration(string);
+                    xQueueSend(response_queue, &response, portMAX_DELAY);
+                    break;
+                }
+
+                case TASK_MESSAGE_CODE_SAVE_ARCHIVE: {
+                    msc_response_t response = {.code = MSC_RESPONSE_CODE_ARCHIVE_SAVING_COMPLETE};
+                    response.error          = archive_management_save_configuration(MOUNTPOINT, message.archive_name);
                     xQueueSend(response_queue, &response, portMAX_DELAY);
                     break;
                 }

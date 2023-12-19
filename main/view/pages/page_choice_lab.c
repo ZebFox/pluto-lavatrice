@@ -23,6 +23,7 @@ struct page_data {
 
     uint16_t allarme;
     uint16_t number;
+    uint16_t previous_credit;
 };
 
 
@@ -45,8 +46,8 @@ static void update_page(model_t *pmodel, struct page_data *pdata) {
 
 static void *create_page(model_t *model, void *extra) {
     struct page_data *pdata = malloc(sizeof(struct page_data));
-    pdata->timer            = view_register_periodic_task(5000UL, LV_TASK_PRIO_OFF, 0);
-    pdata->number           = (uint16_t)(uint32_t)extra;
+    pdata->timer  = view_register_periodic_task(model->prog.parmac.tempo_out_pagine * 1000UL, LV_TASK_PRIO_OFF, 0);
+    pdata->number = (uint16_t)(uint32_t)extra;
     return pdata;
 }
 
@@ -54,6 +55,7 @@ static void *create_page(model_t *model, void *extra) {
 static void open_page(model_t *pmodel, void *args) {
     struct page_data *pdata = args;
     pdata->allarme          = 0;
+    pdata->previous_credit  = model_get_credito(pmodel);
     lv_task_set_prio(pdata->timer, LV_TASK_PRIO_MID);
 
     const programma_preview_t *preview = model_get_preview(pmodel, pdata->number);
@@ -148,6 +150,11 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
             break;
 
         case VIEW_EVENT_CODE_MODEL_UPDATE:
+            if (model_get_credito(pmodel) != pdata->previous_credit) {
+                lv_task_reset(pdata->timer);
+                pdata->previous_credit = model_get_credito(pmodel);
+            }
+
             if (!model_macchina_in_stop(pmodel) && model_can_work(pmodel)) {
                 msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_CHANGE_PAGE;
                 msg.vmsg.page = (void *)view_work_page(pmodel);
@@ -174,7 +181,7 @@ static view_message_t process_page_event(model_t *pmodel, void *arg, pman_event_
                         break;
 
                     case BUTTON_START:
-                        if (model_lavaggio_pagato(pmodel)) {
+                        if (model_lavaggio_pagato(pmodel, pdata->number)) {
                             msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_START_PROGRAM;
                         } else {
                             ESP_LOGI(TAG, "Missing credit!");

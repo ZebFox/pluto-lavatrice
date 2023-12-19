@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define COMPATIBILITY_VERSION 3
+
 void storage_init(void);
 
 int  storage_load_uint8(uint8_t *value, char *key);

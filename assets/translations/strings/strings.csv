@@ -3,6 +3,8 @@ Identificatore, Italiano, Inglese
 INSERIRE_MONETA, Inserire moneta, Insert coin
 INSERIRE_GETTONE, Inserire gettone, Insert token
 PAGARE_CASSA, Pagare cassa, Pay at desk
+PAGARE_GETTONE, Pagare gettone, Insert token 
+PAGARE_MONETA, Pagare moneta, Insert coin 
 SCELTA_PROGRAMMA, Scelta programma, Choose program
 E_PREMERE_START, e premere start, and press start
 MACCHINA_AL_LAVORO, al  lavoro, al  lavoro
@@ -164,7 +166,12 @@ ARCHIVIAZIONE, ARCHIVIAZIONE, STORAGE
 INSERIRE_UN_DISPOSITIVO_DI_ARCHIVIAZIONE, Inserire un dispositivo di archiviazione, Insert a storage device
 DISPOSITIVO_RIMOSSO_PREMERE_MENU_PER_RIAVVIARE_LA_MACCHINA, Dispositivo rimosso; premere menu' per riavviare la macchina, Device removed; press menu' to reset the machine
 NESSUNA_CONFIGURAZIONE_TROVATA, Nessuna configurazione trovata, No configuration found
+CHIAVE_PER_ESPORTARE, Chiave per esportare, Key to export
+CHIAVE_PER_ESPORTARE_BANDIERA_PER_IMPORTARE, Chiave per esportare - Bandiera per importare, Key to export - Flag to import
+CONFIGURAZIONE_ESPORTATA, Configurazione esportata, Configuration saved
+OPERAZIONE_IN_CORSO, Operazione in corso, Processing
 CONFIGURAZIONE_CARICATA_CON_SUCCESSO, Configurazione caricata con successo, Configuration successfully loaded
 ERRORE_NEL_CARICAMENTO_DELLA_CONFIGURAZIONE, Errore nel caricamento della configurazione, Configuration load failed
+ERRORE_NEL_SALVATAGGIO_DELLA_CONFIGURAZIONE, Errore nel salvataggio della configurazione, Configuration save failed
 APRI_E_SVUOTA, Aprire oblo' e svuotare cesto, Open and empty 
 FRENATA_IN_CORSO, Frenata in corso, Stopping

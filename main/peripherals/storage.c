@@ -5,9 +5,9 @@
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include "esp_log.h"
+#include "storage.h"
 
 #define COMPATIBILITY_KEY     "COMPATIBILITY"
-#define COMPATIBILITY_VERSION 3
 
 
 static const char *TAG = "Storage";

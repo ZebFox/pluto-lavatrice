@@ -4,12 +4,17 @@
 #include <string.h>
 #include "model.h"
 #include "gel/serializer/serializer.h"
+#include "esp_log.h"
 
 
 static unsigned int get_credito_macchina(model_t *model);
 
 
+static const char *TAG = "Model";
+
+
 void model_init(model_t *pmodel) {
+    (void)TAG;
     memset(pmodel, 0, sizeof(model_t));
     pmodel->system.comunicazione_abilitata = 1;
     pmodel->system.removable_drive_state   = REMOVABLE_DRIVE_STATE_MISSING;
@@ -17,6 +22,8 @@ void model_init(model_t *pmodel) {
     pmodel->run.maybe_programma            = 0;
     pmodel->run.f_richiedi_scarico         = 0;
     pmodel->prog.contrast                  = 0x1A;
+
+    strcpy(pmodel->prog.parmac.nome, "Pluto");
 }
 
 
@@ -376,7 +383,7 @@ int model_gettoniera_digitale_abilitata(model_t *pmodel) {
 }
 
 
-int model_lavaggio_pagato(model_t *pmodel) {
+int model_lavaggio_pagato(model_t *pmodel, size_t num_prog) {
     assert(pmodel != NULL);
     if (pmodel->prog.parmac.tipo_gettoniera == PAGAMENTO_NESSUNO) {
         return 1;
@@ -384,15 +391,12 @@ int model_lavaggio_pagato(model_t *pmodel) {
         return 1;
     } else if (pmodel->prog.parmac.prezzo_unico) {
         return model_get_credito(pmodel) >= pmodel->prog.parmac.valore_prezzo_unico;
+    } else if (num_prog < pmodel->prog.num_programmi) {
+        const programma_preview_t *p = &pmodel->prog.preview_programmi[num_prog];
+        return model_get_credito(pmodel) >= p->prezzo;
     } else {
-        const programma_lavatrice_t *p = model_get_program(pmodel);
-        if (p) {
-            return model_get_credito(pmodel) >= p->prezzo;
-        } else {
-            return 0;
-        }
+        return 0;
     }
-    return 0;
 }
 
 
@@ -474,6 +478,7 @@ int model_is_level_in_cm(parmac_t *parmac) {
 size_t model_serialize_parmac(uint8_t *buffer, parmac_t *p) {
     size_t i = 0;
 
+    ESP_LOGI(TAG, "Nome macchina in salvataggio %s", p->nome);
     memcpy(&buffer[i], p->nome, sizeof(name_t));
     i += sizeof(name_t);
 
@@ -610,6 +615,7 @@ size_t model_deserialize_parmac(parmac_t *p, uint8_t *buffer) {
 
     memcpy(p->nome, &buffer[i], sizeof(name_t));
     i += sizeof(name_t);
+    ESP_LOGI(TAG, "Nome macchina in caricamento %s", p->nome);
 
     i += UNPACK_UINT16_BE(p->lingua, &buffer[i]);
     i += UNPACK_UINT16_BE(p->lingua_max_bandiera, &buffer[i]);
