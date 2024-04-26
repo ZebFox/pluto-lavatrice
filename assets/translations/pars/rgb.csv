@@ -1,9 +1,9 @@
-Identificatore, Italiano, Inglese
-SPENTO, Spento, Off
-BLU, Blu, Blue
-VERDE, Verde, Green
-AZZURRO, Azzurro, Cyan
-ROSSO, Rosso, Red
-VIOLA, Viola, Purple
-GIALLO, Giallo, Yellow
-BIANCO, Bianco, White
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+SPENTO, Spento, Off, Apagado, Arrêt, Aus
+BLU, Blu, Blue, Azul, Bleu, Blau
+VERDE, Verde, Green, Verde, Vert, Grün
+AZZURRO, Azzurro, Cyan, Azul, azur, Azurblau
+ROSSO, Rosso, Red, Rojo, Rouge, Rot
+VIOLA, Viola, Purple, Morado, Pourpre, Lila
+GIALLO, Giallo, Yellow, Amarillo, Jaune, Gelb
+BIANCO, Bianco, White, Blanco, Blanc, Weiß

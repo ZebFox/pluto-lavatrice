@@ -1,4 +1,4 @@
-Identificatore, Italiano, Inglese
-NON_GESTITA, Non gestita, Not managed
-COMMUTA_START, Commuta allo start, Changes on start
-COMMUTA_PAGAMENTo, Commuta al pagamento, Changes on payment
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+NON_GESTITA, Non gestita, Not managed, No gestionado, Non géré, Nicht verwaltet
+COMMUTA_START, Commuta allo start, Changes on start, Cambio al inicio, Commutation au démarrage, Wechsel beim Start
+COMMUTA_PAGAMENTo, Commuta al pagamento, Changes on payment, Cambio en el momento del pago, Commutation au moment du paiement, Umschalten bei Zahlung

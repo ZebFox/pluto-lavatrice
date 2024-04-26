@@ -4,9 +4,12 @@
 typedef enum {
     PARS_LINGUE_ITALIANO = 0,
     PARS_LINGUE_INGLESE,
+    PARS_LINGUE_SPAGNOLO,
+    PARS_LINGUE_FRANCESE,
+    PARS_LINGUE_TEDESCO,
 } pars_lingue_t;
 
-extern const char *pars_lingue[2][2];
+extern const char *pars_lingue[5][5];
 typedef enum {
     PARS_LOGHI_NESSUNO = 0,
     PARS_LOGHI_MS,
@@ -16,7 +19,7 @@ typedef enum {
     PARS_LOGHI_HOOVER,
 } pars_loghi_t;
 
-extern const char *pars_loghi[6][2];
+extern const char *pars_loghi[6][5];
 typedef enum {
     PARS_GETTONIERA_NESSUNO = 0,
     PARS_GETTONIERA_GETT1_NA,
@@ -29,21 +32,23 @@ typedef enum {
     PARS_GETTONIERA_CASSA_NC,
 } pars_gettoniera_t;
 
-extern const char *pars_gettoniera[9][2];
+extern const char *pars_gettoniera[9][5];
 typedef enum {
     PARS_ACCELEROMETRO_DISABILITATO = 0,
     PARS_ACCELEROMETRO_UNA_VELOCITA,
     PARS_ACCELEROMETRO_DUE_VELOCITA,
     PARS_ACCELEROMETRO_TRE_VELOCITA,
+    PARS_ACCELEROMETRO_SOGLIE_DELTA,
+    PARS_ACCELEROMETRO_HI_SOGLIE,
 } pars_accelerometro_t;
 
-extern const char *pars_accelerometro[4][2];
+extern const char *pars_accelerometro[6][5];
 typedef enum {
     PARS_DIRETTO_INDIRETTO_DIRETTO = 0,
     PARS_DIRETTO_INDIRETTO_INDIRETTO,
 } pars_diretto_indiretto_t;
 
-extern const char *pars_diretto_indiretto[2][2];
+extern const char *pars_diretto_indiretto[2][5];
 typedef enum {
     PARS_LIVELLO_ACCESSO_UTENTE = 0,
     PARS_LIVELLO_ACCESSO_TECNICO,
@@ -51,7 +56,7 @@ typedef enum {
     PARS_LIVELLO_ACCESSO_COSTRUTTORE,
 } pars_livello_accesso_t;
 
-extern const char *pars_livello_accesso[4][2];
+extern const char *pars_livello_accesso[4][5];
 typedef enum {
     PARS_AUSILIARI_SBLOCCO_PAGAMENTO = 0,
     PARS_AUSILIARI_STANDBY_SAPONI,
@@ -63,7 +68,7 @@ typedef enum {
     PARS_AUSILIARI_RISCALDAMENTO_INDIRETTO,
 } pars_ausiliari_t;
 
-extern const char *pars_ausiliari[8][2];
+extern const char *pars_ausiliari[8][5];
 typedef enum {
     PARS_SCALA_ACCELEROMETRO_0 = 0,
     PARS_SCALA_ACCELEROMETRO_1,
@@ -73,7 +78,7 @@ typedef enum {
     PARS_SCALA_ACCELEROMETRO_5,
 } pars_scala_accelerometro_t;
 
-extern const char *pars_scala_accelerometro[6][2];
+extern const char *pars_scala_accelerometro[6][5];
 typedef enum {
     PARS_TIPO_PAGAMENTO_NESSUNO = 0,
     PARS_TIPO_PAGAMENTO_PREZZO,
@@ -82,20 +87,20 @@ typedef enum {
     PARS_TIPO_PAGAMENTO_RIMANENTE_E_CREDITO,
 } pars_tipo_pagamento_t;
 
-extern const char *pars_tipo_pagamento[5][2];
+extern const char *pars_tipo_pagamento[5][5];
 typedef enum {
     PARS_TIPO_LIVELLO_CENTIMETRI = 0,
     PARS_TIPO_LIVELLO_UN_CONTALITRI,
     PARS_TIPO_LIVELLO_DUE_CONTALITRI,
 } pars_tipo_livello_t;
 
-extern const char *pars_tipo_livello[3][2];
+extern const char *pars_tipo_livello[3][5];
 typedef enum {
     PARS_NA_NC_NA = 0,
     PARS_NA_NC_NC,
 } pars_na_nc_t;
 
-extern const char *pars_na_nc[2][2];
+extern const char *pars_na_nc[2][5];
 typedef enum {
     PARS_RGB_SPENTO = 0,
     PARS_RGB_BLU,
@@ -107,13 +112,13 @@ typedef enum {
     PARS_RGB_BIANCO,
 } pars_rgb_t;
 
-extern const char *pars_rgb[8][2];
+extern const char *pars_rgb[8][5];
 typedef enum {
     PARS_ABILITAZIONE_DISABILITATO = 0,
     PARS_ABILITAZIONE_ABILITATO,
 } pars_abilitazione_t;
 
-extern const char *pars_abilitazione[2][2];
+extern const char *pars_abilitazione[2][5];
 typedef enum {
     PARS_TIPO_SERRATURA_NUOVA_TRE_MICRO_LIVELLO = 0,
     PARS_TIPO_SERRATURA_BOBINA_UN_MICRO_LIVELLO,
@@ -121,19 +126,19 @@ typedef enum {
     PARS_TIPO_SERRATURA_BOBINA_UN_MICRO_NO_LIVELLO,
 } pars_tipo_serratura_t;
 
-extern const char *pars_tipo_serratura[4][2];
+extern const char *pars_tipo_serratura[4][5];
 typedef enum {
     PARS_TIPO_INVERTER_AVANTI_INDIETRO = 0,
     PARS_TIPO_INVERTER_MARCIA_DIREZIONE,
 } pars_tipo_inverter_t;
 
-extern const char *pars_tipo_inverter[2][2];
+extern const char *pars_tipo_inverter[2][5];
 typedef enum {
     PARS_NC_NA_NC = 0,
     PARS_NC_NA_NA,
 } pars_nc_na_t;
 
-extern const char *pars_nc_na[2][2];
+extern const char *pars_nc_na[2][5];
 typedef enum {
     PARS_TEMPO_ATTIVO_SUBITO = 0,
     PARS_TEMPO_ATTIVO_DOPO_LIVELLO,
@@ -142,7 +147,7 @@ typedef enum {
     PARS_TEMPO_ATTIVO_CON_VELOCITA_RIEMPIMENTO,
 } pars_tempo_attivo_t;
 
-extern const char *pars_tempo_attivo[5][2];
+extern const char *pars_tempo_attivo[5][5];
 typedef enum {
     PARS_RICHIESTA_PAGAMENTO_INSERIRE_GETTONE = 0,
     PARS_RICHIESTA_PAGAMENTO_INSERIRE_MONETA,
@@ -150,7 +155,7 @@ typedef enum {
     PARS_RICHIESTA_PAGAMENTO_PAGAMENTO_IMPORTO,
 } pars_richiesta_pagamento_t;
 
-extern const char *pars_richiesta_pagamento[4][2];
+extern const char *pars_richiesta_pagamento[4][5];
 typedef enum {
     PARS_DESCRIPTIONS_PARAMETRO = 0,
     PARS_DESCRIPTIONS_LINGUA,
@@ -323,19 +328,19 @@ typedef enum {
     PARS_DESCRIPTIONS_TEMPO_SCARICO,
 } pars_descriptions_t;
 
-extern const char *pars_descriptions[169][2];
+extern const char *pars_descriptions[169][5];
 typedef enum {
     PARS_MACCHINA_LIBERA_NON_GESTITA = 0,
     PARS_MACCHINA_LIBERA_COMMUTA_START,
     PARS_MACCHINA_LIBERA_COMMUTA_PAGAMENTO,
 } pars_macchina_libera_t;
 
-extern const char *pars_macchina_libera[3][2];
+extern const char *pars_macchina_libera[3][5];
 typedef enum {
     PARS_VISUALIZZAZIONE_SELF = 0,
     PARS_VISUALIZZAZIONE_LABORATORIO,
 } pars_visualizzazione_t;
 
-extern const char *pars_visualizzazione[2][2];
+extern const char *pars_visualizzazione[2][5];
 
 #endif

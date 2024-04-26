@@ -7,6 +7,8 @@ Firmware per la scheda Pluto per il controllo della scheda lavatrice quadro.
 Il firmware dovrebbe essere compilato con i seguenti strumenti:
  - ESP-IDF v4.4.x (testato con v4.4.6)
 
+Per generare delle nuove traduzioni modificare i file csv sotto `assets/translations` e invocare il comando `scons intl`.
+
 ## Struttura del Progetto
 
 Il progetto e' strutturato secondo il paradigma Model-View-Controller (o almeno la mia interpretazione).

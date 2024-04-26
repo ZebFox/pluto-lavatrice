@@ -1,6 +1,6 @@
-Identificatore, Italiano, Inglese
-NESSUNO,Nessuno, None
-PREZZO, Prezzo, Price
-PREZZO_E_RIMANENTE, Prezzo e rimanente, Price and remainder
-PREZZO_E_CREDITO, Prezzo e credito, Price and credit
-RIMANENTE_E_CREDITO, Rimanente e credito, Remainder and credit
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+NESSUNO,Nessuno,None,Ninguno,Aucun,Keine
+PREZZO, Prezzo, Price, Precio, Prix, Preis
+PREZZO_E_RIMANENTE, Prezzo e rimanente, Price and remaining, Precio y resto, Prix et reste, Preis und Restbetrag
+PREZZO_E_CREDITO, Prezzo e credito, Price and credit, Precio y crédito, Prix et crédit, Preis und Kredit
+RIMANENTE_E_CREDITO, Rimanente e credito, Remainder and credit, Resto y crédito, Reste et crédit, Restbetrag und Gutschrift

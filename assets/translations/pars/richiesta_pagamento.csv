@@ -1,5 +1,5 @@
-Identificatore, Italiano, Inglese
-INSERIRE_GETTONE, Inserire gettone, Insert token
-INSERIRE_MONETA, Inserire moneta, Insert coin
-PAGAMENTO_CASSA, Pagamento cassa, Pay at the desk
-PAGAMENTO_IMPORTO, Pagamento importo, Pay the required amount
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+INSERIRE_GETTONE, Inserire gettone, Insert token, Insertar ficha, Insérer un jeton, Jeton einwerfen
+INSERIRE_MONETA, Inserire moneta, Insert coin, Insertar moneda, Insérer une pièce, Münze einwerfen
+PAGAMENTO_CASSA, Pagamento cassa, Pay at the desk, Pago en efectivo, Paiement en espèces, Barzahlung
+PAGAMENTO_IMPORTO, Pagamento importo, Pay the required amount, Importe del pago, Montant du paiement, Zahlungsbetrag

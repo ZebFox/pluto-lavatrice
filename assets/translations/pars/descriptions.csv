@@ -1,171 +1,171 @@
-Identificatore, Italiano, Inglese
-PARAMETRO, PARAMETRO, Parameter
-LINGUA, LINGUA, LANGUAGE
-LOGO, LOGO, LOGO
-NODO_MACCHINA, Nodo macchina, Machine node
-LIVELLO_ACCESSO, LIVELLO DI ACCESSO, ACCESS LEVEL
-TEMPO_TASTO_PAUSA, TEMPO TASTO PAUSA, PAUSE BUTTON TIME
-TEMPO_TASTO_STOP, TEMPO TASTO STOP, STOP BUTTON TIME
-TEMPO_OUT_PAGINE, TEMPO OUT PAGINE, OUT PAGE TIME
-DURATA, Durata, Duration
-TEMPO_ATTIVO, Tempo attivo, Active time
-MOTO_IN_RIEMPIMENTO, Moto in riempimento, Fillup motion
-VELOCITA_RIEMPIMENTO, Velocita' riempimento, Fillup speed
-INVERSIONE_RIEMPIMENTO, Inversione riempimento, Fillup reversal
-TEMPO_MOTO_RIEMPIMENTO, T. moto riempimento, Fillup motion time
-TEMPO_PAUSA_RIEMPIMENTO, T. pausa riempimento, Fillup pause time
-VELOCITA_LAVAGGIO, Velocita' lavaggio, Wash speed
-INVERSIONE_LAVAGGIO, Inversione lavaggio, Wash reversal
-GIRO_LAVAGGIO, T. moto lavaggio, Wash motion time
-PAUSA_LAVAGGIO, T. pausa lavaggio, Wash pause time
-RISCALDAMENTO, Riscaldamento, Heating
-TEMPERATURA, Temperatura, Temperature
-TIPO_RISCALDAMENTO, Tipo riscaldamento, Heating type
-TIPO_GETTONIERA, Tipo gettoniera, Payment type
-VALORE_IMPULSO, Valore impulso, Pulse value
-VALORE_PREZZO_UNICO, Valore prezzo unico, Absolute price value
-PREZZO_UNICO, Prezzo unico, Absolute price
-CIFRE_PREZZO, Cifre prezzo, Price digits
-CIFRE_DECIMALI_PREZZO, Cifre decimali prezzo, Decimal price digits
-VISUALIZZAZIONE_PREZZO, Visualizzazione prezzo, Price display
-RICHIESTA_PAGAMENTO, Richiesta pagamento, Payment request
-SBLOCCO_GETTONIERA, Sblocco gettoniera, Coin acc. unlock
-INIBIZIONE_ALLARMI, Inibizione allarmi, Disable alarms
-DIAMETRO_CESTO, Diametro cesto, Basket diameter
-PROFONDITA_CESTO, Profondita' cesto, Basked depth
-ALTEZZA_TRAPPOLA, Altezza trappola, Trap height
-SENSORE_PROSSIMITA, Sensore prossimita', Proximity sensor
-NUMERO_RAGGI, Numero raggi, Radiuses
-CORREZIONE_CONTAGIRI, Correzione contagiri, Rounds corrector
-SCALA_ACCELEROMETRO, Scala accelerometro, Accelerometer scale
-SOGLIA_X_ACCELEROMETRO, Soglia x acc., Acc. x limit
-SOGLIA_Y_ACCELEROMETRO, Soglia y acc., Acc. y limit
-SOGLIA_Z_ACCELEROMETRO, Soglia z acc., Acc. z limit
-SOGLIA_X_ACCELEROMETRO_H, Soglia x acc. (h), Acc. x limit (h)
-SOGLIA_Y_ACCELEROMETRO_H, Soglia y acc. (h), Acc. y limit (h)
-SOGLIA_Z_ACCELEROMETRO_H, Soglia z acc. (h), Acc. z limit (h)
-GIRI_ACCELEROMETRO, Soglia accelerometro, Accelerometer limit
-GIRI_ACCELEROMETRO_2, Soglia accelerometro 2, Accelerometer limit 2
-DELTA_ACCELEROMETRO, Delta accelerometro, Delta accelerometer
-TEMPO_ATTESA_ACCELEROMETRO, Tempo attesa acc., Acc. wait time
-TEMPERATURA_MASSIMA, Temperatura massima, Maximum temperature
-ISTERESI_TEMPERATURA, Isteresi temperatura, Temperature hysteresis
-TEMPERATURA_SICUREZZA, Temperatura sicurezza, Safety temperature
-TEMPERATURA_TERMODEGRADAZIONE, Temperatura termodegradazione, Thermal degradation temperature
-TIPO_LIVELLO, Tipo livello, Level type
-TEMPO_ISTERESI_LIVELLO, Tempo isteresi livello, Level hysteresis time
-MAX_LIVELLO, Livello massimo, Max level
-LIVELLO_SFIORO, Livello sfioro, Touch level
-LIVELLO_MINIMO_SCARICO, Livello minimo scarico, Minimum drain level
-LIVELLO_MINIMO_RISCALDAMENTO, Livello minimo riscaldamento, Minimum heating level
-LITRI_MASSIMI, Litri massimi, Maximum liters
-LITRI_MINIMI_RISCALDAMENTO, Litri minimi riscaldamento, Minimum heating liters
-IMPULSI_LITRI, Impulsi litri, Pulses per liters
-TIPO_INVERTER, Tipo inverter, Inverter type
-VELOCITA_SERVIZIO, Velocita' servizio, Service speed
-VELOCITA_MINIMA_LAVAGGIO, Velocita' minima lavaggio, Minimum wash speed
-VELOCITA_MASSIMA_LAVAGGIO, Velocita' massima lavaggio, Maximum wash speed
-PREPARAZIONE_ROTAZIONE, Cicli preparazione, Preparation cycles
-TEMPO_MARCIA_PREPARAZIONE_ROTAZIONE, T. marcia prep. rot., Run time rot. prep.
-TEMPO_SOSTA_PREPARAZIONE_ROTAZIONE, T. sosta prep. rot., Pause time rot. prep.
-VELOCITA_MINIMA_PREPARAZIONE, V. minima prep., Minimum prep. speed
-VELOCITA_MASSIMA_PREPARAZIONE, V. massima prep., Max prep. speed
-VELOCITA_MINIMA_CENTRIFUGA_1, V. min. centrifuga 1, Minimum cen. 1 speed
-VELOCITA_MASSIMA_CENTRIFUGA_1, V. max centrifuga 1, Maximum cen. 1 speed
-VELOCITA_MINIMA_CENTRIFUGA_2, V. min. centrifuga 2, Minimum cen. 2 speed
-VELOCITA_MASSIMA_CENTRIFUGA_2, V. max centrifuga 2, Maximum cen. 2 speed
-VELOCITA_MINIMA_CENTRIFUGA_3, V. min. centrifuga 3, Minimum cen. 3 speed
-VELOCITA_MASSIMA_CENTRIFUGA_3, V. max centrifuga 3, Maximum cen. 3 speed
-TEMPO_MINIMO_RAMPA, T. minimo rampa, Minium ramp time
-TEMPO_MASSIMO_RAMPA, T. massimo rampa, Maximum ramp time
-NUMERO_MAX_SBILANCIAMENTI, N. max sbilanciamenti, N. max sbilanciamenti
-MIN_SEC, Min/sec, Min/sec
-TIPO_SERRATURA, Tipo serratura, Lock type
-DURATA_IMPULSO_SERRATURA, Durata impulso serratura, Lock pulse duration
-CONTROLLO_TEMPERATURA_CONTINUO, Controllo t. continuo, Continous t. control
-LIVELLO, Livello, Level
-RICIRCOLO, Ricircolo, Recycling
-ACQUA_FREDDA, Acqua fredda, Cold water
-ACQUA_CALDA, Acqua calda, Hot water
-ACQUA_DEPURATA, Acqua depurata/recupero, Purified/recovery water
-SAPONE, Sapone, Detergent
-TEMPO_SAPONE_1, Tempo sapone 1, Detergent time 1
-RITARDO_SAPONE_1, Ritardo sapone 1, Detergent delay 1
-TEMPO_SAPONE_2, Tempo sapone 2, Detergent time 2
-RITARDO_SAPONE_2, Ritardo sapone 2, Detergent delay 2
-TEMPO_SAPONE_3, Tempo sapone 3, Detergent time 3
-RITARDO_SAPONE_3, Ritardo sapone 3, Detergent delay 3
-TEMPO_SAPONE_4, Tempo sapone 4, Detergent time 4
-RITARDO_SAPONE_4, Ritardo sapone 4, Detergent delay 4
-TEMPO_SAPONE_5, Tempo sapone 5, Detergent time 5
-RITARDO_SAPONE_5, Ritardo sapone 5, Detergent delay 5
-TEMPO_SAPONE_6, Tempo sapone 6, Detergent time 6
-RITARDO_SAPONE_6, Ritardo sapone 6, Detergent delay 6
-TEMPO_SAPONE_7, Tempo sapone 7, Detergent time 7
-RITARDO_SAPONE_7, Ritardo sapone 7, Detergent delay 7
-TEMPO_SAPONE_8, Tempo sapone 8, Detergent time 8
-RITARDO_SAPONE_8, Ritardo sapone 8, Detergent delay 8
-TEMPO_SAPONE_9, Tempo sapone 9, Detergent time 9
-RITARDO_SAPONE_9, Ritardo sapone 9, Detergent delay 9
-TEMPO_SAPONE_10, Tempo sapone 10, Detergent time 10
-RITARDO_SAPONE_10, Ritardo sapone 10, Detergent delay 10
-MOTO_FERMO, Movimento, Motion
-RECUPERO, Recupero, Recovery
-TEMPO_PREPARAZIONE, Tempo preparazione, Preparation time
-VELOCITA_PREPARAZIONE, Preparation speed, Preparation speed
-TIPO_SCARICO, Tipo scarico, Drain type
-VELOCITA_CENTRIFUGA_1, Velocita' cen. 1, Cen. speed 1
-TEMPO_RAMPA_1, Tempo rampa 1, Ramp time 1
-VELOCITA_CENTRIFUGA_2, Velocita' cen. 2, Cen. speed 2
-TEMPO_RAMPA_2, Tempo rampa 2, Ramp time 2
-VELOCITA_CENTRIFUGA_3, Velocita' cen. 3, Cen. speed 3
-TEMPO_RAMPA_3, Tempo rampa 3, Ramp time 3
-TEMPO_FRENATA, Tempo frenata, Stop time
-TEMPO_ATTESA, Tempo attesa, Wait time
-TEMPO_AVVISO_ATTESA_ON, Tempo avviso attesa on, Tempo avviso attesa on
-TEMPO_AVVISO_ATTESA_OFF, Tempo avviso attesa off, Tempo avviso attesa off
-NUMERO_RAMPE, Numero rampe, Ramp number
-TEMPO_ATTIVO, Tempo attivo, Active time
-TEMPO_ATTIVO_SAPONE, Tempo attivo sapone, Detergent active time
-TEMPO_ATTESA_CENTRIFUGA_1, T. attesa cen. 1, Cen. 1 wait time
-TEMPO_ATTESA_CENTRIFUGA_2, T. attesa cen. 2, Cen. 2 wait time
-NUMERO_SAPONI, Numero saponi, Detergent count
-TEMPO_ALLARME_LIVELLO, Ritardo allarme livello, Level alarm delay
-TEMPO_ALLARME_SCARICO, Ritardo allarme scarico, Drain alarm delay
-TEMPO_RITARDO_MICRO_OBLO, Ritardo micro oblo, Door contact delay
-TEMPO_PRECARICA, Tempo precarica, Preload time
-TEMPO_PULIZIA_SAPONI, Tempo pulizia saponi, Soap cleaning time
-TEMPO_CARICO_SAPONI, Tempo carico saponi, Soap load time
-TEMPO_COLPO_SCARICO, Tempo colpo scarico, Drain opening time
-TEMPO_MINIMO_SCARICO, Tempo minimo scarico, Minimum drain time
-TEMPO_MINIMO_FRENATA, Tempo minimo frenata, Minimum stop time
-SCARICO_RECUPERO, Scarico recupero, Drain recovery
-PERCENTUALE_LIVELLO_CARICO_RIDOTTO, Livello carico ridotto, Reduced load level
-PERCENTUALE_SAPONE_CARICO_RIDOTTO, Sapone carico ridotto, Reduced load detergent
-AUTOAVVIO, Autoavvio, Autostart
-ACCELEROMETRO, Accelerometro, Accelerometer
-TEMPO_SCARICO_ACCELEROMETRO, Tempo scarico accelerometro, Accelerometer drain time
-TEMPO_ALLARME_TEMPERATURA, Tempo allarme temperatura, Temperature alarm time
-ESPANSIONE_IO, Espansione IO, IO expansion
-ESCLUSIONE_SAPONE, Esclusione sapone, Detergent exclusion
-MACCHINA_LIBERA, Macchina libera, Machine free
-TIPO_MACCHINA_LIBERA, Tipo macchina libera, Machine free signal
-TIPO_IN_AUX_1, Tipo IN ausiliario 1, Auxiliary IN type 1
-TIPO_OUT_AUX_2, Tipo OUT ausiliario 2, Auxiliary OUT type 2
-TIPO_OUT_AUX_3, Tipo OUT ausiliario 3, Auxiliary OUT type 3
-TIPO_OUT_AUX_4, Tipo OUT ausiliario 4, Auxiliary OUT type 4
-LAVAGGIO_PROGRAMMATO, Lavaggio programmato, Scheduled cycle
-MACCHINA_FERMA, LED da fermo, LED while stopped
-MACCHINA_LAVORO, LED al lavoro, LED while working
-MACCHINA_PAUSA, LED in pausa, LED in pause
-MACCHINA_ATTESA, LED in attesa, LED waiting
-MACCHINA_AVVISO, LED con avviso, LED with notification
-MACCHINA_ALLARME, LED con allarme, LED with alarmti
-INTERFACCIA_START, Interf. al lavoro, Work interf.
-INTERFACCIA_STOP, Interf. da fermo, Stopped interf.
-INTERFACCIA_MENU, Interf. menu', Menu interface
-VELOCITA, Velocita', Speed
-MAX_PROGRAMMI_UTENTE, Max programmi utente, Max user programs
-RIPETIZIONE_CICLO, Ripetizione ciclo, Cycle repetition
-INTERFACCIA_SAPONI, Interf. saponi, Detergent interf.
-TEMPO_SCARICO, Tempo scarico servizio, Service drain time
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+PARAMETRO, PARAMETRO, Parameter, PARÁMETRO, PARAMÈTRE, PARAMETER
+LINGUA, LINGUA, LANGUAGE, IDIOMA, LANGUE, SPRACHE
+LOGO, LOGO, LOGO, LOGO, LOGO, LOGO
+NODO_MACCHINA, Nodo macchina, Machine node, Nodo máquina, Nœud de la machine, Maschinenknoten
+LIVELLO_ACCESSO, LIVELLO DI ACCESSO, ACCESS LEVEL, NIVEL DE ACCESO, NIVEAU D'ACCES, ZUGRIFFSEBENE
+TEMPO_TASTO_PAUSA, TEMPO TASTO PAUSA, PAUSE BUTTON TIME, BOTÓN DE PAUSA TIEMPO, DURÉE DE LA TOUCHE PAUSE, PAUSE-TASTE ZEIT
+TEMPO_TASTO_STOP, TEMPO TASTO STOP, STOP BUTTON TIME, BOTÓN DE PARADA TIEMPO, BOUTON D'ARRET TEMPS, STOP-TASTE ZEIT
+TEMPO_OUT_PAGINE, TEMPO OUT PAGINE, OUT PAGE TIME, TIEMPO FUERA PÁGINAS, TEMPS DE SORTIE PAGES, TIME OUT SEITEN
+DURATA, Durata, Duration, Duración, Durée de l'activité, Dauer
+TEMPO_ATTIVO, Tempo attivo, Active time, Tiempo activo, Temps actif, Aktive Zeit
+MOTO_IN_RIEMPIMENTO, Moto in riempimento, Fillup motion, Marcha de llenado, Mode de remplissage, Füllgeschwindigkeit
+VELOCITA_RIEMPIMENTO, Velocita' riempimento, Fillup speed, Velocidad de llenado, Vitesse de remplissage, Geschwindigkeit der Befüllung
+INVERSIONE_RIEMPIMENTO, Inversione riempimento, Fillup reversal, Llenado inverso, Remplissage inversé, Füllen in umgekehrter Richtung
+TEMPO_MOTO_RIEMPIMENTO, T. moto riempimento, Fillup motion time, Tiempo de movimiento de llenado, Temps de mouvement du remplissage, Zeit der Füllbewegung
+TEMPO_PAUSA_RIEMPIMENTO, T. pausa riempimento, Fillup pause time, Tiempo de pausa de llenado, Temps de pause du remplissage, Pausenzeit beim Füllen
+VELOCITA_LAVAGGIO, Velocita' lavaggio, Wash speed, Velocidad de lavado, Vitesse de lavage, Geschwindigkeit des Waschens
+INVERSIONE_LAVAGGIO, Inversione lavaggio, Wash reversal, Lavado inverso, Lavage en marche arrière, Waschen Inversion
+GIRO_LAVAGGIO, T. moto lavaggio, Wash motion time, Tiempo de movimiento de lavado, Temps de mouvement du lavage, Bewegungszeit Waschen
+PAUSA_LAVAGGIO, T. pausa lavaggio, Wash pause time, Tiempo de pausa de lavado, Temps de pause du lavage, Waschpausenzeit
+RISCALDAMENTO, Riscaldamento, Heating, Calefacción, Chauffage, Heizung
+TEMPERATURA, Temperatura, Temperature, Temperatura, Température d'utilisation, Temperatur
+TIPO_RISCALDAMENTO, Tipo riscaldamento, Heating type, Tipo de calefacción, Type de chauffage, Art der Heizung
+TIPO_GETTONIERA, Tipo gettoniera, Payment type, Tipo de ficha, Type de jeton, Token-Typ
+VALORE_IMPULSO, Valore impulso, Pulse value, Valor de impulso, Valeur de l'impulsion, Impulswertigkeit
+VALORE_PREZZO_UNICO, Valore prezzo unico, Absolute price value, Valor de precio único, Valeur du prix unique, Einzelpreiswert
+PREZZO_UNICO, Prezzo unico, Absolute price, Precio único, Prix unique, Einzelner Preis
+CIFRE_PREZZO, Cifre prezzo, Price digits, Dígitos del precio, Chiffres du prix, Preis Ziffern
+CIFRE_DECIMALI_PREZZO, Cifre decimali prezzo, Decimal price digits, Dígitos decimales del precio, Chiffres décimaux du prix, Preis Dezimalziffern
+VISUALIZZAZIONE_PREZZO, Visualizzazione prezzo, Price display, Visualización del precio, Affichage du prix, Preisanzeige
+RICHIESTA_PAGAMENTO, Richiesta pagamento, Payment request, Solicitud de pago, Demande de paiement, Zahlungsanforderung
+SBLOCCO_GETTONIERA, Sblocco gettoniera, Coin acc. unlock, Liberación de fichas, Libération du jeton, Token-Freigabe
+INIBIZIONE_ALLARMI, Inibizione allarmi, Disable alarms, Inhibición de alarma, Inhibition de l'alarme, Alarmverriegelung
+DIAMETRO_CESTO, Diametro cesto, Basket diameter, Diámetro de la cesta, Diamètre du panier, Korbdurchmesser
+PROFONDITA_CESTO, Profondita' cesto, Basked depth, Profundidad de la cesta, Profondeur du panier, Tiefe des Korbes
+ALTEZZA_TRAPPOLA, Altezza trappola, Trap height, Altura de la trampa, Hauteur de la trappe, Höhe des Auffangbehälters
+SENSORE_PROSSIMITA, Sensore prossimita', Proximity sensor, Sensor de proximidad, Capteur de proximité, Näherungsschalter
+NUMERO_RAGGI, Numero raggi, Radiuses, Número de haces, Nombre de faisceaux, Anzahl der Strahlen
+CORREZIONE_CONTAGIRI, Correzione contagiri, Rounds corrector, Corrección del tacómetro, Correction du tachymètre, Tachometer-Korrektur
+SCALA_ACCELEROMETRO, Scala accelerometro, Accelerometer scale, Escala del acelerómetro, Échelle de l'accéléromètre, Skala des Beschleunigungsmessers
+SOGLIA_X_ACCELEROMETRO, Soglia x acc., Acc. x limit, Umbral x acelerómetro, Accéléromètre x à seuil, Schwellenwert x-Beschleunigungsmesser
+SOGLIA_Y_ACCELEROMETRO, Soglia y acc., Acc. y limit, Umbral y acelerómetro, Seuil accéléromètre y, Schwellenwert y-Beschleunigungsmesser
+SOGLIA_Z_ACCELEROMETRO, Soglia z acc., Acc. z limit, Umbral z acelerómetro, Seuil z accéléromètre, Schwellenwert z-Beschleunigungsmesser
+SOGLIA_X_ACCELEROMETRO_H, Soglia x acc. (h), Acc. x limit (h), Umbral x acelerómetro (h), Seuil accéléromètre x (h), Schwellenwert x-Beschleunigungsmesser (h)
+SOGLIA_Y_ACCELEROMETRO_H, Soglia y acc. (h), Acc. y limit (h), Umbral y acelerómetro (h), Seuil y accéléromètre (h), Schwellenwert y-Beschleunigungsmesser (h)
+SOGLIA_Z_ACCELEROMETRO_H, Soglia z acc. (h), Acc. z limit (h), Umbral z acelerómetro (h), Seuil accéléromètre z (h), Schwellenwert z-Beschleunigungsmesser (h)
+GIRI_ACCELEROMETRO, Soglia accelerometro, Accelerometer limit, Umbral acelerómetro, Seuil accéléromètre, Schwellenwert Beschleunigungsmesser
+GIRI_ACCELEROMETRO_2,Soglia accelerometro 2,Accelerometer limit 2,Umbral acelerómetro 2,Seuil accéléromètre 2,Schwellenwert Beschleunigungsmesser 2
+DELTA_ACCELEROMETRO, Delta accelerometro, Delta accelerometer, Delta del acelerómetro, Accéléromètre delta, Beschleunigungsmesser delta
+TEMPO_ATTESA_ACCELEROMETRO, Tempo attesa acc., Acc. wait time, Tiempo de espera del acelerómetro, Temps d'attente de l'accéléromètre, Beschleunigungsmesser Wartezeit
+TEMPERATURA_MASSIMA, Temperatura massima, Maximum temperature, Temperatura máxima, Température maximale, Höchsttemperatur
+ISTERESI_TEMPERATURA, Isteresi temperatura, Temperature hysteresis, Histéresis de temperatura, Hystérésis de température, Temperatur-Hysterese
+TEMPERATURA_SICUREZZA, Temperatura sicurezza, Safety temperature, Temperatura de seguridad, Température de sécurité, Sicherheitstemperatur
+TEMPERATURA_TERMODEGRADAZIONE, Temperatura termodegradazione, Thermal degradation temperature, Temperatura de termodegradación, Température de thermodégradation, Temperatur der thermischen Zersetzung
+TIPO_LIVELLO, Tipo livello, Level type, Tipo de nivel, Type de niveau, Niveau-Typ
+TEMPO_ISTERESI_LIVELLO, Tempo isteresi livello, Level hysteresis time, Tiempo de histéresis de nivel, Temps d'hystérésis du niveau, Pegel-Hysteresezeit
+MAX_LIVELLO, Livello massimo, Max level, Nivel máximo, Niveau maximum, Maximaler Füllstand
+LIVELLO_SFIORO, Livello sfioro, Touch level, Nivel de desbordamiento, Niveau de débordement, Überlaufniveau
+LIVELLO_MINIMO_SCARICO, Livello minimo scarico, Minimum drain level, Nivel mínimo de drenaje, Niveau de vidange minimum, Minimales Abflussniveau
+LIVELLO_MINIMO_RISCALDAMENTO, Livello minimo riscaldamento, Minimum heating level, Nivel mínimo de calefacción, Niveau minimum de chauffage, Minimales Heizungsniveau
+LITRI_MASSIMI, Litri massimi, Maximum liters, Litros máximos, Lits maximums, Maximale Liter
+LITRI_MINIMI_RISCALDAMENTO, Litri minimi riscaldamento, Minimum heating liters, Calentamiento mínimo litros, Chauffage minimum litres, Minimale Heizleistung Liter
+IMPULSI_LITRI, Impulsi litri, Pulses per liters, Pulsos litros, Impulsions litres, Pulsierende Liter
+TIPO_INVERTER, Tipo inverter, Inverter type, Tipo de inversor, Type d'inverseur, Inverter-Typ
+VELOCITA_SERVIZIO, Velocita' servizio, Service speed, Velocidad de servicio, Vitesse de service, Betriebsgeschwindigkeit
+VELOCITA_MINIMA_LAVAGGIO, Velocita' minima lavaggio, Minimum wash speed, Velocidad mínima de lavado, Vitesse de lavage minimum, Minimale Waschgeschwindigkeit
+VELOCITA_MASSIMA_LAVAGGIO, Velocita' massima lavaggio, Maximum wash speed, Velocidad máxima de lavado, Vitesse de lavage maximale, Maximale Waschgeschwindigkeit
+PREPARAZIONE_ROTAZIONE, Cicli preparazione, Preparation cycles, Ciclos de preparación, Cycles de préparation, Aufbereitungszyklen
+TEMPO_MARCIA_PREPARAZIONE_ROTAZIONE, T. marcia prep. rot., Run time rot. prep., Tiempo de preparación de la rotación, Temps de fonctionnement de la préparation de la rotation, Vorbereitungszeit der Rotation
+TEMPO_SOSTA_PREPARAZIONE_ROTAZIONE, T. sosta prep. rot., Pause time rot. prep., Tiempo de preparación de la rotación, Temps d'arrêt de la préparation de la rotation, Verweilzeit für die Vorbereitung der Rotation
+VELOCITA_MINIMA_PREPARAZIONE, V. minima prep., Minimum prep. speed, Velocidad mínima de preparación, Vitesse de préparation minimale, Min. Vorbereitungsgeschwindigkeit
+VELOCITA_MASSIMA_PREPARAZIONE, V. massima prep., Max prep. speed, Velocidad máxima de preparación, Vitesse de préparation maximale, Maximale Präparationsgeschwindigkeit
+VELOCITA_MINIMA_CENTRIFUGA_1,V. min. centrifuga 1,Minimum cen. 1 speed,Velocidad mín. de centrifugado 1,Vitesse d'essorage minimale 1,Min. Schleuderdrehzahl 1
+VELOCITA_MASSIMA_CENTRIFUGA_1,V. max centrifuga 1,Maximum cen. 1 speed,Velocidad máx. de centrifugado 1,Vitesse d'essorage maximale 1,Max. Schleuderdrehzahl 1
+VELOCITA_MINIMA_CENTRIFUGA_2,V. min. centrifuga 2,Minimum cen. 2 speed,Velocidad mín. de centrifugado 2,Vitesse d'essorage minimale 2,Min. Schleuderdrehzahl 2
+VELOCITA_MASSIMA_CENTRIFUGA_2,V. max centrifuga 2,Maximum cen. 2 speed,Velocidad máx. de centrifugado 2,Vitesse d'essorage maximale 2,Max. Schleuderdrehzahl 2
+VELOCITA_MINIMA_CENTRIFUGA_3,V. min. centrifuga 3,Minimum cen. 3 speed,Velocidad mín. de centrifugado 3,Vitesse d'essorage min. 3,Min. Schleuderdrehzahl 3
+VELOCITA_MASSIMA_CENTRIFUGA_3,V. max centrifuga 3,Maximum cen. 3 speed,Velocidad máx. de centrifugado 3,Vitesse d'essorage max. 3,Max. Schleuderdrehzahl 3
+TEMPO_MINIMO_RAMPA, T. minimo rampa, Minium ramp time, Tiempo mínimo de rampa, Temps de rampe minimum, Min. Rampenzeit
+TEMPO_MASSIMO_RAMPA, T. massimo rampa, Maximum ramp time, Tiempo de rampa máx., Durée maximale de la rampe, Max. Rampenzeit
+NUMERO_MAX_SBILANCIAMENTI, N. max sbilanciamenti, N. max sbilanciamenti, Número máx. de desequilibrio, Nombre de déséquilibres max., Max. Unwuchtzahl
+MIN_SEC, Min/sec, Min/sec, Min/seg, Min/sec, Min/Sek.
+TIPO_SERRATURA, Tipo serratura, Lock type, Tipo de bloqueo, Type de blocage, Art der Sperre
+DURATA_IMPULSO_SERRATURA, Durata impulso serratura, Lock pulse duration, Duración del impulso de bloqueo, Durée de l'impulsion de verrouillage, Dauer des Sperrimpulses
+CONTROLLO_TEMPERATURA_CONTINUO, Controllo t. continuo, Continous t. control, Control de tiempo continuo, Contrôle du temps continu, Kontinuierliche Zeitsteuerung
+LIVELLO, Livello, Level, Nivel, Niveau,Pegel
+RICIRCOLO, Ricircolo, Recycling, Recirculación, Recirculation, Umwälzung
+ACQUA_FREDDA, Acqua fredda, Cold water, Agua fría, Eau froide, Kaltes Wasser
+ACQUA_CALDA, Acqua calda, Hot water, Agua caliente, Eau chaude, Warmes Wasser
+ACQUA_DEPURATA, Acqua depurata/recupero, Purified/recovery water, Agua depurada/recuperada, Eau purifiée/récupérée, Gereinigtes/zurückgewonnenes Wasser
+SAPONE, Sapone, Detergent, Jabón, Savon, Seife
+TEMPO_SAPONE_1,Tempo sapone 1,Detergent time 1,Tiempo jabón 1,Durée du savon 1,Seife Zeit 1
+RITARDO_SAPONE_1,Ritardo sapone 1,Detergent delay 1,Tiempo de jabón 1,Délai de savon 1,Seife Verzögerung 1
+TEMPO_SAPONE_2,Tempo sapone 2,Detergent time 2,Tiempo de jabón 2,Temps de savon 2,Seife Zeit 2
+RITARDO_SAPONE_2,Ritardo sapone 2,Detergent delay 2,Retraso del jabón 2,Délai de savon 2,Seife Verzögerung 2
+TEMPO_SAPONE_3,Tempo sapone 3,Detergent time 3,Jabón Tiempo 3,Temps de savon 3,Seife Zeit 3
+RITARDO_SAPONE_3,Ritardo sapone 3,Detergent delay 3,Jabón Retraso 3,Délai de savon 3,Seife Verzögerung 3
+TEMPO_SAPONE_4,Tempo sapone 4,Detergent time 4,Jabón Tiempo 4,Temps de savon 4,Seife Zeit 4
+RITARDO_SAPONE_4,Ritardo sapone 4,Detergent delay 4,Jabón Retraso 4,Délai de savon 4,Seife Verzögerung 4
+TEMPO_SAPONE_5,Tempo sapone 5,Detergent time 5,Tiempo de jabón 5,Temps de savon 5,Seife Zeit 5
+RITARDO_SAPONE_5,Ritardo sapone 5,Detergent delay 5,Jabón Retraso 5,Délai de savon 5,Seife Verzögerung 5
+TEMPO_SAPONE_6,Tempo sapone 6,Detergent time 6,Tiempo de jabón 6,Temps de savon 6,Seife Zeit 6
+RITARDO_SAPONE_6,Ritardo sapone 6,Detergent delay 6,Retraso del jabón 6,Délai de savon 6,Seife Verzögerung 6
+TEMPO_SAPONE_7,Tempo sapone 7,Detergent time 7,Tiempo de jabón 7,Temps de savon 7,Seife Zeit 7
+RITARDO_SAPONE_7,Ritardo sapone 7,Detergent delay 7,Retraso del jabón 7,Délai de savon 7,Seife Verzögerung 7
+TEMPO_SAPONE_8,Tempo sapone 8,Detergent time 8,Tiempo de jabón 8,Temps de savon 8,Seife Zeit 8
+RITARDO_SAPONE_8,Ritardo sapone 8,Detergent delay 8,Retraso del jabón 8,Délai de savon 8,Seife Verzögerung 8
+TEMPO_SAPONE_9,Tempo sapone 9,Detergent time 9,Tiempo de jabón 9,Temps de savon 9,Seife Zeit 9
+RITARDO_SAPONE_9,Ritardo sapone 9,Detergent delay 9,Retraso del jabón 9,Délai de savon 9,Seife Verzögerung 9
+TEMPO_SAPONE_10,Tempo sapone 10,Detergent time 10,Tiempo de jabón 10,Temps de savon 10,Seife Zeit 10
+RITARDO_SAPONE_10,Ritardo sapone 10,Detergent delay 10,Retraso del jabón 10,Délai de savon 10,Seife Verzögerung 10
+MOTO_FERMO, Movimento, Motion, Movimiento, Mouvement, Bewegung
+RECUPERO, Recupero, Recovery, Recuperación, Récupération, Erholung
+TEMPO_PREPARAZIONE, Tempo preparazione, Preparation time, Tiempo de preparación, Temps de préparation, Vorbereitungszeit
+VELOCITA_PREPARAZIONE, Preparation speed, Preparation speed, Velocidad de preparación, Vitesse de préparation, Geschwindigkeit der Vorbereitung
+TIPO_SCARICO, Tipo scarico, Drain type, Tipo de descarga, Type de décharge, Art der Entleerung
+VELOCITA_CENTRIFUGA_1,Velocita' cen. 1,Cen. speed 1,Velocidad de centrifugado 1,Vitesse de centrifugation 1,Zentrifugengeschwindigkeit 1
+TEMPO_RAMPA_1,Tempo rampa 1,Ramp time 1,Tiempo de rampa 1,Temps de rampe 1,Rampenzeit 1
+VELOCITA_CENTRIFUGA_2,Velocita' cen. 2,Cen. speed 2,Velocidad de centrifugado 2,Vitesse de centrifugation 2,Zentrifugendrehzahl 2
+TEMPO_RAMPA_2,Tempo rampa 2,Ramp time 2,Tiempo de rampa 2,Durée de la rampe 2,Rampenzeit 2
+VELOCITA_CENTRIFUGA_3,Velocita' cen. 3,Cen. speed 3,Velocidad centrífuga 3,Vitesse de centrifugation 3,Zentrifugaldrehzahl 3
+TEMPO_RAMPA_3,Tempo rampa 3,Ramp time 3,Tiempo de rampa 3,Temps de rampe 3,Rampenzeit 3
+TEMPO_FRENATA, Tempo frenata, Stop time, Tiempo de frenado, Temps de freinage, Abbremszeit
+TEMPO_ATTESA, Tempo attesa, Wait time, Tiempo de espera, Temps d'attente, Wartezeit
+TEMPO_AVVISO_ATTESA_ON, Tempo avviso attesa on, Tempo avviso attesa on, Tiempo de espera activado, Temps d'attente activé, Wartezeit Warnzeit ein
+TEMPO_AVVISO_ATTESA_OFF, Tempo avviso attesa off, Tempo avviso attesa off, Tiempo de aviso de espera desactivado, Temps d'attente et d'avertissement désactivé, Wartezeit Vorwarnzeit aus
+NUMERO_RAMPE, Numero rampe, Ramp number, Número de rampa, Nombre de rampes, Rampennummer
+TEMPO_ATTIVO, Tempo attivo, Active time, Tiempo activo, Temps actif, Aktive Zeit
+TEMPO_ATTIVO_SAPONE, Tempo attivo sapone, Detergent active time, Tiempo activo de jabón, Temps de savonnage actif, Seife aktive Zeit
+TEMPO_ATTESA_CENTRIFUGA_1,T. attesa cen. 1,Cen. 1 wait time,Tiempo de espera centrifugadora 1,Temps d'attente en centrifugeuse 1,Zentrifuge Wartezeit 1
+TEMPO_ATTESA_CENTRIFUGA_2,T. attesa cen. 2,Cen. 2 wait time,Tiempo de espera centrifugado 2,Temps d'attente en centrifugeuse 2,Zentrifugenwartezeit 2
+NUMERO_SAPONI, Numero saponi, Detergent count, Número de jabón, Numéro de savon, Anzahl der Seifen
+TEMPO_ALLARME_LIVELLO, Ritardo allarme livello, Level alarm delay, Retardo de alarma de nivel, Retard de l'alarme de niveau, Verzögerung Füllstandsalarm
+TEMPO_ALLARME_SCARICO, Ritardo allarme scarico, Drain alarm delay, Retardo de alarma de descarga, Retard de l'alarme d'échappement, Verzögerung Entleerungsalarm
+TEMPO_RITARDO_MICRO_OBLO, Ritardo micro oblo, Door contact delay, Retardo micro portilla, Retard de l'alarme du hublot, Verzögerung Porthole Micro
+TEMPO_PRECARICA, Tempo precarica, Preload time, Tiempo de precarga, Temps de précharge, Vorladezeit
+TEMPO_PULIZIA_SAPONI, Tempo pulizia saponi, Soap cleaning time, Tiempo de limpieza del jabón, Temps de nettoyage du savon, Seifenreinigungszeit
+TEMPO_CARICO_SAPONI, Tempo carico saponi, Soap load time, Tiempo de carga del jabón, Temps de chargement du savon, Seifenladezeit
+TEMPO_COLPO_SCARICO, Tempo colpo scarico, Drain opening time, Tiempo de descarga, Durée de la course de décharge, Entleerungshubzeit
+TEMPO_MINIMO_SCARICO, Tempo minimo scarico, Minimum drain time, Tiempo mínimo de descarga, Temps de déchargement minimum, Minimale Entladezeit
+TEMPO_MINIMO_FRENATA, Tempo minimo frenata, Minimum stop time, Tiempo mínimo de frenado, Temps de freinage minimum, Minimale Abbremszeit
+SCARICO_RECUPERO, Scarico recupero, Drain recovery, Recuperación de la descarga, Récupération de la décharge, Erholung der Entladung
+PERCENTUALE_LIVELLO_CARICO_RIDOTTO, Livello carico ridotto, Reduced load level, Nivel de carga reducido, Niveau de charge réduit, Reduzierter Füllstand
+PERCENTUALE_SAPONE_CARICO_RIDOTTO, Sapone carico ridotto, Reduced load detergent, Jabón de carga reducida, Savon à charge réduite, Reduzierte Lastseife
+AUTOAVVIO, Autoavvio, Autostart, Autoarranque, Démarrage automatique, Auto-Start
+ACCELEROMETRO, Accelerometro, Accelerometer, Acelerómetro, Accéléromètre, Beschleunigungsmesser
+TEMPO_SCARICO_ACCELEROMETRO, Tempo scarico accelerometro, Accelerometer drain time, Tiempo de descarga del acelerómetro, Temps de déchargement de l'accéléromètre, Beschleunigungsmesser-Entladezeit
+TEMPO_ALLARME_TEMPERATURA, Tempo allarme temperatura, Temperature alarm time, Tiempo de alarma de temperatura, Temps d'alarme de température, Temperaturalarmzeit
+ESPANSIONE_IO, Espansione IO, IO expansion, Expansión IO, Extension IO, IO-Erweiterung
+ESCLUSIONE_SAPONE, Esclusione sapone, Detergent exclusion, Exclusión de jabón, Exclusion du savon, Ausschluss von Seife
+MACCHINA_LIBERA, Macchina libera, Machine free, Máquina libre, Machine libre, Freie Maschine
+TIPO_MACCHINA_LIBERA, Tipo macchina libera, Machine free signal, Máquina tipo libre, Type de machine libre, Maschinentyp frei
+TIPO_IN_AUX_1,Tipo IN ausiliario 1,Auxiliary IN type 1,Auxiliar IN tipo 1,Entrée auxiliaire type 1,Auxiliary IN Typ 1
+TIPO_OUT_AUX_2,Tipo OUT ausiliario 2,Auxiliary OUT type 2,Auxiliar OUT tipo 2,Auxiliaire OUT type 2,Auxiliary OUT Typ 2
+TIPO_OUT_AUX_3,Tipo OUT ausiliario 3,Auxiliary OUT type 3,Auxiliar OUT tipo 3,Auxiliaire OUT type 3,Hilfsausgang Typ 3
+TIPO_OUT_AUX_4,Tipo OUT ausiliario 4,Auxiliary OUT type 4,Salida auxiliar tipo 4,Sortie auxiliaire type 4,Hilfsausgang Typ 4
+LAVAGGIO_PROGRAMMATO, Lavaggio programmato, Scheduled cycle, Lavado programado, Lavage programmé, Programmiertes Waschen
+MACCHINA_FERMA, LED da fermo, LED while stopped, LED en reposo, LED à l'arrêt, LED im Stillstand
+MACCHINA_LAVORO, LED al lavoro, LED while working, LED en funcionamiento, LED au travail, LED bei der Arbeit
+MACCHINA_PAUSA, LED in pausa, LED in pause, LED en pausa, LED en pause, LED pausiert
+MACCHINA_ATTESA, LED in attesa, LED waiting, LED en espera, LED en attente, LED im Wartezustand
+MACCHINA_AVVISO, LED con avviso, LED with notification, LED con aviso, LED avec avertissement, LED mit Warnung
+MACCHINA_ALLARME, LED con allarme, LED with alarmti, LED con alarma, LED avec alarme, LED mit Alarm
+INTERFACCIA_START, Interf. al lavoro, Work interf., Interfaz en funcionamiento, Interface en fonctionnement, Schnittstelle in Betrieb
+INTERFACCIA_STOP, Interf. da fermo, Stopped interf., Interfaz en reposo, Interface à l'arrêt, Schnittstelle im Leerlauf
+INTERFACCIA_MENU, Interf. menu', Menu interface, Interfaz de menú, Interface de menu, Menü-Schnittstelle
+VELOCITA, Velocita', Speed, Velocidad, Vitesse, Geschwindigkeit
+MAX_PROGRAMMI_UTENTE, Max programmi utente, Max user programs, Programas de usuario máx., Programmes utilisateur max., Max. Benutzerprogramme
+RIPETIZIONE_CICLO, Ripetizione ciclo, Cycle repetition, Repetición de ciclo, Répétition du cycle, Zykluswiederholung
+INTERFACCIA_SAPONI, Interf. saponi, Detergent interf., Interfaz de jabón, Interface savon, Seifenschnittstelle
+TEMPO_SCARICO, Tempo scarico servizio, Service drain time, Tiempo de drenaje de servicio, Temps de vidange du service, Service-Ablaufzeit

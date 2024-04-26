@@ -1,5 +1,7 @@
-Identificatore, Italiano, Inglese
-DISABILITATO, Disabilitato, Disabled
-UNA_VELOCITA, 1 velocita', 1 speed
-DUE_VELOCITA, "2 velocita', soglie delta", "2 speed, delta thresh."
-TRE_VELOCITA, "3 velocita', soglie HI", "3 speed, HI thresh."
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+DISABILITATO, Disabilitato,Deactivated, Desactivado, Désactivé, Deaktiviert
+UNA_VELOCITA,1 velocita',1 speed,1 velocidad,1 vitesse,1 Geschwindigkeit
+DUE_VELOCITA,2 velocita',2 speed,2 velocidades,2 vitesses,2 Geschwindigkeiten
+TRE_VELOCITA,3 velocita',3 speed,3 velocidades,3 vitesses,3 Geschwindigkeiten
+SOGLIE_DELTA,soglie delta,delta thresh.,Umbrales delta, Seuils delta,Delta-Schwellenwerte
+HI_SOGLIE,soglie HI,HI thresh.,Umbrales HI,Seuils HI,HI-Schwellenwerte

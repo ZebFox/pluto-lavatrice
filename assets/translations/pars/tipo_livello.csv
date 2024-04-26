@@ -1,4 +1,4 @@
-Identificatore, Italiano, Inglese
-CENTIMETRI, Centimetri, Centimeters
-UN_CONTALITRI, 1 contalitri, 1 liter counter
-DUE_CONTALITRI, 2 contalitri, 2 liter counter
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+CENTIMETRI, Centimetri, Centimeters, Centímetros, Centimètres, Zentimeter
+UN_CONTALITRI,1 contalitri,1 liter counter,Contador de 1 litro,Compteur de 1 litre,1-Liter-Zähler
+DUE_CONTALITRI,2 contalitri,2 liter counter,Contadores de 2 litros,Compteurs 2 litres,2-Liter-Zähler

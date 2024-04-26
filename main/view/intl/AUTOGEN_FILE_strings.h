@@ -179,6 +179,6 @@ typedef enum {
     STRINGS_FRENATA_IN_CORSO,
 } strings_t;
 
-extern const char *strings[175][2];
+extern const char *strings[175][5];
 
 #endif

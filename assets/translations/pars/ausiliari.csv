@@ -1,9 +1,9 @@
-Identificatore, Italiano, Inglese
-SBLOCCO_PAGAMENTO, Sblocco pagamento, Payment unlock
-STANDBY_SAPONI, Standby saponi, Detergent Standby
-MACCHINA_OCCUPATA, Macchina occupata, Machine busy
-LAMPEGGIANTE, Lampeggiante, Blink
-H2O_RECUPERO, H2O recupero, H2O recycle
-POMPA_RICIRCOLO, Pompa ricircolo, Recycle pump
-SCARICO_RECUPERO, Scarico recupero, Drain recovery
-RISCALDAMENTO_INDIRETTO, Riscald. indir., Indirect heating
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+SBLOCCO_PAGAMENTO, Sblocco pagamento, Unlocking payment, Desbloqueo del pago, Déblocage du paiement, Entriegelung der Zahlung
+STANDBY_SAPONI, Standby saponi, Soap standby, Jabón en espera, Savon en attente, Seife in Bereitschaft
+MACCHINA_OCCUPATA, Macchina occupata, Machine busy, Máquina ocupada, Machine occupée, Maschine besetzt
+LAMPEGGIANTE, Lampeggiante, Flashing light, Luz intermitente, Lumière clignotante, Blinkendes Licht
+H2O_RECUPERO,H2O recupero,H2O recycling,Recirculación de H2O,Recyclage H2O,H2O Rückführung
+POMPA_RICIRCOLO, Pompa ricircolo, Recirculation pump, Bomba de recirculación, Pompe de recirculation, Umwälzpumpe
+SCARICO_RECUPERO, Scarico recupero, Drain recovery, Recuperación de drenaje, Récupération des eaux usées, Rückgewinnung des Abflusses
+RISCALDAMENTO_INDIRETTO, Riscald. indir., Indirect heating, Calefacción indirecta, Chauffage indirect, Indirekte Heizung

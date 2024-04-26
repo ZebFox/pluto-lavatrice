@@ -1,7 +1,7 @@
-Identificatore, Italiano, Inglese
-0, 0-2g con offset, 0-2g with offset
-1, 1-4g con offset, 1-4g with offset
-2, 2-8g con offset, 2-8g with offset
-3, 3-2g no offset, 3-2g no offset
-4, 4-4g no offset, 4-4g no offset
-5, 5-8g no offset, 5-8g no offset
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+0,0-2g con offset,0-2g with offset,0-2g con desviación,0-2g avec décalage,0-2g mit offset
+1,1-4g con offset,1-4g with offset,1-4g con desviación,1-4g avec décalage,1-4g mit offset
+2,2-8g con offset,2-8g with offset,2-8g con desviación,2-8g avec décalage,2-8g mit offset
+3,3-2g no offset,3-2g no offset,3-2g sin desviación,3-2g sans décalage,3-2g kein Offset
+4,4-4g no offset,4-4g no offset,4-4g sin desviación,4-4g sans décalage,4-4g kein Offset
+5,5-8g no offset,5-8g no offset,5-8g sin desviación,5-8g sans décalage,5-8g kein Offset

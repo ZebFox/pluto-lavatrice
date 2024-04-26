@@ -1,6 +1,6 @@
-Identificatore, Italiano, Inglese
-SUBITO, Subito, Immediate
-DOPO_LIVELLO, Dopo il livello, After the level
-DOPO_TEMPERATURA, Dopo la temperatura, After the temperature
-DOPO_LIVELLO_E_TEMPERATURA, Dopo liv. e temp., After lev. and temp.
-CON_VELOCITA_RIEMPIMENTO, Con vel. di riempimento, With fill speed
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+SUBITO, Subito, Immediate, Inmediatamente, Immédiatement, Unmittelbar
+DOPO_LIVELLO, Dopo il livello, After the level, Después del nivel, Après le niveau, Nach Füllstand
+DOPO_TEMPERATURA, Dopo la temperatura, After the temperature, Después de la temperatura, Après la température, Nach der Temperatur
+DOPO_LIVELLO_E_TEMPERATURA, Dopo liv. e temp., After lev. and temp., Después de nivel y temperatura, Après le niveau et la température, Nach Füllstand und Temperatur
+CON_VELOCITA_RIEMPIMENTO, Con vel. di riempimento, With fill speed, Con velocidad de llenado, Avec vitesse de remplissage, Mit Füllgeschwindigkeit

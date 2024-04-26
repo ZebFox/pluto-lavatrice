@@ -1,7 +1,7 @@
-Identificatore, Italiano, Inglese
-NESSUNO,Nessuno, None
-MS, MS, MS
-LAVENDA, Lavenda, Lavenda
-ROTONDI, Rotondi, Rotondi
-SCHULTHESS, Schulthess, Schulthess
-HOOVER, Hoover, Hoover
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+NESSUNO,Nessuno, None,Nadie,Personne,Niemand
+MS, MS, MS, MS, MS, MS
+LAVENDA, Lavenda, Lavenda, Lavenda, Lavenda, Lavenda
+ROTONDI, Rotondi, Rotondi,Rotondi,Rotondi,Rotondi
+SCHULTHESS, Schulthess, Schulthess, Schulthess, Schulthess, Schulthess
+HOOVER, Hoover, Hoover, Hoover, Hoover, Hoover

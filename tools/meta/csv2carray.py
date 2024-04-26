@@ -16,7 +16,7 @@ def main(indir, outdir):
             csvreader = csv.reader(f, delimiter=',', skipinitialspace=True)
             arrayname = os.path.basename(csvfile).replace(".csv", "")
             tmp = {}
-            csvreader.__next__() # Drop the first line
+            csvreader.__next__()  # Drop the first line
             for line in csvreader:
                 if len(line) < 2:
                     print("Devono esserci almeno due colonne (la prima e' per l'enum)")
@@ -47,7 +47,7 @@ def main(indir, outdir):
                 for enum in value.keys():
                     if len(value[enum]) != lingue:
                         print(
-                            f"Numero di lingue diverso nel file {key}.csv, {count}: {lingue} vs {len(value[enum])}")
+                            f"Numero di lingue diverso nel file {key}.csv, {count}: {lingue} vs {len(value[enum])}\n{value[enum]}")
                         exit(1)
 
                     if count == 1:
@@ -59,7 +59,22 @@ def main(indir, outdir):
 
                     c.write("    {")
                     for string in value[enum]:
-                        c.write('"' + string.replace('"', '\\"') + '", ')
+                        sanitized = string.replace('"', '\\"')
+                        nonAscii = [
+                            ("é", "e"), ("ó", "o"), ("ü", "u"), ("à", "a"),
+                            ("â", "a"), ("ä", "a"), ("æ", "ae"), ("ç", "c"),
+                            ("è", "e"), ("é", "e"), ("ë", "e"), ("î", "i"),
+                            ("ï", "i"), ("ô", "o"), ("œ", "oe"),  ("ù", "u"),
+                            ("û", "u"), ("ß", "ss"), ("ö", "o"), ("í", "i"),
+                            ("ñ", "n"), ("ú", "u"), ("ê", "e"),
+                        ]
+
+                        for chars in nonAscii:
+                            sanitized = sanitized.replace(chars[0], chars[1])
+                            sanitized = sanitized.replace(
+                                chars[0].upper(), chars[1].upper())
+
+                        c.write('"' + sanitized + '", ')
                     c.write("},\n")
 
                 c.write("};\n\n")

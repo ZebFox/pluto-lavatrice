@@ -1,5 +1,5 @@
-Identificatore, Italiano, Inglese
-UTENTE, Utente, User
-TECNICO, Tecnico, Technician
-DISTRIBUTORE, Distributore, Distributor
-COSTRUTTORE, Costruttore, Constructor
+Identificatore, Italiano, Inglese,Spagnolo,Francese,Tedesco
+UTENTE, Utente, User, Usuario, Utilisateur, Benutzer
+TECNICO, Tecnico, Technician, Técnico, Technicien, Techniker
+DISTRIBUTORE, Distributore, Distributor, Distribuidor, Distributeur, Vertriebspartner
+COSTRUTTORE, Costruttore, Constructor, Fabricante, Fabricant, Hersteller

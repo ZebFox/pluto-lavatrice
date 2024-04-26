@@ -1,177 +1,177 @@
-Identificatore, Italiano, Inglese
-,,
-INSERIRE_MONETA, Inserire moneta, Insert coin
-INSERIRE_GETTONE, Inserire gettone, Insert token
-PAGARE_CASSA, Pagare cassa, Pay at desk
-PAGARE_GETTONE, Pagare gettone, Insert token 
-PAGARE_MONETA, Pagare moneta, Insert coin 
-SCELTA_PROGRAMMA, Scelta programma, Choose program
-E_PREMERE_START, e premere start, and press start
-MACCHINA_AL_LAVORO, al  lavoro, al  lavoro
-MACCHINA_IN_PAUSA, pausa lavoro, pausa lavoro
-ALLARME_ERRORE_RAM, *  RAM   KO  *, *  RAM   KO  *
-ALLARME_OBLO_APERTO, OBLO' APERTO, OBLO' APERTO
-ALLARME_OBLO_SBLOCCATO, OBLO' SBLOCCATO, OBLO' SBLOCCATO
-ALLARME_EMERGENZA, STOP EMERGENZA, STOP EMERGENZA
-ALLARME_SBILANCIAMENTO, SBILANCIAMENTO, LURCHING
-ALLARME_CHIAVISTELLO_BLOCCATO, CHIAVISTELLO BLOCCATO, STUCK LOCK
-ALLARME_SERRATURA, ALLARME SERRATURA, LOCK ALARM
-ALLARME_LIVELLO, ALLARME LIVELLO, LEVEL ALARM
-ALLARME_SERRATURA_FORZATA, SERRATURA FORZATA, FORCED LOCK
-ALLARME_TEMPO_SCADUTO_T1, NO TEMPERATURA, NO TEMPERATURA
-ALLARME_INVERTER, INVERTER KO, INVERTER KO
-ALLARME_FILTRO_APERTO, FILTRO APERTO, OPENED FILTER
-ALLARME_BLOCCO_BRUCIATORE, BLOCC.BRUCIATORE, BLOCC.BRUCIATORE
-ALLARME_TEMPERATURA_1, ALL.SONDA TEMP., ALL.SONDA TEMP.
-ALLARME_APERTO_H2O, APERTO CON H2O, OPEN WITH H2O
-ALLARME_ACCELEROMETRO, ALLARME ACCELEROMETRO, ACCELEROMETER ALARM
-ALLARME_ACCELEROMETRO_FUORI_SCALA, ACC. FUORI SCALA, ACC. OUT OF RANGE
-ALLARME_VELOCITA, ALLARME VELOCITA', SPEED ALARM
-ALLARME_NO_MOTO, NO MOTO, NOT MOVING
-ALLARME_NO_FERMO, NO FERMO, NOT STOPPED
-ALLARME_TEMPERATURA, ALLARME TEMPERATURA, TEMPERATURE ALARM
-ALLARME_H2O_IN_VASCA, H2O IN VASCA, H2O INSIDE
-ALLARME_RIEMPIMENTO, ALLARME RIEMPIMENTO, FILLUP ALARM
-ALLARME_RISCALDAMENTO, ALLARME RISC., HEATING ALARM
-ALLARME_SCARICO, ALLARME SCARICO, DRAIN ALARM
-MACCHINA_ACCESA, MACCHINA ACCESA, MACHINE ON
-ALLARME_FLUSSO_ARIA, NO  ARIA, NO  ARIA
-ALLARME_ANOMALIA_ARIA, ANOMALIA  ARIA, ANOMALIA  ARIA
-AVVISO_ANTIPIEGA, ANTIPIEGA  !, ANTIPIEGA  !
-AVVISO_DRY_CONTROL, DRY  CONTROL, DRY  CONTROL
-AVVISO_SOVRATEMPERATURA, TEMPERATURA ALTA, TEMPERATURA ALTA
-AVVISO_MANUTENZIONE, MANUTENZIONE !, MANUTENZIONE !
-ITALIANO, ITALIANO, ITALIAN
-INGLESE, INGLESE, ENGLISH
-CONTRASTO_LCD, CONTRASTO LCD, LCD CONTRAST
-STATISTICHE, STATISTICHE, STATISTICS
-TEMPO_ACCENSIONE, T acceso, Active t.
-TEMPO_LAVORO, T lavoro, Work t.
-TEMPO_MOTO, T moto, Run t.
-TEMPO_VENTILAZIONE, T ventilaz., Fan run time
-TEMPO_RISCALDAMENTO, T risc., Heat time
-CICLI_PARZIALI, Cicli par, Part cycles
-CICLI_TOTALI, Cicli tot, Tot cycles
-GETTONI_TOTALI, Gettoni totali, Total coins
-SALVATAGGIO_IN_CORSO, Salvataggio in corso..., Saving...
-TEMPO_CICLO, TEMPO CICLO, CYCLE TIME
-TEMPERATURA, TEMPERATURA, TEMPERATURE
-VELOCITA, VELOCITA', SPEED
-LUNEDI, LUNEDI', MONDAY
-MARTEDI, MARTEDI', TUESDAY
-MERCOLEDI, MERCOLEDI', WEDNESDAY
-GIOVEDI, GIOVEDI', THURSDAY
-VENERDI, VENERDI', FRIDAY
-SABATO, SABATO, SATURDAY
-DOMENICA, DOMENICA, SUNDAY
-MODIF_PROGRAMMA, MODIF. PROGRAMMA, MODIFY PROG.
-NESSUN_PROGRAMMA, Nessun programma, No programs
-NUOVO_PROGRAMMA, Crea un nuovo programma, Create a new program
-PARAMETRI_MAC, PARAMETRI MAC., MAC. PARAMETERS
-PARAMETRI_PASSO, PARAMETRI PASSO, STEP PARAMETERS
-PREZZO, PREZZO, PRICE
-PREZZO_LOWER, Prezzo, Price
-TIPO, TIPO, TYPE
-PASSI_PROGRAMMA, PASSI PROGRAMMA, PROGRAM STEPS
-PASSO, Passo, Step
-PROGRAMMA_VUOTO, Programma vuoto, Empty program
-AMMOLLO, Ammollo, Soaking
-PRELAVAGGIO, Prelavaggio, Prewash
-LAVAGGIO, Lavaggio, Washing
-RISCIACQUO, Risciacquo, Flushing
-SCARICO, Scarico, Drain
-CENTRIFUGA, Centrifuga, Centrifuge
-SROTOLAMENTO, Srotolamento, Unrolling
-ATTESA_OPERATORE, Attesa operatore, Waiting
-FASE, FASE, PHASE
-PRECARICA_IN_CORSO, Precarica in corso, Preloading
-ATTESA_LIVELLO_E_TEMPERATURA, Attesa livel. e temp., Wait for temper/level
-ATTESA_LIVELLO, Attesa livello, Waiting for the water level
-ATTESA_TEMPERATURA, Attesa temperatura, Waiting for temperature
-RIEMPIMENTO, Riempimento, Filling up
-ATTESA_TERMODEGRADAZIONE, Att.termodegradazione, Wait for thermal down
-ATTESA_LIVELLO_SCARICO, Attesa livel. scarico, Wait for drain level
-PRESCARICO, Prescarico, Pre-draining
-PREPARAZIONE, Preparazione, Preparing
-RAGGIUNGIMENTO_VELOCITA, Attesa velocita', Warning speed
-IN_FRENATA, In frenata, Stopping due to lurching
-ATTESA_FRENATA, Attesa frenata, Waiting for full stop
-SCARICO_FORZATO, Scarico forzato, Forced drain
-RECUPERO, Recupero, Recovery
-USCITA_LAVAGGIO, Uscita lavaggio, Washing exit
-PAUSA_LAVAGGIO, Pausa lavaggio, Cycle pause
-SCARICO_NECESSARIO, Scarico necessario; tenere premuto il tasto stop, Drain required; long press the stop button
-MOLTO_SPORCHI_CON_PRELAVAGGIO, Molto sporchi con prelavaggio, Very dirty with prewash
-SPORCHI_CON_PRELAVAGGIO, Sportchi con prelavaggio, Dirty with prewash
-MOLTO_SPORCHI, Molto sporchi, Very dirty
-SPORCHI, Sporchi, Dirty
-COLORATI, Colorati, Coloured
-SINTETICI, Sintetici, Artificial
-PIUMONI, Piumoni, Duvets
-DELICATI, Delicati, Delicates
-LANA, Lana, Whool
-LINO_E_TENDAGGI, Lino e tendaggi, Linen and curtains
-CENTRIFUGA, Centrifuga, Centrifuge
-CENTRIFUGA_PER_DELICATI, Centrifuga per delicati, Centrifuge for delicates
-SANIFICAZIONE, Sanificazione, Sanification
-ERRORE_EEPROM, Errore EEPROM, EEPROM error
-ALLARME_SPEGNIMENTO, Allarme spegnimento, Power off alarm
-ALLARME_COMUNICAZIONE, Allarme comunicazione, Communication alarm
-ALLARME, Allarme, Alarm
-CANCELLARE_IL_PROGRAMMA, Cancellare il programma?, Delete the program?
-INIZIO_PROGRAMMA, Inizio programma, Program start
-TEST_LIVELLO, TEST LIVELLO, LEVEL TEST
-ERRORE_COMUNICAZIONE, Errore di comunicazione con la macchina, Communication error with the machine
-LINGUA_VIDEATE, Lingua videate, Display language
-LINGUA, Lingua, Language
-INFORMAZIONI, INFORMAZIONI, INFORMATIONS
-ERRORE, Errore, Error
-ABILITATA, Abilitata, Enabled
-SI, Si, Yes
-NO, No, No
-DEBUG, Debug, Debug
-TEMPO_H2O_CALDA, H2O cal, Warm H2O
-TEMPO_H2O_FREDDA, H2O fre, Cold H2O
-TEMPO_H2O_FLUSSO, H2O flu, Flux H2O
-TEMPO_H2O_REC_DEP, H2O rec, Rec H2O
-CHIUSURE_OBLO, Chiu. oblo, Port close
-APERTURE_OBLO, Aper. oblo, Port open
-TEMPO_SAPONE_1, T sap. 1, T det. 1
-TEMPO_SAPONE_2, T sap. 2, T det. 2
-TEMPO_SAPONE_3, T sap. 3, T det. 3
-TEMPO_SAPONE_4, T sap. 4, T det. 4
-TEMPO_SAPONE_5, T sap. 5, T det. 5
-TEMPO_SAPONE_6, T sap. 6, T det. 6
-TEMPO_SAPONE_7, T sap. 7, T det. 7
-TEMPO_SAPONE_8, T sap. 8, T det. 8
-TEMPO_SAPONE_9, T sap. 9, T det. 9
-TEMPO_SAPONE_10, T sap. 10, T det. 10
-FINE_LAVAGGIO, FINE LAVAGGIO, CYCLE END
-INIZIO_LAVAGGIO, INIZIO LAVAGGIO, CYCLE START
-LAVAGGIO_INTERROTTO, LAV. INTERROTTO, CYCLE STOPPED
-APRIRE_OBLO, APRIRE OBLO, OPEN PORT
-STANDBY_SAPONI, STANDBY SAPONI, DET. STANDBY
-INIZIO, Inizio, Start
-COPIARE_IN_POSIZIONE, Copiare in posizione, Copy in position
-SAPONE, Sapone, Detergent
-TEST_TEMPERATURE, TEST TEMPERATURE, TEMPERATURES TEST
-TEST_INGRESSI, TEST INGRESSI, INPUT TEST
-TEST_RISCALDO, TEST RISCALDO, HEATING TEST
-TEST_S_PROSSIMITA, S. PROSSIMITA', PROXIMITY S.
-TEST_CONTALITRI, TEST CONTALITRI, TEST L. COUNTER
-TEST_MOTORE_AVA, TEST MOTORE AVA, TEST FORWARD
-TEST_MOTORE_IND, TEST MOTORE IND, TEST BACKWARD
-TEST_010, TEST 0/10V, TEST 0/10V
-ARCHIVIAZIONE, ARCHIVIAZIONE, STORAGE
-INSERIRE_UN_DISPOSITIVO_DI_ARCHIVIAZIONE, Inserire un dispositivo di archiviazione, Insert a storage device
-DISPOSITIVO_RIMOSSO_PREMERE_MENU_PER_RIAVVIARE_LA_MACCHINA, Dispositivo rimosso; premere menu' per riavviare la macchina, Device removed; press menu' to reset the machine
-NESSUNA_CONFIGURAZIONE_TROVATA, Nessuna configurazione trovata, No configuration found
-CHIAVE_PER_ESPORTARE, Chiave per esportare, Key to export
-CHIAVE_PER_ESPORTARE_BANDIERA_PER_IMPORTARE, Chiave per esportare - Bandiera per importare, Key to export - Flag to import
-CONFIGURAZIONE_ESPORTATA, Configurazione esportata, Configuration saved
-OPERAZIONE_IN_CORSO, Operazione in corso, Processing
-CONFIGURAZIONE_CARICATA_CON_SUCCESSO, Configurazione caricata con successo, Configuration successfully loaded
-ERRORE_NEL_CARICAMENTO_DELLA_CONFIGURAZIONE, Errore nel caricamento della configurazione, Configuration load failed
-ERRORE_NEL_SALVATAGGIO_DELLA_CONFIGURAZIONE, Errore nel salvataggio della configurazione, Configuration save failed
-APRI_E_SVUOTA, Aprire oblo' e svuotare cesto, Open and empty 
-FRENATA_IN_CORSO, Frenata in corso, Stopping
+Identificatore, Italiano, Inglese,spagnolo,francese,tedesco
+,,,,,
+INSERIRE_MONETA, Inserire moneta, Insert coin, Insertar moneda, Insérer une pièce, Münze einwerfen
+INSERIRE_GETTONE, Inserire gettone, Insert token, Insertar ficha, Insérer un jeton, Jeton einwerfen
+PAGARE_CASSA, Pagare cassa, Pay cashier, Pagar al cajero, Payer le caissier, Kassierer bezahlen
+PAGARE_GETTONE, Pagare gettone, Pay token, Pagar ficha, Payer le jeton, Jeton bezahlen
+PAGARE_MONETA, Pagare moneta, Pay coin, Pagar moneda, Payer la pièce, Münze bezahlen
+SCELTA_PROGRAMMA, Scelta programma, Select programme, Seleccione el programa, Sélectionner le programme, Programm auswählen
+E_PREMERE_START, e premere start, and press start, y pulse Inicio, et appuyer sur start, und Start drücken
+MACCHINA_AL_LAVORO, al  lavoro, at work, al trabajo, au travail, bei der Arbeit
+MACCHINA_IN_PAUSA, pausa lavoro, pause work, pausar trabajo, pause travail, Arbeit unterbrechen
+ALLARME_ERRORE_RAM, *  RAM   KO  *, * RAM KO, * RAM KO, * RAM KO, * RAM KO
+ALLARME_OBLO_APERTO, OBLO' APERTO, PORTHOLE OPEN, PORTILLA ABIERTA, PORTOLE OUVERT, PORTHOLE ÖFFNEN
+ALLARME_OBLO_SBLOCCATO, OBLO' SBLOCCATO, PORTHOLE UNLOCKED, PORTILLA DESBLOQUEADA, HUBLOT DÉVERROUILLÉ, BULLAUGE ENTRIEGELT
+ALLARME_EMERGENZA, STOP EMERGENZA, EMERGENCY STOP, PARADA DE EMERGENCIA, ARRÊT D'URGENCE, NOTHALT
+ALLARME_SBILANCIAMENTO, SBILANCIAMENTO, UNBALANCING, DESBLOQUEO, DÉSÉQUILIBRAGE, AUSGLEICH
+ALLARME_CHIAVISTELLO_BLOCCATO, CHIAVISTELLO BLOCCATO, LOCK LOCKED, CERRADURA BLOQUEADA, VERROUILLAGE VERROUILLÉ, SCHLOSS VERRIEGELT
+ALLARME_SERRATURA, ALLARME SERRATURA, LOCK ALARM, ALARMA DE BLOQUEO, ALARME DE VERROUILLAGE, SCHLOSS ALARM
+ALLARME_LIVELLO, ALLARME LIVELLO, LEVEL ALARM, ALARMA DE NIVEL, ALARME DE NIVEAU, NIVEAUALARM
+ALLARME_SERRATURA_FORZATA, SERRATURA FORZATA, LOCK FORCED, BLOQUEO FORZADO, VERROUILLAGE FORCÉ, VERRIEGELUNG GEZWUNGEN
+ALLARME_TEMPO_SCADUTO_T1, NO TEMPERATURA, NO TEMPERATURE, SIN TEMPERATURA, PAS DE TEMPERATURE, KEINE TEMPERATUR
+ALLARME_INVERTER, INVERTER KO, INVERTER KO, INVERSOR KO, INVERTER KO, UMRICHTER KO
+ALLARME_FILTRO_APERTO, FILTRO APERTO, FILTER OPEN, FILTRO ABIERTO, FILTRE OUVERT, FILTER OFFEN
+ALLARME_BLOCCO_BRUCIATORE, BLOCC.BRUCIATORE, BURNER BLOCK, BLOQUE QUEMADOR, BLOCAGE DU BRÛLEUR, BURNER BLOCK
+ALLARME_TEMPERATURA_1, ALL.SONDA TEMP., ALL.TEMP. PROBE, SONDA TODO.TEMP., SONDE ALL.TEMP., ALL.TEMP.FÜHLER
+ALLARME_APERTO_H2O,APERTO CON H2O,OPEN WITH H2O,ABIERTO CON H2O,OUVERT AVEC H2O,OFFEN MIT H2O
+ALLARME_ACCELEROMETRO, ALLARME ACCELEROMETRO, ACCELEROMETER ALARM, ACELERÓMETRO ALARMA, ACCÉLÉROMÈTRE ALARME, BESCHLEUNIGUNGSMESSER ALARM
+ALLARME_ACCELEROMETRO_FUORI_SCALA, ACC. FUORI SCALA, ACC. OFF SCALE, ACC. ESCALA OFF, ACC. OFF SCALE, ACC. AUS WAAGE
+ALLARME_VELOCITA, ALLARME VELOCITA', SPEED ALARM, ALARMA VELOCIDAD, ALARME DE VITESSE, GESCHWINDIGKEITSALARM
+ALLARME_NO_MOTO, NO MOTO, NO MOTION, NO MOVIMIENTO, PAS DE MOUVEMENT, KEINE BEWEGUNG
+ALLARME_NO_FERMO, NO FERMO, NO STOP, NO STOP, PAS D'ARRÊT, NICHT STOPP
+ALLARME_TEMPERATURA, ALLARME TEMPERATURA, TEMPERATURE ALARM, ALARMA DE TEMPERATURA, ALARME TEMPÉRATURE, TEMPERATURALARM
+ALLARME_H2O_IN_VASCA,H2O IN VASCA,H2O IN TANK,H2O EN TANQUE,H2O DANS LE RÉSERVOIR,H2O IM TANK
+ALLARME_RIEMPIMENTO, ALLARME RIEMPIMENTO, FILLING ALARM, ALARMA DE LLENADO, ALARME DE REMPLISSAGE, FÜLLUNGSALARM
+ALLARME_RISCALDAMENTO, ALLARME RISC., HEAT ALARM, ALARMA DE CALOR, ALARME DE CHALEUR, HEIZUNGSALARM
+ALLARME_SCARICO, ALLARME SCARICO, DRAIN ALARM, ALARMA DE DRENAJE, ALARME DE VIDANGE, ALARM ENTLEERUNG
+MACCHINA_ACCESA, MACCHINA ACCESA, MACHINE ON, MÁQUINA ENCENDIDA, MACHINE EN MARCHE, MASCHINE AN
+ALLARME_FLUSSO_ARIA, NO  ARIA, NO AIR, NO AIRE, PAS D'AIR, KEINE LUFT
+ALLARME_ANOMALIA_ARIA, ANOMALIA  ARIA, AIR ANOMALY, ANOMALIA AIRE, ANOMALIE DE L'AIR, LUFT ANOMALIE
+AVVISO_ANTIPIEGA, ANTIPIEGA  !, DRY CONTROL !, CONTROL SECO, DRY CONTROL !, TROCKENKONTROLLE !
+AVVISO_DRY_CONTROL, DRY  CONTROL, DRY CONTROL, CONTROL SECO, DRY CONTROL, TROCKENKONTROLLE
+AVVISO_SOVRATEMPERATURA, TEMPERATURA ALTA, HIGH TEMPERATURE, ALTA TEMPERATURA, TEMPÉRATURE ÉLEVÉE, HOHE TEMPERATUR
+AVVISO_MANUTENZIONE, MANUTENZIONE !, MAINTENANCE !, ¡MANTENIMIENTO !, MAINTENANCE !, WARTUNG !
+ITALIANO, ITALIANO, ITALIAN, ITALIANO, ITALIEN, ITALIENISCH
+INGLESE, INGLESE, ENGLISH, INGLÉS, ANGLAIS, ENGLISCH
+CONTRASTO_LCD, CONTRASTO LCD, LCD CONTRAST, LCD CONTRASTE, CONTRASTE LCD, LCD KONTRAST
+STATISTICHE, STATISTICHE, STATISTICS, ESTADÍSTICAS, STATISTIQUES, STATISTIKEN
+TEMPO_ACCENSIONE, T acceso, Active t., Tiempo de puesta en marcha, Temps de démarrage, Zeit der Inbetriebnahme
+TEMPO_LAVORO, T lavoro, Work t., Tiempo de trabajo, Temps de travail, Betriebszeit
+TEMPO_MOTO, T moto, Run t., Tiempo de movimiento, Temps de mouvement, Bewegungszeit
+TEMPO_VENTILAZIONE, T ventilaz., Fan run time, Tiempo de ventilación, Temps de ventilation, Lüftungszeit
+TEMPO_RISCALDAMENTO, T risc., Heat time, Tiempo de calentamiento, Temps de chauffe, Heizzeit
+CICLI_PARZIALI, Cicli par, Part cycles, Ciclos parciales, Cycles partiels, Teilweise Zyklen
+CICLI_TOTALI, Cicli tot, Tot cycles, Ciclos totales, Cycles totaux, Gesamtzyklen
+GETTONI_TOTALI, Gettoni totali, Total coins, Total de fichas, Total des jetons, Token gesamt
+SALVATAGGIO_IN_CORSO, Salvataggio in corso..., Saving..., Ahorro en curso, Mémorisation en cours..., Laufende Speicherung
+TEMPO_CICLO, TEMPO CICLO, CYCLE TIME, TIEMPO DE CICLO, TEMPS DU CYCLE, ZYKLUSZEIT
+TEMPERATURA, TEMPERATURA, TEMPERATURE, TEMPERATURA, TEMPERATURE, TEMPERATUR
+VELOCITA, VELOCITA', SPEED, VELOCIDAD, VITESSE, GESCHWINDIGKEIT
+LUNEDI, LUNEDI', MONDAY, LUNES, LUNDI, MONTAG
+MARTEDI, MARTEDI', TUESDAY, MARTES, MARDI, DIESTAG
+MERCOLEDI, MERCOLEDI', WEDNESDAY, MIÉRCOLES, MERCREDI, MITTWOCH
+GIOVEDI, GIOVEDI', THURSDAY, JUEVES, JEUDI, DONNERSTAG
+VENERDI, VENERDI', FRIDAY, VIERNES, VENDREDI, FREITAG
+SABATO, SABATO, SATURDAY, SÁBADO, SAMEDI, SAMSTAG
+DOMENICA, DOMENICA, SUNDAY, DOMINGO, DIMANCHE, SONNTAG
+MODIF_PROGRAMMA, MODIF. PROGRAMMA, MODIFY PROG., MODIF. PROGRAMA, MODIF. PROGRAMME, ÄNDERUNG DES PROGRAMMS
+NESSUN_PROGRAMMA, Nessun programma, No programs, Ningún programa, Pas de programme, Kein Programm
+NUOVO_PROGRAMMA, Crea un nuovo programma, Create a new program, Crear un nuevo programa, Créer un nouveau programme, Erstellen Sie ein neues Programm
+PARAMETRI_MAC, PARAMETRI MAC., MAC. PARAMETERS, PARÁMETROS MAC, PARAMÈTRES DU MAC, MAC-PARAMETER
+PARAMETRI_PASSO, PARAMETRI PASSO, STEP PARAMETERS, PARÁMETROS DE PASO, PARAMÈTRES DE L'ÉTAPE, SCHRITT-PARAMETER
+PREZZO, PREZZO, PRICE, PRECIO, PRIX, PREIS
+PREZZO_LOWER, Prezzo, Price, Precio, Prix, Preis
+TIPO, TIPO, TYPE, TIPO, TYPE, TYP
+PASSI_PROGRAMMA, PASSI PROGRAMMA, PROGRAM STEPS, PROGRAMA PASOS, PROGRAMME ÉTAPES, PROGRAMM SCHRITTE
+PASSO, Passo, Step, Paso, Etape, Schritt
+PROGRAMMA_VUOTO, Programma vuoto, Empty program, Programa vacío, Programme vide, Programm entleeren
+AMMOLLO, Ammollo, Soaking, Remojo, Trempage, Einweichen
+PRELAVAGGIO, Prelavaggio, Prewash, Prelavado, Prélavage, Vorwaschen
+LAVAGGIO, Lavaggio, Washing, Lavar, Lavage, Waschen
+RISCIACQUO, Risciacquo, Flushing, Aclarado, Rinçage, Spülen
+SCARICO, Scarico, Drain, Escurrir, Vidange, Entleeren
+CENTRIFUGA, Centrifuga, Centrifuge, Centrifugar, Centrifugeuse, Zentrifugieren
+SROTOLAMENTO, Srotolamento, Unrolling, Desenrollar, Déroulement, Abspulen
+ATTESA_OPERATORE, Attesa operatore, Waiting, En espera del operario, Opérateur en attente, Bediener wartet
+FASE, FASE, PHASE, FASE, PHASE, PHASE
+PRECARICA_IN_CORSO, Precarica in corso, Preloading, Precarga en curso, Préchargement en cours, Vorbeladung im Gange
+ATTESA_LIVELLO_E_TEMPERATURA, Attesa livel. e temp., Wait for temper/level, Esperando nivel y temp., Attente du niveau et de la température, Warten auf Füllstand und Temp.
+ATTESA_LIVELLO, Attesa livello, Waiting for the water level, Esperando nivel, Attente du niveau, Warten auf Füllstand
+ATTESA_TEMPERATURA, Attesa temperatura, Waiting for temperature, Esperando temperatura, Attente de la température, Warten auf Temperatur
+RIEMPIMENTO, Riempimento, Filling up, Llenado, Remplissage, Füllen
+ATTESA_TERMODEGRADAZIONE, Att.termodegradazione, Wait for thermal down, En espera de termodegradación, Thermodégradation en attente, Standby-Thermoabbau
+ATTESA_LIVELLO_SCARICO, Attesa livel. scarico, Wait for drain level, Esperando nivel de descarga, Attente du niveau de décharge, Warten auf Entladeniveau
+PRESCARICO, Prescarico, Pre-draining, Pre-descarga, Pré-décharge, Vor der Entleerung
+PREPARAZIONE, Preparazione, Preparing, Preparación, Préparation, Vorbereitung
+RAGGIUNGIMENTO_VELOCITA, Attesa velocita', Warning speed, Velocidad de espera, Vitesse d'attente, Wartende Geschwindigkeit
+IN_FRENATA, In frenata, Stopping due to lurching, Frenado, Freinage, Bremsen
+ATTESA_FRENATA, Attesa frenata, Waiting for full stop, Espera de frenado, Freinage de l'attente, Bremsen warten
+SCARICO_FORZATO, Scarico forzato, Forced drain, Descarga forzada, Déchargement forcé, Erzwungene Entladung
+RECUPERO, Recupero, Recovery, Recuperación, Récupération, Wiederherstellung
+USCITA_LAVAGGIO, Uscita lavaggio, Washing exit, Salida de lavado, Sortie de la chasse d'eau, Spülen Ausgang
+PAUSA_LAVAGGIO, Pausa lavaggio, Cycle pause, Pausa lavado, Pause du lavage, Pause Waschen
+SCARICO_NECESSARIO, Scarico necessario; tenere premuto il tasto stop, Drain required; long press the stop button, Descarga forzada; mantenga pulsado el botón de parada, Déchargement nécessaire ; maintenir le bouton d'arrêt, Entladen erforderlich; Stopptaste gedrückt halten
+MOLTO_SPORCHI_CON_PRELAVAGGIO, Molto sporchi con prelavaggio, Very dirty with prewash, Muy sucio con prelavado, Très sale avec prélavage, Starke Verschmutzung mit Vorwaschgang
+SPORCHI_CON_PRELAVAGGIO, Sportchi con prelavaggio, Dirty with prewash, Muy sucio con prelavado, Très sale avec prélavage, Starke Verschmutzung mit Vorwaschgang
+MOLTO_SPORCHI, Molto sporchi, Very dirty, Muy sucio, Très sale, Stark verschmutzt
+SPORCHI, Sporchi, Dirty, Sucio, Sale, Verschmutzt
+COLORATI, Colorati, Coloured, Colores, Couleurs, Buntes
+SINTETICI, Sintetici, Artificial, Sintéticos, Synthétiques, Synthetik
+PIUMONI, Piumoni, Duvets, Edredones, Couettes, Bettdecken
+DELICATI, Delicati, Delicates, Delicados, Délicats, Feinwäsche
+LANA, Lana, Whool, Lana, Laine, Wolle
+LINO_E_TENDAGGI, Lino e tendaggi, Linen and curtains, Lino y cortinas, Linge et rideaux, Leinen und Gardinen
+CENTRIFUGA, Centrifuga, Centrifuge, Centrifugadora, Centrifugeuse, Zentrifuge
+CENTRIFUGA_PER_DELICATI, Centrifuga per delicati, Centrifuge for delicates, Centrifugadora para prendas delicadas, Centrifugeuse pour linge délicat, Zentrifuge für Feinwäsche
+SANIFICAZIONE, Sanificazione, Sanification, Desinfección, Assainissement, Desinfektion
+ERRORE_EEPROM, Errore EEPROM, EEPROM error, Error EEPROM, Erreur EEPROM, EEPROM-Fehler
+ALLARME_SPEGNIMENTO, Allarme spegnimento, Power off alarm, Alarma de desconexión, Alarme d'arrêt, Abschalt-Alarm
+ALLARME_COMUNICAZIONE, Allarme comunicazione, Communication alarm, Alarma de comunicación, Alarme de communication, Kommunikationsalarm
+ALLARME, Allarme, Alarm, Alarma, Alarme de communication, Alarm
+CANCELLARE_IL_PROGRAMMA, Cancellare il programma?, Delete the program?, ¿Borrar programa?, Effacer le programme ?, Programm löschen?
+INIZIO_PROGRAMMA, Inizio programma, Program start, Iniciar programa, Démarrer le programme, Programm starten
+TEST_LIVELLO, TEST LIVELLO, LEVEL TEST, NIVEL DE PRUEBA, NIVEAU DE TEST, TEST-EBENE
+ERRORE_COMUNICAZIONE, Errore di comunicazione con la macchina, Communication error with the machine, Error de comunicación con la máquina, Erreur de communication avec la machine, Kommunikationsfehler mit der Maschine
+LINGUA_VIDEATE, Lingua videate, Display language, Idioma de la pantalla, Langue de l'écran, Sprache des Bildschirms
+LINGUA, Lingua, Language, Idioma, Langue de l'écran, Sprache
+INFORMAZIONI, INFORMAZIONI, INFORMATIONS, INFORMACIÓN, INFORMATION, INFORMATIONEN
+ERRORE, Errore, Error, Error, Erreur, Fehler
+ABILITATA, Abilitata, Enabled, Activado, Activé, Aktiviert
+SI, Si, Yes, Sí, Oui, Ja
+NO, No, No, No, Non, Nein
+DEBUG, Debug, Debug, Depurar, Débogage, Fehlersuche
+TEMPO_H2O_CALDA,H2O cal,Warm H2O,H2O caliente,H2O chaud,H2O heiß
+TEMPO_H2O_FREDDA,H2O fre,Cold H2O,H2O frío,H2O froid,H2O kalt
+TEMPO_H2O_FLUSSO,H2O flu,Flux H2O,Flujo de H2O,H2O flow,H2O Durchfluss
+TEMPO_H2O_REC_DEP,H2O rec,Rec H2O,H2O rec,H2O rec,H2O rec
+CHIUSURE_OBLO, Chiu. oblo, Port close, Cerrando portilla, Fermeture du hublot, Schauglas schließen
+APERTURE_OBLO, Aper. oblo, Port open, Abertura de portilla, Ouverture du hublot, Bullauge öffnen
+TEMPO_SAPONE_1,T sap. 1,T det. 1,Tiempo jabón 1,Temps de savonnage 1,Seifenzeit 1
+TEMPO_SAPONE_2,T sap. 2,T det. 2,Tiempo jabón 2,Temps de savonnage 2,Seifenzeit 2
+TEMPO_SAPONE_3,T sap. 3,T det. 3,Tiempo jabón 3,Temps de savonnage 3,Seifenzeit 3
+TEMPO_SAPONE_4,T sap. 4,T det. 4,Tiempo jabón 4,Temps de savonnage 4,Seifenzeit 4
+TEMPO_SAPONE_5,T sap. 5,T det. 5,Tiempo jabón 5,Temps de savonnage 5,Seifenzeit 5
+TEMPO_SAPONE_6,T sap. 6,T det. 6,Tiempo jabón 6,Temps de savonnage 6,Seifenzeit 6
+TEMPO_SAPONE_7,T sap. 7,T det. 7,Tiempo jabón 7,Temps de savonnage 7,Seifenzeit 7
+TEMPO_SAPONE_8,T sap. 8,T det. 8,Tiempo jabón 8,Temps de savonnage 8,Seifenzeit 8
+TEMPO_SAPONE_9,T sap. 9,T det. 9,Tiempo jabón 9,Temps de savonnage 9,Seifenzeit 9
+TEMPO_SAPONE_10,T sap. 10,T det. 10,Tiempo jabón 10,Temps de savonnage 10,Seifenzeit 10
+FINE_LAVAGGIO, FINE LAVAGGIO, CYCLE END, FIN LAVADO, END WASH, ENDE WASCHEN
+INIZIO_LAVAGGIO, INIZIO LAVAGGIO, CYCLE START, INICIO LAVADO, START WASH, WASCHEN STARTEN
+LAVAGGIO_INTERROTTO, LAV. INTERROTTO, CYCLE STOPPED, LAVADO PARAR, LAVAGE ARRÊT, WASCHEN STOPP
+APRIRE_OBLO, APRIRE OBLO, OPEN PORT, AGUJERO ABIERTO, OUVERTURE, HÖLLE ÖFFNEN
+STANDBY_SAPONI, STANDBY SAPONI, DET. STANDBY, JABÓN EN ESPERA, SAVON EN RESERVE, SEIFE STANDBY
+INIZIO, Inizio, Start, Inicio, Démarrage, Start
+COPIARE_IN_POSIZIONE, Copiare in posizione, Copy in position, Copia en posición, Copie en position, Kopie in Position
+SAPONE, Sapone, Detergent, Jabón, Savon, Seife
+TEST_TEMPERATURE, TEST TEMPERATURE, TEMPERATURES TEST, TEST TEMPERATURA, TEST DE TEMPÉRATURE, TEMPERATURTEST
+TEST_INGRESSI, TEST INGRESSI, INPUT TEST, PRUEBA DE ENTRADA, TEST D'ENTRÉE, EINGABE TEST
+TEST_RISCALDO, TEST RISCALDO, HEATING TEST, PRUEBA DE CALOR, TEST DE CHALEUR, WÄRME TEST
+TEST_S_PROSSIMITA, S. PROSSIMITA', PROXIMITY S., S. PROXIMIDAD, S. PROXIMITÉ, S. PROXIMITÄT
+TEST_CONTALITRI, TEST CONTALITRI, TEST L. COUNTER, PRUEBA DE CAUDALÍMETRO, TEST DE DÉBITMÈTRE, DURCHFLUSSMESSER-TEST
+TEST_MOTORE_AVA, TEST MOTORE AVA, TEST FORWARD, PRUEBA MOTOR AVA, TEST MOTEUR AVA, AVA MOTOR TEST
+TEST_MOTORE_IND, TEST MOTORE IND, TEST BACKWARD, PRUEBA MOTOR IND, IND MOTEUR TEST, IND MOTOR TEST
+TEST_010,TEST 0/10V,TEST 0/10V,TEST 0/10V,TEST 0/10V,0/10V TEST
+ARCHIVIAZIONE, ARCHIVIAZIONE, STORAGE, ARCHIVO, ARCHIVAGE, ARCHIVIEREN
+INSERIRE_UN_DISPOSITIVO_DI_ARCHIVIAZIONE, Inserire un dispositivo di archiviazione, Insert a storage device, Insertar un dispositivo de almacenamiento, Insérer un périphérique de stockage, Einlegen eines Speichermediums
+DISPOSITIVO_RIMOSSO_PREMERE_MENU_PER_RIAVVIARE_LA_MACCHINA, Dispositivo rimosso; premere menu' per riavviare la macchina, Device removed; press menu' to reset the machine, Dispositivo retirado; pulse menú para reiniciar la máquina, Périphérique retiré ; appuyer sur menu pour redémarrer la machine, "Gerät entfernt; drücken Sie das Menü, um das Gerät neu zu starten"
+NESSUNA_CONFIGURAZIONE_TROVATA, Nessuna configurazione trovata, No configuration found, No se ha encontrado ninguna configuración, Aucune configuration trouvée, Keine Konfiguration gefunden
+CHIAVE_PER_ESPORTARE, Chiave per esportare, Key to export, Clave para exportar, Clé d'exportation, Schlüssel zum Exportieren
+CHIAVE_PER_ESPORTARE_BANDIERA_PER_IMPORTARE, Chiave per esportare - Bandiera per importare, Key to export - Flag to import, Clave para exportar - Bandera para importar, Touche d'exportation - Drapeau d'importation, Taste zum Exportieren - Flagge zum Importieren
+CONFIGURAZIONE_ESPORTATA, Configurazione esportata, Configuration saved, Configuración exportada, Configuration exportée, Konfiguration exportiert
+OPERAZIONE_IN_CORSO, Operazione in corso, Processing, Operación en curso, Opération en cours, Vorgang läuft
+CONFIGURAZIONE_CARICATA_CON_SUCCESSO, Configurazione caricata con successo, Configuration successfully loaded, Configuración cargada correctamente, Configuration chargée avec succès, Konfiguration erfolgreich geladen
+ERRORE_NEL_CARICAMENTO_DELLA_CONFIGURAZIONE, Errore nel caricamento della configurazione, Configuration load failed, Error al cargar la configuración, Erreur de chargement de la configuration, Fehler beim Laden der Konfiguration
+ERRORE_NEL_SALVATAGGIO_DELLA_CONFIGURAZIONE, Errore nel salvataggio della configurazione, Configuration save failed, Error al guardar la configuración, Erreur de sauvegarde de la configuration, Fehler beim Speichern der Konfiguration
+APRI_E_SVUOTA, Aprire oblo' e svuotare cesto, Open and empty , Portilla abierta y cesta vacía, Ouvrir le hublot et vider le panier, Bullauge öffnen und Korb leeren
+FRENATA_IN_CORSO, Frenata in corso, Stopping, Frenado en curso, Freinage en cours, Bremsvorgang läuft
