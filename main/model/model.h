@@ -336,6 +336,13 @@ typedef struct {
 } test_data_t;
 
 
+typedef enum {
+    TEST_OVERRIDE_NONE = 0,
+    TEST_OVERRIDE_ON,
+    TEST_OVERRIDE_OFF,
+} test_override_t;
+
+
 typedef struct {
     statistics_t stats;
     test_data_t  test;     // Informazioni relative alle schermate di test
@@ -373,6 +380,8 @@ typedef struct {
 
         uint8_t done;
         int     livello_accesso_temporaneo;
+
+        test_override_t digital_coin_reader_test_override;
     } run;     // Informazioni relative all'esecuzione attuale (sia della scheda quadro che dell'applicazione)
 
     struct {
@@ -451,7 +460,8 @@ size_t                     model_get_num_user_programs(model_t *pmodel);
 void                       model_set_drive_mounted(model_t *pmodel, removable_drive_state_t drive_mounted);
 int                        model_get_minimo_livello_riscaldo(model_t *model);
 int                        model_get_velocita_corretta(model_t *model);
-void program_deserialize_preview(model_t *pmodel, programma_preview_t *p, uint8_t *buffer, uint16_t lingua);
-
+void         program_deserialize_preview(model_t *pmodel, programma_preview_t *p, uint8_t *buffer, uint16_t lingua);
+int          model_gettoniera_digitale_abilitata(model_t *pmodel);
+unsigned int model_get_credito_gettoniera_digitale(model_t *model);
 
 #endif

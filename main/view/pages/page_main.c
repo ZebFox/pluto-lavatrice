@@ -38,6 +38,7 @@ struct page_data {
     lv_obj_t *lbl_alarm;
     lv_obj_t *lbl_alarm_code;
     lv_obj_t *lbl_done;
+    lv_obj_t *lbl_screen_language;
 
     lv_obj_t *img_left;
     lv_obj_t *img_right;
@@ -193,10 +194,13 @@ static void open_page(model_t *pmodel, void *args) {
     pdata->popup_language = view_common_popup(lv_scr_act(), &lang_cont);
 
     lbl = lv_label_create(lang_cont, NULL);
+    lv_label_set_long_mode(lbl, LV_LABEL_LONG_BREAK);
+    lv_obj_set_width(lbl, 110);
+    lv_label_set_align(lbl, LV_LABEL_ALIGN_CENTER);
     lv_obj_set_style(lbl, &style_label_6x8);
     lv_label_set_text(lbl,
                       view_intl_get_string_from_language(model_get_temporary_language(pmodel), STRINGS_LINGUA_VIDEATE));
-    lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, -10);
+    pdata->lbl_screen_language = lbl;
 
     lbl = lv_label_create(lang_cont, NULL);
     lv_obj_set_style(lbl, &style_label_6x8);
@@ -554,9 +558,12 @@ static void update_timer_data(model_t *pmodel, struct page_data *pdata) {
 
 
 static void update_language_popup(model_t *pmodel, struct page_data *pdata) {
-    const strings_t languages[] = {STRINGS_ITALIANO, STRINGS_INGLESE};
+    const strings_t languages[] = {STRINGS_ITALIANO, STRINGS_INGLESE, STRINGS_SPAGNOLO, STRINGS_FRANCESE,
+                                   STRINGS_TEDESCO};
     uint16_t        language    = model_get_temporary_language(pmodel);
     lv_label_set_text(pdata->lbl_language, view_intl_get_string_from_language(language, languages[language]));
+    lv_label_set_text(pdata->lbl_screen_language, view_intl_get_string_from_language(language, STRINGS_LINGUA_VIDEATE));
+    lv_obj_align(pdata->lbl_screen_language, NULL, LV_ALIGN_CENTER, 0, -10);
 }
 
 

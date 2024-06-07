@@ -23,6 +23,8 @@ void model_init(model_t *pmodel) {
     pmodel->run.f_richiedi_scarico         = 0;
     pmodel->prog.contrast                  = 0x1A;
 
+    pmodel->run.digital_coin_reader_test_override = TEST_OVERRIDE_NONE;
+
     strcpy(pmodel->prog.parmac.nome, "Pluto");
 }
 
@@ -378,8 +380,13 @@ unsigned int model_get_credito(model_t *pmodel) {
 
 int model_gettoniera_digitale_abilitata(model_t *pmodel) {
     assert(pmodel != NULL);
-    return pmodel->prog.parmac.tipo_gettoniera == PAGAMENTO_DIGITALE ||
-           pmodel->prog.parmac.tipo_gettoniera == PAGAMENTO_DIGITALE_LINEA_SINGOLA;
+    if (pmodel->run.digital_coin_reader_test_override == TEST_OVERRIDE_NONE) {
+        return (pmodel->prog.parmac.tipo_gettoniera == PAGAMENTO_DIGITALE ||
+                pmodel->prog.parmac.tipo_gettoniera == PAGAMENTO_DIGITALE_LINEA_SINGOLA) &&
+               !model_lavaggio_pagato(pmodel, model_get_program_num(pmodel));
+    } else {
+        return pmodel->run.digital_coin_reader_test_override == TEST_OVERRIDE_ON;
+    }
 }
 
 

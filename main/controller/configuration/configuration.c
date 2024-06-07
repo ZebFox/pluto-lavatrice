@@ -187,7 +187,7 @@ int configuration_clone_program(model_t *pmodel, size_t destination) {
     int    res = 0;
 
     snprintf(path, sizeof(path), "%s/%s", PROGRAMS_PATH, model_new_unique_filename(pmodel, filename, get_millis()));
-    ESP_LOGI(TAG, "Cloning new program %s", path);
+    ESP_LOGI(TAG, "Cloning new program %s (from %i to %i)", path, model_get_program_num(pmodel), destination);
 
     uint8_t *buffer = malloc(MAX_PROGRAM_SIZE);
     assert(buffer != NULL);
@@ -200,13 +200,20 @@ int configuration_clone_program(model_t *pmodel, size_t destination) {
     fclose(fp);
     free(buffer);
 
-    for (size_t i = model_get_num_programs(pmodel); i > destination; i--) {
-        pmodel->prog.preview_programmi[i] = pmodel->prog.preview_programmi[i - 1];
-    }
-    pmodel->prog.preview_programmi[destination] = pmodel->prog.preview_programmi[model_get_program_num(pmodel)];
-    strcpy(pmodel->prog.preview_programmi[destination].filename, filename);
+    if (destination < model_get_num_programs(pmodel)) {
+        memcpy(&pmodel->prog.preview_programmi[destination],
+               &pmodel->prog.preview_programmi[model_get_program_num(pmodel)], sizeof(programma_preview_t));
+        strcpy(pmodel->prog.preview_programmi[destination].filename, filename);
+    } else {
+        for (size_t i = model_get_num_programs(pmodel); i > destination; i--) {
+            pmodel->prog.preview_programmi[i] = pmodel->prog.preview_programmi[i - 1];
+        }
+        memcpy(&pmodel->prog.preview_programmi[destination],
+               &pmodel->prog.preview_programmi[model_get_program_num(pmodel)], sizeof(programma_preview_t));
+        strcpy(pmodel->prog.preview_programmi[destination].filename, filename);
 
-    pmodel->prog.num_programmi++;
+        pmodel->prog.num_programmi++;
+    }
     update_index(pmodel->prog.preview_programmi, model_get_num_programs(pmodel));
     return res;
 }
@@ -351,7 +358,6 @@ int list_saved_programs(programma_preview_t *previews, size_t len) {
 int configuration_load_program(model_t *pmodel, size_t num) {
     programma_lavatrice_t *programma = model_get_program(pmodel);
     char                   path[PATH_MAX];
-    int                    count = 0;
 
     if (num >= model_get_num_programs(pmodel)) {
         return -1;
@@ -375,15 +381,14 @@ int configuration_load_program(model_t *pmodel, size_t num) {
         if (read == 0) {
             ESP_LOGE(TAG, "Non sono riuscito a leggere il file %s: %s", path, strerror(errno));
         } else {
-            program_deserialize_preview(pmodel, &pmodel->prog.preview_programmi[num], buffer, model_get_language(pmodel));
+            program_deserialize_preview(pmodel, &pmodel->prog.preview_programmi[num], buffer,
+                                        model_get_language(pmodel));
             deserialize_program(programma, buffer);
 
             // Controllo dei limiti
             for (size_t i = 0; i < programma->num_steps; i++) {
                 parlav_init(&pmodel->prog.parmac, &programma->steps[i]);
             }
-
-            count++;
         }
         pmodel->run.num_programma_caricato = num;
         pmodel->run.maybe_programma        = 1;
@@ -391,6 +396,7 @@ int configuration_load_program(model_t *pmodel, size_t num) {
         fclose(fp);
         free(buffer);
     }
+
     return 0;
 }
 
@@ -539,9 +545,10 @@ int configuration_load_all_data(model_t *pmodel) {
         parmac_init(pmodel, 0);
     }
 
-    pmodel->prog.num_programmi =
-        configuration_load_programs_preview(pmodel, pmodel->prog.preview_programmi, MAX_PROGRAMMI, model_get_language(pmodel));
+    pmodel->prog.num_programmi = configuration_load_programs_preview(pmodel, pmodel->prog.preview_programmi,
+                                                                     MAX_PROGRAMMI, model_get_language(pmodel));
     configuration_clear_orphan_programs(pmodel->prog.preview_programmi, pmodel->prog.num_programmi);
+    model_reset_temporary_language(pmodel);
 
     return configuration_read_local_data_version();
 }

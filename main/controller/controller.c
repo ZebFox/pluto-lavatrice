@@ -290,10 +290,22 @@ void controller_process_msg(view_controller_command_t *msg, model_t *pmodel) {
 
 
 void controller_manage(model_t *pmodel) {
-    static int           initial_level_check = 0;
-    static unsigned long stato_ts            = 0;
+    static int           initial_level_check         = 0;
+    static unsigned long stato_ts                    = 0;
+    static uint8_t       program_payed               = -1;
+    static uint8_t       digital_coin_reader_enabled = -1;
     machine_response_t   machine_response;
     msc_response_t       msc_response;
+
+    size_t current_program_num = model_get_program_num(pmodel);
+    if (program_payed != model_lavaggio_pagato(pmodel, current_program_num)) {
+        program_payed = model_lavaggio_pagato(pmodel, current_program_num);
+        machine_payment_state(program_payed);
+    }
+    if (digital_coin_reader_enabled != model_gettoniera_digitale_abilitata(pmodel)) {
+        digital_coin_reader_enabled = model_gettoniera_digitale_abilitata(pmodel);
+        machine_enable_digital_coin_reader(digital_coin_reader_enabled);
+    }
 
     if (is_expired(stato_ts, get_millis(), 500)) {
         model_set_drive_mounted(pmodel, msc_is_device_mounted());
@@ -406,7 +418,6 @@ void controller_manage(model_t *pmodel) {
                 if (!model_macchina_in_stop(pmodel) &&
                     (model_get_program_num(pmodel) != pmodel->run.macchina.numero_programma ||
                      pmodel->run.maybe_programma == 0)) {
-                    ESP_LOGI(TAG, "Loading current program");
                     configuration_load_program(pmodel, pmodel->run.macchina.numero_programma);
                 }
 

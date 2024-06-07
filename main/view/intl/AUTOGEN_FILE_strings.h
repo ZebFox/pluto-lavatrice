@@ -46,6 +46,9 @@ typedef enum {
     STRINGS_AVVISO_MANUTENZIONE,
     STRINGS_ITALIANO,
     STRINGS_INGLESE,
+    STRINGS_SPAGNOLO,
+    STRINGS_FRANCESE,
+    STRINGS_TEDESCO,
     STRINGS_CONTRASTO_LCD,
     STRINGS_STATISTICHE,
     STRINGS_TEMPO_ACCENSIONE,
@@ -179,6 +182,6 @@ typedef enum {
     STRINGS_FRENATA_IN_CORSO,
 } strings_t;
 
-extern const char *strings[175][5];
+extern const char *strings[178][5];
 
 #endif

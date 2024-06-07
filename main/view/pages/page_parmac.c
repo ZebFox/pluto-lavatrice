@@ -101,6 +101,8 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
 
     switch (event.code) {
         case VIEW_EVENT_CODE_TIMER:
+            model_reset_temporary_language(model);
+            msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_SAVE_PARMAC;
             msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
             break;
 
@@ -147,6 +149,7 @@ static view_message_t process_page_event(model_t *model, void *args, pman_event_
                         break;
 
                     case BUTTON_STOP:
+                        model_reset_temporary_language(model);
                         msg.cmsg.code = VIEW_CONTROLLER_COMMAND_CODE_SAVE_PARMAC;
                         msg.vmsg.code = VIEW_PAGE_COMMAND_CODE_BACK;
                         break;

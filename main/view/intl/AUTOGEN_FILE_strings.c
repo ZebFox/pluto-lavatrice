@@ -1,4 +1,4 @@
-const char *strings[175][5] = {
+const char *strings[178][5] = {
     {"", "", "", "", "", },
     {"Inserire moneta", "Insert coin", "Insertar moneda", "Inserer une piece", "Munze einwerfen", },
     {"Inserire gettone", "Insert token", "Insertar ficha", "Inserer un jeton", "Jeton einwerfen", },
@@ -43,6 +43,9 @@ const char *strings[175][5] = {
     {"MANUTENZIONE !", "MAINTENANCE !", "¡MANTENIMIENTO !", "MAINTENANCE !", "WARTUNG !", },
     {"ITALIANO", "ITALIAN", "ITALIANO", "ITALIEN", "ITALIENISCH", },
     {"INGLESE", "ENGLISH", "INGLES", "ANGLAIS", "ENGLISCH", },
+    {"SPAGNOLO", "SPANISH", "ESPANOL", "ESPAGNOL", "SPANISCH", },
+    {"FRANCESE", "FRENCH", "FRANCES", "FRANCAIS", "FRANZOSISCH", },
+    {"TEDESCO", "GERMAN", "ALEMAN", "ALLEMAND", "DEUTSCH", },
     {"CONTRASTO LCD", "LCD CONTRAST", "LCD CONTRASTE", "CONTRASTE LCD", "LCD KONTRAST", },
     {"STATISTICHE", "STATISTICS", "ESTADISTICAS", "STATISTIQUES", "STATISTIKEN", },
     {"T acceso", "Active t.", "Tiempo de puesta en marcha", "Temps de demarrage", "Zeit der Inbetriebnahme", },

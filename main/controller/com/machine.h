@@ -67,5 +67,7 @@ void machine_imposta_uscita_multipla(size_t uscita, int valore);
 void machine_imposta_dac(uint8_t dac);
 void machine_imposta_led(uint8_t led);
 void machine_azzera_credito(void);
+void machine_payment_state(uint8_t payment_state);
+void machine_enable_digital_coin_reader(uint8_t enable);
 
 #endif

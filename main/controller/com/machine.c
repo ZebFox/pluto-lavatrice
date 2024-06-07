@@ -38,6 +38,8 @@ typedef enum {
     MACHINE_REQUEST_CODE_SEND_DEBUG_CODE,
     MACHINE_REQUEST_CODE_DETERGENT_ACTIVATION,
     MACHINE_REQUEST_CODE_DETERGENT_CONTROL,
+    MACHINE_REQUEST_CODE_STATO_PAGAMENTO,
+    MACHINE_REQUEST_CODE_ABILITA_GETTONIERA,
 } machine_request_code_t;
 
 
@@ -76,6 +78,12 @@ typedef struct {
         struct {
             uint8_t value;
         } led;
+        struct {
+            uint8_t payment_state;
+        } payment_state;
+        struct {
+            uint8_t enable;
+        } enable_digital_coin_reader;
     };
 } machine_request_t;
 
@@ -123,6 +131,24 @@ int machine_read_state(model_t *pmodel) {
     memcpy(&pmodel->run.macchina, &stato, sizeof(stato_macchina_t));
     xSemaphoreGive(sem);
     return res;
+}
+
+
+void machine_payment_state(uint8_t payment_state) {
+    machine_request_t richiesta = {
+        .code          = MACHINE_REQUEST_CODE_STATO_PAGAMENTO,
+        .payment_state = {.payment_state = payment_state},
+    };
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
+}
+
+
+void machine_enable_digital_coin_reader(uint8_t enable) {
+    machine_request_t richiesta = {
+        .code                       = MACHINE_REQUEST_CODE_ABILITA_GETTONIERA,
+        .enable_digital_coin_reader = {.enable = enable},
+    };
+    xQueueSend(requestq, &richiesta, portMAX_DELAY);
 }
 
 
@@ -371,6 +397,18 @@ static int task_gestisci_richiesta(machine_request_t request) {
         case MACHINE_REQUEST_CODE_SEND_DEBUG_CODE: {
             uint8_t debug_code = request.debug_code;
             res                = invia_pacchetto(COMANDO_DEBUG, &debug_code, 1, &risposta_pacchetto, -1);
+            break;
+        }
+
+        case MACHINE_REQUEST_CODE_STATO_PAGAMENTO: {
+            res = invia_pacchetto(COMANDO_STATO_PAGAMENTO, &request.payment_state.payment_state, 1, &risposta_pacchetto,
+                                  -1);
+            break;
+        }
+
+        case MACHINE_REQUEST_CODE_ABILITA_GETTONIERA: {
+            res = invia_pacchetto(IMPOSTA_GETTONIERA, &request.enable_digital_coin_reader.enable, 1,
+                                  &risposta_pacchetto, -1);
             break;
         }
 
