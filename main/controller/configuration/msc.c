@@ -86,7 +86,7 @@ void msc_init(void) {
     message_queue = xQueueCreateStatic(sizeof(message_queue_buffer) / sizeof(task_message_t), sizeof(task_message_t),
                                        message_queue_buffer, &static_message_queue);
 
-    static uint8_t       response_queue_buffer[sizeof(task_message_t) * 4] = {0};
+    static uint8_t       response_queue_buffer[sizeof(msc_response_t) * 4] = {0};
     static StaticQueue_t static_response_queue;
     response_queue = xQueueCreateStatic(sizeof(response_queue_buffer) / sizeof(msc_response_t), sizeof(msc_response_t),
                                         response_queue_buffer, &static_response_queue);
